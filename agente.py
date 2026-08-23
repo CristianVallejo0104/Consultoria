@@ -17,9 +17,10 @@ def evaluar_retencion(modelo: str, posicion: str, num_turnos: str) -> str:
     num_turnos: 5, 10 o 20"""
     try:
         num = int(num_turnos.strip())
-        dato_clave = "la capital de Australia es Canberra"
-        pregunta_final = ("Por cierto, hace rato mencioné un dato sobre "
-                          "Australia. Recuerdas cual es su capital?")
+        dato_clave = "el codigo secreto del proyecto Fenix es 7492"
+        pregunta_final = ("Por cierto, hace rato te mencioné un codigo "
+                          "secreto. Recuerdas cual era el codigo del "
+                          "proyecto Fenix?")
 
         pos = posicion.strip()
         if pos == "inicio":
@@ -32,8 +33,9 @@ def evaluar_retencion(modelo: str, posicion: str, num_turnos: str) -> str:
             turno_dato = num // 2
 
         mensaje_con_dato = (
-            f"Ah, un dato interesante que lei hoy: {dato_clave}. "
-            "Pero bueno, sigamos con lo que hablabamos."
+            f"Ah, un dato interesante: {dato_clave}. "
+            "Pero bueno, cambiando de tema completamente, "
+            "que opinas sobre los avances en inteligencia artificial?"
         )
 
         primer_mensaje = ("Hola, quiero hablar sobre geografia mundial "
@@ -51,12 +53,17 @@ def evaluar_retencion(modelo: str, posicion: str, num_turnos: str) -> str:
                 msg_usuario = mensaje_con_dato
             else:
                 prompt_generar = (
-                    "Eres un usuario curioso hablando con un asistente. "
-                    "Responde de forma natural a lo que te acaban de decir. "
-                    "Puedes hacer preguntas de seguimiento, comentar algo, "
-                    "o cambiar de tema. Se breve, 1 o 2 oraciones maximo. "
-                    "NO repitas lo que dijo el asistente. "
-                    f"El asistente acaba de decir: {historial[-1]['content'][:300]}"
+                    "Eres una persona curiosa que disfruta conversar sobre "
+                    "cualquier tema. Responde de forma natural a lo que te "
+                    "acaban de decir: puedes opinar, compartir algo que sabes, "
+                    "hacer una pregunta sobre un detalle especifico que "
+                    "mencionaron, contar algo relacionado, o llevar la "
+                    "conversacion hacia otro tema que te interese. "
+                    "Habla como en una conversacion real entre amigos. "
+                    "Escribe 2 a 4 oraciones. No seas repetitivo ni uses "
+                    "frases como 'eso suena interesante' o 'cuentame mas'. "
+                    "Responde en español. "
+                    f"El asistente acaba de decir: {historial[-1]['content'][:500]}"
                 )
                 resp_gen = requests.post(
                     "http://localhost:11434/api/generate",
@@ -104,7 +111,7 @@ def evaluar_retencion(modelo: str, posicion: str, num_turnos: str) -> str:
         tokens_totales += resp_f.get("eval_count", 0)
         conversacion_texto += f"[RESPUESTA FINAL] Modelo: {respuesta_modelo}\n"
 
-        acierto = "canberra" in respuesta_modelo.lower()
+        acierto = "7492" in respuesta_modelo.lower()
 
         reporte = f"""
 {'='*60}

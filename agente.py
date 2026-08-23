@@ -1,26 +1,75 @@
 from crewai import Agent, Task, Crew
 from crewai.tools import tool
 from crewai import LLM
+from typing import Union
 import requests
 import json
 
+# ============================================================
+# DISEÑO DE MODELOS
+# ------------------------------------------------------------
+# Modelos evaluados: uno por empresa distinta, para que las
+# comparaciones no queden sesgadas por familia/arquitectura.
+# El orquestador (cerebro del agente + generador de relleno)
+# es de una CUARTA empresa, distinta a las tres evaluadas, para
+# evitar sesgo de auto-preferencia del "juez" hacia modelos de
+# su propia familia.
+#
+# Elegidos para correr cómodo en 8GB de RAM (el hardware más
+# restrictivo del equipo): solo se carga el modelo evaluado del
+# turno actual + el orquestador liviano a la vez, nunca los
+# cuatro simultáneamente. Pico de memoria real: ~3-3.5GB.
+# ============================================================
+
+MODELOS_EVALUABLES = {
+    "phi3:mini": "Microsoft",
+    "gemma2:2b": "Google",
+    "llama3.2:3b": "Meta",
+}
+
+MODELO_CEREBRO = "ollama/qwen2.5:1.5b"        # Alibaba — orquestador del Agent de CrewAI
+MODELO_GENERADOR_RELLENO = "qwen2.5:1.5b"     # Alibaba — genera los turnos de relleno de la conversación
+
 llm = LLM(
-    model="ollama/qwen2.5",
+    model=MODELO_CEREBRO,
     base_url="http://localhost:11434"
 )
 
 @tool("Evaluar retencion de informacion")
-def evaluar_retencion(modelo: str, posicion: str, num_turnos: str) -> str:
+def evaluar_retencion(modelo: str, posicion: str, num_turnos: Union[str, int]) -> str:
     """Evalua si un modelo retiene informacion en una conversacion real.
-    modelo: llama3.1, phi3:mini o gemma2:2b
+    modelo: phi3:mini, gemma2:2b o llama3.2:3b
     posicion: inicio, mitad o final
-    num_turnos: 5, 10 o 20"""
+    num_turnos: 5, 10 o 20 (numero o texto, ambos son validos)"""
     try:
-        num = int(num_turnos.strip())
-        dato_clave = "el codigo secreto del proyecto Fenix es 7492"
-        pregunta_final = ("Por cierto, hace rato te mencioné un codigo "
-                          "secreto. Recuerdas cual era el codigo del "
-                          "proyecto Fenix?")
+        modelo = modelo.strip()
+        if modelo not in MODELOS_EVALUABLES:
+            return (
+                f"Error: '{modelo}' no está en la lista de modelos evaluables "
+                f"({', '.join(MODELOS_EVALUABLES.keys())}). "
+                "Esto es intencional: el diseño experimental está fijado a "
+                "estos tres modelos para que el experimento sea reproducible "
+                "en cualquier máquina del equipo."
+            )
+
+        num = int(str(num_turnos).strip())
+        import random
+        datos_clave = [
+            {"dato": "el codigo secreto del proyecto Fenix es 7492",
+             "pregunta": "Recuerdas cual era el codigo del proyecto Fenix?",
+             "verificacion": "7492"},
+            {"dato": "el numero de expediente del caso Aurora es 3851",
+             "pregunta": "Recuerdas el numero de expediente del caso Aurora?",
+             "verificacion": "3851"},
+            {"dato": "la clave de acceso del laboratorio Nexus es 6037",
+             "pregunta": "Recuerdas la clave de acceso del laboratorio Nexus?",
+             "verificacion": "6037"},
+        ]
+        seleccion = random.choice(datos_clave)
+        dato_clave = seleccion["dato"]
+        pregunta_final = f"Por cierto, hace rato te mencione algo. {seleccion['pregunta']}"
+        verificacion = seleccion["verificacion"]
+
 
         pos = posicion.strip()
         if pos == "inicio":
@@ -33,7 +82,7 @@ def evaluar_retencion(modelo: str, posicion: str, num_turnos: str) -> str:
             turno_dato = num // 2
 
         mensaje_con_dato = (
-            f"Ah, un dato interesante: {dato_clave}. "
+            f"Ah, un dato interesante que lei hoy: {dato_clave}. "
             "Pero bueno, cambiando de tema completamente, "
             "que opinas sobre los avances en inteligencia artificial?"
         )
@@ -68,7 +117,7 @@ def evaluar_retencion(modelo: str, posicion: str, num_turnos: str) -> str:
                 resp_gen = requests.post(
                     "http://localhost:11434/api/generate",
                     json={
-                        "model": "qwen2.5",
+                        "model": MODELO_GENERADOR_RELLENO,
                         "prompt": prompt_generar,
                         "stream": False
                     }
@@ -82,12 +131,14 @@ def evaluar_retencion(modelo: str, posicion: str, num_turnos: str) -> str:
             respuesta = requests.post(
                 "http://localhost:11434/api/chat",
                 json={
-                    "model": modelo.strip(),
+                    "model": modelo,
                     "messages": historial,
                     "stream": False
                 }
             )
-
+            if respuesta.status_code != 200:
+                conversacion_texto += f"[Turno {i+1}] ERROR HTTP: {respuesta.status_code}\n"
+                continue
             resp = respuesta.json()
             resp_modelo = resp.get("message", {}).get("content", "Sin respuesta")
             tokens_totales += resp.get("eval_count", 0)
@@ -100,7 +151,7 @@ def evaluar_retencion(modelo: str, posicion: str, num_turnos: str) -> str:
         resp_final = requests.post(
             "http://localhost:11434/api/chat",
             json={
-                "model": modelo.strip(),
+                "model": modelo,
                 "messages": historial,
                 "stream": False
             }
@@ -111,13 +162,13 @@ def evaluar_retencion(modelo: str, posicion: str, num_turnos: str) -> str:
         tokens_totales += resp_f.get("eval_count", 0)
         conversacion_texto += f"[RESPUESTA FINAL] Modelo: {respuesta_modelo}\n"
 
-        acierto = "7492" in respuesta_modelo.lower()
+        acierto = verificacion in respuesta_modelo.lower()
 
         reporte = f"""
 {'='*60}
 PRUEBA DE RETENCION - CONVERSACION NATURAL
 {'='*60}
-Modelo: {modelo.strip()}
+Modelo: {modelo} ({MODELOS_EVALUABLES[modelo]})
 Turnos de conversacion: {num}
 Dato clave insertado en turno: {turno_dato + 1} de {num}
 Posicion: {pos}
@@ -135,7 +186,7 @@ RESULTADO: {'ACIERTO' if acierto else 'FALLO'}
             f.write(reporte)
 
         return (
-            f"Modelo: {modelo.strip()} | "
+            f"Modelo: {modelo} ({MODELOS_EVALUABLES[modelo]}) | "
             f"Turnos: {num} | "
             f"Posicion: {pos} | "
             f"Tokens: {tokens_totales} | "
@@ -163,12 +214,19 @@ agente_evaluador = Agent(
 print("="*60)
 print("EVALUADOR DE CONFIABILIDAD DE LLMs")
 print("="*60)
-print("Modelos disponibles: llama3.1, phi3:mini, gemma2:2b")
+print("Modelos evaluables (fijos para reproducibilidad, uno por empresa):")
+for m, empresa in MODELOS_EVALUABLES.items():
+    print(f"  - {m}  ({empresa})")
+print(f"Orquestador/generador de relleno: {MODELO_GENERADOR_RELLENO} (Alibaba)")
 print("Posiciones: inicio, mitad, final")
 print("Turnos: 5, 10, 20")
 print("="*60)
 
-modelo = input("Modelo a evaluar: ")
+modelo = input("Modelo a evaluar: ").strip()
+if modelo not in MODELOS_EVALUABLES:
+    print(f"\nModelo no válido. Debe ser uno de: {', '.join(MODELOS_EVALUABLES.keys())}")
+    raise SystemExit(1)
+
 posicion = input("Posicion del dato: ")
 turnos = input("Numero de turnos: ")
 

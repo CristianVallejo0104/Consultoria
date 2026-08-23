@@ -4,7 +4,7 @@ from crewai import LLM
 from typing import Union
 import requests
 import json
-
+import time
 # ============================================================
 # DISEÑO DE MODELOS
 # ------------------------------------------------------------
@@ -42,6 +42,7 @@ def evaluar_retencion(modelo: str, posicion: str, num_turnos: Union[str, int]) -
     posicion: inicio, mitad o final
     num_turnos: 5, 10 o 20 (numero o texto, ambos son validos)"""
     try:
+        inicio_tiempo = time.time()
         modelo = modelo.strip()
         if modelo not in MODELOS_EVALUABLES:
             return (
@@ -71,12 +72,12 @@ def evaluar_retencion(modelo: str, posicion: str, num_turnos: Union[str, int]) -
         verificacion = seleccion["verificacion"]
 
 
-        pos = posicion.strip()
-        if pos == "inicio":
+        pos = posicion.strip().lower()
+        if pos in ["inicio", "inicial", "principio", "comienzo"]:
             turno_dato = 1
-        elif pos == "mitad":
+        elif pos in ["mitad", "medio", "media", "center", "centro"]:
             turno_dato = num // 2
-        elif pos == "final":
+        elif pos in ["final", "fin", "ultimo", "end"]:
             turno_dato = num - 2
         else:
             turno_dato = num // 2
@@ -163,7 +164,7 @@ def evaluar_retencion(modelo: str, posicion: str, num_turnos: Union[str, int]) -
         conversacion_texto += f"[RESPUESTA FINAL] Modelo: {respuesta_modelo}\n"
 
         acierto = verificacion in respuesta_modelo.lower()
-
+        tiempo_total = time.time() - inicio_tiempo
         reporte = f"""
 {'='*60}
 PRUEBA DE RETENCION - CONVERSACION NATURAL
@@ -172,6 +173,7 @@ Modelo: {modelo} ({MODELOS_EVALUABLES[modelo]})
 Turnos de conversacion: {num}
 Dato clave insertado en turno: {turno_dato + 1} de {num}
 Posicion: {pos}
+Tiempo de ejecucion: {tiempo_total:.1f} segundos ({tiempo_total/60:.1f} minutos)
 Tokens generados: {tokens_totales}
 {'='*60}
 CONVERSACION COMPLETA:
@@ -191,7 +193,8 @@ RESULTADO: {'ACIERTO' if acierto else 'FALLO'}
             f"Posicion: {pos} | "
             f"Tokens: {tokens_totales} | "
             f"Resultado: {'ACIERTO' if acierto else 'FALLO'} | "
-            f"Respuesta final: {respuesta_modelo[:100]}"
+            f"Respuesta final: {respuesta_modelo[:100]} | "
+            f"Tiempo: {tiempo_total:.1f}s"
         )
     except Exception as e:
         return f"Error: {str(e)}"

@@ -187,6 +187,28 @@ RESULTADO: {'ACIERTO' if acierto else 'FALLO'}
         with open("resultados.txt", "a") as f:
             f.write(reporte)
 
+        resultado_json = {
+            "modelo": modelo,
+            "empresa": MODELOS_EVALUABLES[modelo],
+            "turnos": num,
+            "posicion": pos,
+            "dato_clave": dato_clave,
+            "turno_dato": turno_dato + 1,
+            "tokens": tokens_totales,
+            "tiempo_segundos": round(tiempo_total, 1),
+            "acierto": acierto,
+            "respuesta_final": respuesta_modelo[:200],
+            "verificacion": verificacion
+        }
+
+        import os
+        resultados_previos = []
+        if os.path.exists("resultados.json"):
+            with open("resultados.json", "r") as f:
+                resultados_previos = json.load(f)
+        resultados_previos.append(resultado_json)
+        with open("resultados.json", "w") as f:
+            json.dump(resultados_previos, f, indent=2, ensure_ascii=False)
         return (
             f"Modelo: {modelo} ({MODELOS_EVALUABLES[modelo]}) | "
             f"Turnos: {num} | "

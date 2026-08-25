@@ -207,8 +207,12 @@ git clone https://github.com/CristianVallejo0104/Consultoria.git
 cd Consultoria
 
 # Crear entorno virtual
-python3 -m venv venv
-source venv/bin/activate
+python3 -m venv venv                # Linux/Mac
+python -m venv venv                 # Windows
+
+# Activar entorno virtual
+source venv/bin/activate            # Linux/Mac
+venv\Scripts\activate               # Windows
 
 # Instalar dependencias
 pip install -r requirements.txt
@@ -223,8 +227,10 @@ ollama pull gemma2:2b
 ## Uso
 
 ```bash
-source venv/bin/activate
-python3 agente.py
+source venv/bin/activate            # Linux/Mac
+venv\Scripts\activate               # Windows
+python3 agente.py                   # Linux/Mac
+python agente.py                    # Windows
 ```
 
 El programa pide tres datos:

@@ -156,7 +156,7 @@ con 8 GB de RAM. Se agregó medición automática de tiempo por prueba.
 | Modelo | Parámetros | Turnos | Posición | Tokens | Tiempo | Resultado |
 |--------|-----------|--------|----------|--------|--------|-----------|
 | gemma2:2b (Google) | 2B | 5 | inicio | 1903 | 1:40 | ACIERTO |
-| gemma2:2b (Google) | 2B | 10 | mitad | 2224 | ~3 min | ACIERTO |
+| gemma2:2b (Google) | 2B | 10 | inicio | 2224 | ~3 min | ACIERTO |
 | gemma2:2b (Google) | 2B | 20 | inicio | 9548 | 6:30 | FALLO |
 | phi3:mini (Microsoft) | 3.8B | 5 | inicio | 10259 | 9:00 | FALLO |
 | phi3:mini (Microsoft) | 3.8B | 10 | inicio | 4474 | 5:00 | FALLO |

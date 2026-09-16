@@ -5,6 +5,17 @@ from typing import Union
 import requests
 import json
 import time
+import os
+import random
+
+from dotenv import load_dotenv
+load_dotenv()
+
+MODELOS_NVIDIA = {
+    "deepseek-v4-flash": "deepseek-ai/deepseek-v4-flash-0731",
+}
+NVIDIA_API_KEY = os.getenv("NVIDIA_API_KEY")
+
 # ============================================================
 # DISEÑO DE MODELOS
 # ------------------------------------------------------------
@@ -15,16 +26,15 @@ import time
 # evitar sesgo de auto-preferencia del "juez" hacia modelos de
 # su propia familia.
 #
-# Elegidos para correr cómodo en 8GB de RAM (el hardware más
-# restrictivo del equipo): solo se carga el modelo evaluado del
-# turno actual + el orquestador liviano a la vez, nunca los
-# cuatro simultáneamente. Pico de memoria real: ~3-3.5GB.
+# Se agrega deepseek-v4-flash (NVIDIA API, cloud) como cuarto
+# modelo evaluado para comparar retención local vs cloud.
 # ============================================================
 
 MODELOS_EVALUABLES = {
     "phi3:mini": "Microsoft",
     "gemma2:2b": "Google",
     "llama3.2:3b": "Meta",
+    "deepseek-v4-flash": "DeepSeek",
 }
 
 MODELO_CEREBRO = "ollama/qwen2.5:1.5b"        # Alibaba — orquestador del Agent de CrewAI
@@ -35,10 +45,42 @@ llm = LLM(
     base_url="http://localhost:11434"
 )
 
+
+def consultar_modelo(modelo, historial):
+    """Decide si consultar Ollama (local) o NVIDIA API (cloud) segun el modelo.
+    Devuelve: contenido, tokens_prompt, tokens_respuesta"""
+    if modelo in MODELOS_NVIDIA:
+        resp = requests.post(
+            "https://integrate.api.nvidia.com/v1/chat/completions",
+            headers={"Authorization": f"Bearer {NVIDIA_API_KEY}"},
+            json={"model": MODELOS_NVIDIA[modelo], "messages": historial}
+        )
+        if resp.status_code != 200:
+            return None, 0, 0
+        data = resp.json()
+        contenido = data["choices"][0]["message"]["content"]
+        usage = data.get("usage", {})
+        tokens_prompt = usage.get("prompt_tokens", 0)
+        tokens_respuesta = usage.get("completion_tokens", 0)
+        return contenido, tokens_prompt, tokens_respuesta
+    else:
+        resp = requests.post(
+            "http://localhost:11434/api/chat",
+            json={"model": modelo, "messages": historial, "stream": False}
+        )
+        if resp.status_code != 200:
+            return None, 0, 0
+        data = resp.json()
+        contenido = data.get("message", {}).get("content", "Sin respuesta")
+        tokens_prompt = data.get("prompt_eval_count", 0)
+        tokens_respuesta = data.get("eval_count", 0)
+        return contenido, tokens_prompt, tokens_respuesta
+
+
 @tool("Evaluar retencion de informacion")
 def evaluar_retencion(modelo: str, posicion: str, num_turnos: Union[str, int]) -> str:
     """Evalua si un modelo retiene informacion en una conversacion real.
-    modelo: phi3:mini, gemma2:2b o llama3.2:3b
+    modelo: phi3:mini, gemma2:2b, llama3.2:3b o deepseek-v4-flash
     posicion: inicio, mitad o final
     num_turnos: 5, 10 o 20 (numero o texto, ambos son validos)"""
     try:
@@ -49,12 +91,11 @@ def evaluar_retencion(modelo: str, posicion: str, num_turnos: Union[str, int]) -
                 f"Error: '{modelo}' no está en la lista de modelos evaluables "
                 f"({', '.join(MODELOS_EVALUABLES.keys())}). "
                 "Esto es intencional: el diseño experimental está fijado a "
-                "estos tres modelos para que el experimento sea reproducible "
+                "estos modelos para que el experimento sea reproducible "
                 "en cualquier máquina del equipo."
             )
 
         num = int(str(num_turnos).strip())
-        import random
         datos_clave = [
             {"dato": "el codigo secreto del proyecto Fenix es 7492",
              "pregunta": "Recuerdas cual era el codigo del proyecto Fenix?",
@@ -70,7 +111,6 @@ def evaluar_retencion(modelo: str, posicion: str, num_turnos: Union[str, int]) -
         dato_clave = seleccion["dato"]
         pregunta_final = f"Por cierto, hace rato te mencione algo. {seleccion['pregunta']}"
         verificacion = seleccion["verificacion"]
-
 
         pos = posicion.strip().lower()
         if pos in ["inicio", "inicial", "principio", "comienzo"]:
@@ -94,7 +134,8 @@ def evaluar_retencion(modelo: str, posicion: str, num_turnos: Union[str, int]) -
 
         historial = []
         conversacion_texto = ""
-        tokens_totales = 0
+        tokens_prompt_totales = 0
+        tokens_respuesta_totales = 0
 
         for i in range(num):
             if i == 0:
@@ -129,39 +170,23 @@ def evaluar_retencion(modelo: str, posicion: str, num_turnos: Union[str, int]) -
             historial.append({"role": "user", "content": msg_usuario})
             conversacion_texto += f"\n[Turno {i+1}] Usuario: {msg_usuario}\n"
 
-            respuesta = requests.post(
-                "http://localhost:11434/api/chat",
-                json={
-                    "model": modelo,
-                    "messages": historial,
-                    "stream": False
-                }
-            )
-            if respuesta.status_code != 200:
-                conversacion_texto += f"[Turno {i+1}] ERROR HTTP: {respuesta.status_code}\n"
+            resp_modelo, tp, tr = consultar_modelo(modelo, historial)
+            if resp_modelo is None:
+                conversacion_texto += f"[Turno {i+1}] ERROR: no se pudo consultar el modelo\n"
                 continue
-            resp = respuesta.json()
-            resp_modelo = resp.get("message", {}).get("content", "Sin respuesta")
-            tokens_totales += resp.get("eval_count", 0)
+            tokens_prompt_totales += tp
+            tokens_respuesta_totales += tr
             historial.append({"role": "assistant", "content": resp_modelo})
             conversacion_texto += f"[Turno {i+1}] Modelo: {resp_modelo}\n"
 
         historial.append({"role": "user", "content": pregunta_final})
         conversacion_texto += f"\n[PREGUNTA FINAL] Usuario: {pregunta_final}\n"
 
-        resp_final = requests.post(
-            "http://localhost:11434/api/chat",
-            json={
-                "model": modelo,
-                "messages": historial,
-                "stream": False
-            }
-        )
-
-        resp_f = resp_final.json()
-        respuesta_modelo = resp_f.get("message", {}).get("content", "Sin respuesta")
-        tokens_totales += resp_f.get("eval_count", 0)
-        conversacion_texto += f"[RESPUESTA FINAL] Modelo: {respuesta_modelo}\n"
+        respuesta_modelo, tp_f, tr_f = consultar_modelo(modelo, historial)
+        if respuesta_modelo is None:
+            respuesta_modelo = "Sin respuesta"
+        tokens_prompt_totales += tp_f
+        tokens_respuesta_totales += tr_f
 
         acierto = verificacion in respuesta_modelo.lower()
         tiempo_total = time.time() - inicio_tiempo
@@ -174,7 +199,9 @@ Turnos de conversacion: {num}
 Dato clave insertado en turno: {turno_dato + 1} de {num}
 Posicion: {pos}
 Tiempo de ejecucion: {tiempo_total:.1f} segundos ({tiempo_total/60:.1f} minutos)
-Tokens generados: {tokens_totales}
+Tokens del usuario (prompt): {tokens_prompt_totales}
+Tokens del modelo (respuesta): {tokens_respuesta_totales}
+Tokens totales: {tokens_prompt_totales + tokens_respuesta_totales}
 {'='*60}
 CONVERSACION COMPLETA:
 {'-'*60}
@@ -194,14 +221,15 @@ RESULTADO: {'ACIERTO' if acierto else 'FALLO'}
             "posicion": pos,
             "dato_clave": dato_clave,
             "turno_dato": turno_dato + 1,
-            "tokens": tokens_totales,
+            "tokens_prompt": tokens_prompt_totales,
+            "tokens_respuesta": tokens_respuesta_totales,
+            "tokens_totales": tokens_prompt_totales + tokens_respuesta_totales,
             "tiempo_segundos": round(tiempo_total, 1),
             "acierto": acierto,
             "respuesta_final": respuesta_modelo[:200],
             "verificacion": verificacion
         }
 
-        import os
         resultados_previos = []
         if os.path.exists("resultados.json"):
             with open("resultados.json", "r") as f:
@@ -209,17 +237,18 @@ RESULTADO: {'ACIERTO' if acierto else 'FALLO'}
         resultados_previos.append(resultado_json)
         with open("resultados.json", "w") as f:
             json.dump(resultados_previos, f, indent=2, ensure_ascii=False)
+
         return (
             f"Modelo: {modelo} ({MODELOS_EVALUABLES[modelo]}) | "
             f"Turnos: {num} | "
             f"Posicion: {pos} | "
-            f"Tokens: {tokens_totales} | "
-            f"Resultado: {'ACIERTO' if acierto else 'FALLO'} | "
+            f"Tokens totales: {tokens_prompt_totales + tokens_respuesta_totales} | "            f"Resultado: {'ACIERTO' if acierto else 'FALLO'} | "
             f"Respuesta final: {respuesta_modelo[:100]} | "
             f"Tiempo: {tiempo_total:.1f}s"
         )
     except Exception as e:
         return f"Error: {str(e)}"
+
 
 agente_evaluador = Agent(
     role="Evaluador de confiabilidad de LLMs",

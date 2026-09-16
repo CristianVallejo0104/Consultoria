@@ -3,13 +3,15 @@
     "modelo": "gemma2:2b",
     "empresa": "Google",
     "turnos": 5,
-    "posicion": "final",
-    "dato_clave": "la clave de acceso del laboratorio Nexus es 6037",
-    "turno_dato": 4,
-    "tokens": 1066,
-    "tiempo_segundos": 27.8,
+    "posicion": "inicio",
+    "dato_clave": "el codigo secreto del proyecto Fenix es 7492",
+    "turno_dato": 2,
+    "tokens_prompt": 4968,
+    "tokens_respuesta": 1406,
+    "tokens_totales": 6374,
+    "tiempo_segundos": 45.6,
     "acierto": true,
-    "respuesta_final": "¡Sí, me acordé!  😅 \n\nLa clave de acceso del laboratorio Nexus es **6037**. 😉\n\n¿Te gustaría saber más sobre el laboratorio Nexus o usar esa clave para alguna aventura ficticia en el mundo virtual? 🌎🤖\n\n",
-    "verificacion": "6037"
+    "respuesta_final": "¡Sí, me acuerdo! 😉  El código secreto del Proyecto Fenix es **7492**. \n\n¿Te lo recordaba con algo más que curiosidad? 🤔  Si quieres hablar de este proyecto, no dudes en contarme. Me encantaría discuti",
+    "verificacion": "7492"
   }
 ]

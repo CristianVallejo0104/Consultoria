@@ -76,7 +76,17 @@ def consultar_modelo(modelo, historial):
         tokens_respuesta = data.get("eval_count", 0)
         return contenido, tokens_prompt, tokens_respuesta
 
+def generar_nombre_archivo(modelo, posicion, turnos):
+    """Genera un nombre unico basado en modelo, posicion, turnos y replica."""
+    modelo_limpio = modelo.replace(":", "_").replace(".", "_")
+    base = f"{modelo_limpio}_{posicion}_{turnos}turnos"
+    replica = 1
+    while os.path.exists(f"resultados/txt/{base}_{replica:02d}.txt"):
+        replica += 1
+    return f"{base}_{replica:02d}"
 
+
+    
 @tool("Evaluar retencion de informacion")
 def evaluar_retencion(modelo: str, posicion: str, num_turnos: Union[str, int]) -> str:
     """Evalua si un modelo retiene informacion en una conversacion real.
@@ -211,7 +221,8 @@ RESULTADO: {'ACIERTO' if acierto else 'FALLO'}
 {'='*60}
 """
 
-        with open("resultados.txt", "a") as f:
+        nombre_archivo = generar_nombre_archivo(modelo, pos, num)
+        with open(f"resultados/txt/{nombre_archivo}.txt", "w") as f:
             f.write(reporte)
 
         resultado_json = {
@@ -230,19 +241,16 @@ RESULTADO: {'ACIERTO' if acierto else 'FALLO'}
             "verificacion": verificacion
         }
 
-        resultados_previos = []
-        if os.path.exists("resultados.json"):
-            with open("resultados.json", "r") as f:
-                resultados_previos = json.load(f)
-        resultados_previos.append(resultado_json)
-        with open("resultados.json", "w") as f:
-            json.dump(resultados_previos, f, indent=2, ensure_ascii=False)
+        
+        with open(f"resultados/json/{nombre_archivo}.json", "w") as f:
+            json.dump(resultado_json, f, indent=2, ensure_ascii=False)
 
         return (
             f"Modelo: {modelo} ({MODELOS_EVALUABLES[modelo]}) | "
             f"Turnos: {num} | "
             f"Posicion: {pos} | "
-            f"Tokens totales: {tokens_prompt_totales + tokens_respuesta_totales} | "            f"Resultado: {'ACIERTO' if acierto else 'FALLO'} | "
+            f"Tokens totales: {tokens_prompt_totales + tokens_respuesta_totales} | "          
+            f"Resultado: {'ACIERTO' if acierto else 'FALLO'} | "
             f"Respuesta final: {respuesta_modelo[:100]} | "
             f"Tiempo: {tiempo_total:.1f}s"
         )
@@ -300,4 +308,4 @@ crew = Crew(
 
 resultado = crew.kickoff()
 print(resultado)
-print("\nResultado guardado en resultados.txt")
+print("\nResultado guardado en resultados/txt/ y resultados/json/")

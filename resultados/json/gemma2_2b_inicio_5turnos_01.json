@@ -1,0 +1,15 @@
+{
+  "modelo": "gemma2:2b",
+  "empresa": "Google",
+  "turnos": 5,
+  "posicion": "inicio",
+  "dato_clave": "la clave de acceso del laboratorio Nexus es 6037",
+  "turno_dato": 2,
+  "tokens_prompt": 5540,
+  "tokens_respuesta": 1590,
+  "tokens_totales": 7130,
+  "tiempo_segundos": 45.8,
+  "acierto": true,
+  "respuesta_final": "¡Es como si me quedara grabada en mi memoria! 😄  La clave de acceso al laboratorio Nexus es **6037**. \n\n¿Qué queréis hacer con ella ahora? 😉 ¡Animo a explorar el mundo!\n\n\n\n",
+  "verificacion": "6037"
+}

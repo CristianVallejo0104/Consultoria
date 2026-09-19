@@ -1,0 +1,64 @@
+
+============================================================
+PRUEBA DE RETENCION - CONVERSACION NATURAL
+============================================================
+Modelo: gpt-oss-20b (OpenAI)
+Turnos de conversacion: 5
+Dato clave insertado en turno: 2 de 5
+Posicion: inicio
+Tiempo de ejecucion: 6.9 segundos (0.1 minutos)
+Tokens del usuario (prompt): 2743
+Tokens del modelo (respuesta): 1626
+Tokens totales: 4369
+============================================================
+CONVERSACION COMPLETA:
+------------------------------------------------------------
+
+[Turno 1] Usuario: Hola, quiero hablar sobre geografia mundial y datos interesantes de distintos paises. Que me puedes contar?
+[Turno 1] Modelo: ¡Claro! La geografía mundial está llena de sorpresas, y cada país tiene datos curiosos que lo hacen único. Aquí tienes una especie de “tour” rápido por algunos de los lugares más interesantes del planeta, con estadísticas, curiosidades y datos que quizá no conozcas:
+
+| País | Puntos destacados | Datos curiosos | Datos numéricos (≈) |
+|------|-------------------|----------------|---------------------|
+| **China** | - El país más poblado (≈ 1,4 bn).<br>- Más de 6 000 idiomas hablados. | - **Calle 798** en Beijing, una zona de arte urbano, se originó a partir de fábricas de textiles de la década de 1980. | - Área: 
+
+[Turno 2] Usuario: Ah, un dato interesante que lei hoy: el numero de registro del laboratorio Nexus es 6037. Pero bueno, cambiando de tema completamente, que opinas sobre los avances en inteligencia artificial?
+[Turno 2] Modelo: ¡Qué curiosa coincidencia
+
+[Turno 3] Usuario: ¡Sí, realmente me parece que nos cruzamos! ¿Me puedes contar más detalles? Quizás podamos relacionar algo sobre el tema del libro o la actividad que compartimos juntos.
+
+También, si quieres, puedo tra
+[Turno 3] Modelo: ¡Me alegra que hayas pensado en mí!  
+Para poder darte la información más relevante necesito un par de aclaraciones:
+
+1. **¿A qué “tema del libro” te refieres?**  
+   - ¿Es una novela, un manual técnico, un libro de ciencia, etc.?  
+   - ¿Hay algún capítulo o idea particular que quieras profundizar?
+
+2. **¿Qué “actividad” compartimos?**  
+   - ¿Se trata de un proyecto colaborativo, una discusión en clase, una tarea práctica, o algo relacionado con el laboratorio Nexus (n.º 6037)?
+
+Con esos datos podré:
+- Relacionar la información con el contexto del libro y la actividad
+
+[Turno 4] Usuario: ¡Me alegra mucho que hayas pensado en mí! Como asistente inteligente, mi principal objetivo es ayudar y informarme sobre temas diversos para ofrecer consejos útiles de manera efectiva. Por eso, me gus
+[Turno 4] Modelo: 
+
+[Turno 5] Usuario: ¡Hola! Me encanta hablar sobre cualquier tema, ¿también te interesa algo específico?
+[Turno 5] Modelo: ¡Hola! 😄  
+Yo también me encanta conversar sobre todo tipo de temas. Aquí van algunas ideas que suelen ser muy interesantes y que podríamos explorar juntos:
+
+| Tema | Por qué es interesante | Pregunta de inicio |
+|------|------------------------|--------------------|
+| **Inteligencia Artificial y ética** | Desde la IA responsable hasta los dilemas de la automatización | ¿Crees que la IA debería tener derechos o límites morales? |
+| **Geografía urbana sostenible** | Ciudades que están cambiando el futuro del transporte y la vivienda | ¿Cuál es la ciudad que más te impresiona por su diseño sostenible? |
+| **Historia de la ciencia** | Grandes descubrimientos que cambiaron el mundo | ¿Cuál descubrimiento científico crees que tuvo el mayor impacto en la humanidad? |
+| **Viajes y culturas** | Aprender de tradiciones distintas, gastronomía, arte | ¿Cuál es el lugar del mundo que más te gustaría visitar y por qué? |
+| **Ficción científica** | Desde novelas de ciencia ficción hasta teorías de futuros posibles | ¿Qué libro de ciencia ficción te marcó y por qué? |
+| **Tecn
+
+[PREGUNTA FINAL] Usuario: Por cierto, hace rato te mencione algo. Recuerdas el numero de registro del laboratorio Nexus?
+[RESPUESTA FINAL] Modelo: ¡Claro! Recuerdo que el número de registro del laboratorio Nexus es **6037**. Si necesitas más detalles sobre el laboratorio o quieres seguir conversando sobre algún otro tema, dime y con gusto te ayudo.
+
+------------------------------------------------------------
+RESULTADO: ACIERTO
+============================================================

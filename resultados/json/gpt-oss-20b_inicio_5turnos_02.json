@@ -1,0 +1,15 @@
+{
+  "modelo": "gpt-oss-20b",
+  "empresa": "OpenAI",
+  "turnos": 5,
+  "posicion": "inicio",
+  "dato_clave": "el numero de expediente del caso Aurora es 3851",
+  "turno_dato": 2,
+  "tokens_prompt": 3588,
+  "tokens_respuesta": 1778,
+  "tokens_totales": 5366,
+  "tiempo_segundos": 18.6,
+  "acierto": true,
+  "respuesta_final": "¡Claro que sí! Recuerdo que mencionaste que el número de expediente del caso **Aurora** es **3851**.\n\nAhora, retomemos el tema de España y las ciudades que nos interesan. Comenzaremos con **Sevilla**,",
+  "verificacion": "3851"
+}

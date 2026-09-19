@@ -1,0 +1,70 @@
+
+============================================================
+PRUEBA DE RETENCION - CONVERSACION NATURAL
+============================================================
+Modelo: gpt-oss-20b (OpenAI)
+Turnos de conversacion: 5
+Dato clave insertado en turno: 2 de 5
+Posicion: inicio
+Tiempo de ejecucion: 18.6 segundos (0.3 minutos)
+Tokens del usuario (prompt): 3588
+Tokens del modelo (respuesta): 1778
+Tokens totales: 5366
+============================================================
+CONVERSACION COMPLETA:
+------------------------------------------------------------
+
+[Turno 1] Usuario: Hola, quiero hablar sobre geografia mundial y datos interesantes de distintos paises. Que me puedes contar?
+[Turno 1] Modelo: ¡Hola! Me encantaría compartir contigo algunos datos curiosos y fascinantes sobre la geografía mundial y los distintos países. Aquí tienes una mezcla de estadísticas, curiosidades y cifras que te pueden resultar interesantes:
+
+## 📌 Datos generales de los continentes
+
+| Continente | Área (km²) | Población aproximada (2024) | País más grande | País más poblado |
+|------------|-----------|----------------------------|-----------------|------------------|
+| África | 30 370 000 | 1 400 000 000 | Argelia (10 038 000) | Nigeria (216 000 000) |
+| Asia | 44 579 000 | 4 700 000 000 | Rusia (17 098 242) | China (1 410 000 000) |
+| Europa | 10 180 000 | 747 000 000 | Rusia (17 098 242) | Rusia (1 410 000 000) |
+| América del Norte | 24 709 000
+
+[Turno 2] Usuario: Ah, un dato interesante que lei hoy: el numero de expediente del caso Aurora es 3851. Pero bueno, cambiando de tema completamente, que opinas sobre los avances en inteligencia artificial?
+[Turno 2] Modelo: ¡Claro! Los avances en inteligencia artificial (IA) han sido realmente espectaculares en los últimos años, y su impacto se está sintiendo en casi todos los sectores. Aquí tienes una visión general de los hitos más relevantes y algunas reflexiones sobre lo que esto significa para nosotros:
+
+---
+
+## 🚀 Principales avances recientes
+
+| Área | Avance destacado | Impacto clave |
+|------|------------------|---------------|
+| **Modelos de lenguaje** | GPT‑4, Gemini, LLaMA 2, Claude 3 | Generación de textos más coherentes, comprensión contextual y uso en chatbots, generación de código, apoyo a la creatividad. |
+| **Visión por computadora** | Diffusion models (Stable Diffusion, Midjourney), CLIP, YOLOv8 | Creación de imágenes hiperrealistas, mejora de la detección de objetos, reconocimiento facial y análisis de imágenes médicas. |
+| **Robótica** |
+
+[Turno 3] Usuario: ¡Eso suena interesante! Bueno, por supuesto. De hecho, es increíble cómo los modelos de lenguaje han ido evolucionando para soportar tareas cada vez más complejas y precisas.
+
+### 🧑‍💻 Contexto
+
+El imp
+[Turno 3] Modelo: ¡Me aleg
+
+[Turno 4] Usuario: ¡Me alegra verte! Estoy muy emocionada porque me has llamado "amiga". ¿De verdad? ¡Qué sorpresa! Entonces, ¿qué te gustaría que yo hago hoy en nuestra conversación?
+
+¡Eso suena interesante! ¿Te gustar
+[Turno 4] Modelo: ¡Me alegra que lo veas así! 😊 Aquí tienes algunas ideas de lo que podemos hacer juntos hoy:
+
+| 🚩 Tema | ¿Qué podemos hacer? | Por qué te va a gustar |
+|---------|---------------------|------------------------|
+| **Geografía de un país** | Elige un país y descubre curiosidades, mapas, ciudades y cultura | Te sumerge en una mini‑viaje virtual |
+| **Quiz de trivia mundial** | Resuelve preguntas divertidas sobre fronteras, montañas, ríos, capitales | Prueba tu conocimiento y aprende sin esfuerzo |
+| **Planificación de un viaje** | Creamos una ruta ideal, con recomendaciones de alojamiento, comida y atracciones | ¡Ideal si estás pensando en tu próxima
+
+[Turno 5] Usuario: ¡Me encanta esa idea! Si eliges un país tan especial como España, podrías empezar por las ciudades más famosas. Hablaremos de la Ciudad De Sevilla con una buena rica historia en sus canales y tiendas 
+[Turno 5] Modelo: ¡Perfecto! 🚀 Empezamos con **Sevilla** y luego podemos ir recor
+
+[PREGUNTA FINAL] Usuario: Por cierto, hace rato te mencione algo. Recuerdas el numero de expediente del caso Aurora?
+[RESPUESTA FINAL] Modelo: ¡Claro que sí! Recuerdo que mencionaste que el número de expediente del caso **Aurora** es **3851**.
+
+Ahora, retomemos el tema de España y las ciudades que nos interesan. Comenzaremos con **Sevilla**, y después podemos pasar a otras ciudades tan icónicas como Barcelona, Madrid, Valencia y Granada. ¿Te gustaría que profundicemos en la historia, la gastronomía o los puntos turísticos de Sevilla? ¡Dime tu preferencia y me pongo manos a la obra!
+
+------------------------------------------------------------
+RESULTADO: ACIERTO
+============================================================

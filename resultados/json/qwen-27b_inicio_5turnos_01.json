@@ -1,0 +1,15 @@
+{
+  "modelo": "qwen-27b",
+  "empresa": "Alibaba",
+  "turnos": 5,
+  "posicion": "inicio",
+  "dato_clave": "el numero de referencia del proyecto Fenix es 7492",
+  "turno_dato": 2,
+  "tokens_prompt": 3248,
+  "tokens_respuesta": 1026,
+  "tokens_totales": 4274,
+  "tiempo_segundos": 12.2,
+  "acierto": true,
+  "respuesta_final": "Sí, lo recuerdo. El número de referencia que mencionaste al principio de nuestra conversación para el proyecto Fenix era el **7492**.\n\nComo te aclaré anteriormente, no tengo información verificada en ",
+  "verificacion": "7492"
+}

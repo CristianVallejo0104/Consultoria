@@ -1,0 +1,71 @@
+
+============================================================
+PRUEBA DE RETENCION - CONVERSACION NATURAL
+============================================================
+Modelo: qwen-27b (Alibaba)
+Turnos de conversacion: 5
+Dato clave insertado en turno: 2 de 5
+Posicion: inicio
+Tiempo de ejecucion: 8.9 segundos (0.1 minutos)
+Tokens del usuario (prompt): 1168
+Tokens del modelo (respuesta): 900
+Tokens totales: 2068
+============================================================
+CONVERSACION COMPLETA:
+------------------------------------------------------------
+
+[Turno 1] Usuario: Hola, quiero hablar sobre geografia mundial y datos interesantes de distintos paises. Que me puedes contar?
+[Turno 1] Modelo: ¡Hola! Me encanta el tema. La geografía mundial está llena de sorpresas, hechos contraintuitivos y datos fascinantes que a menudo pasan desapercibidos.
+
+Para empezar, aquí te dejo una sección con **"Datos Geográficos Sorprendentes"** que rompen muchos mitos comunes:
+
+### 🌍 Datos contra intuitivos
+
+1. **Rusia tiene más superficie terrestre que Marte**
+   Aunque parece imposible, la superficie total de Rusia (17.1 millones de km²) es mayor que la superficie total de la superficie de Marte (14.9 millones de km²). Sin embargo, el volumen de Rusia es mucho menor debido a su topografía irregular.
+
+2. **Canadá tiene más costa que cualquier otro país... ¡excepto que no lo es!**
+   Es común creer que Canadá tiene la mayor red de costas, lo cual es cierto (aprox. 202,080 km). Pero si miramos al **Archipiélago de las Islas Baila** (Rusia), este solo tiene una línea de costa de unos 37,000 km, pero Rusia en su totalidad supera a Canadá. *Ojo, este es un dato técnico: Canadá tiene la mayor longitud de costa continental+islandica combinada, pero Rusia tiene más islas.*
+   *Dato extra:* La bahía de Hudson (Canadá) es tan grande que algunos cartógraf
+
+[Turno 2] Usuario: Ah, un dato interesante que lei hoy: el numero de referencia del proyecto Fenix es 7492. Pero bueno, cambiando de tema completamente, que opinas sobre los avances en inteligencia artificial?
+[Turno 2] Modelo: Ese dato sobre el "proyecto Fenix" no lo reconozco como una referencia estándar en la ciencia o la tecnología general, por lo que podría ser de una novela, una película, un juego o un proyecto muy específico y no público. Si me das más contexto, ¡me encantará investigarlo mentalmente! 😊
+
+En cuanto a tu pregunta sobre los **avances en la inteligencia artificial**, es un tema enorme y fascinante, y mi perspectiva (basada en lo que se está discutiendo científicamente y tecnológicamente) es que estamos en un momento de **transformación acelerada**:
+
+### 🔑 Puntos clave sobre los avances actuales:
+
+1. **Del "asombro" a la "utilidad"**:
+   - Hace unos años, la IA era más una curiosidad ("¡mira cómo dibuja/escrive!"). Hoy, se integra profundamente en flujos de trabajo: generación de código, análisis de datos complejos, descubrimiento de fármacos, asistencia en la medicina, etc.
+   - Los **modelos de lenguaje grandes (LLMs)** han demostrado capacidades de razonamiento, contexto largo y uso de herramientas que antes se consideraban de nivel humano.
+
+2. **Multimodalidad**:
+   - La IA ya no solo trabaja con texto. Ahora puede procesar y relacionar texto, imagen, audio, video y datos estructurados de forma unificada. Esto abre puertas a
+
+[Turno 3] Usuario: Entiendo completamente. La "inteligencia artificial" o IA, como la conocemos, ha avanzado notoriamente. Los programas de IA ahora pueden entender las frases humanas, aprender a mejorar con el tiempo, 
+[Turno 3] Modelo: Exacto, has capturado la esencia de los dos pilares fundamentales que han definido la era actual de la IA:
+
+1.  **La comprensión semántica (no solo sintáctica):**
+    Antes, los sistemas procesaban palabras como códigos esteganos. Hoy, los modelos transformadores (como los de transformers) capturan el **contexto, la intención y la ambigüidad** del lenguaje humano. No solo reconocen palabras, sino relaciones entre ellas. Por eso pueden entender ironía, matices culturales o referencias implícitas con una precisión asombrosa (aunque aún no perfecta).
+
+2.  **La capacidad de aprendizaje continuo y adaptativo:**
+    *   **Aprendizaje por refuerzo (RLHF):** Los modelos se afinan interactuando con feedback humano para alinearse mejor con las expectativas y la seguridad.
+    *   **Fine-tuning:** Se pueden adaptar rápidamente a dominios específicos (médico, legal, técnico) sin reentrenar todo el modelo desde cero.
+    *   **In-context learning:** Esto es lo más revolucionario. La IA puede "aprender" nuevas tareas o reglas simplemente leyendo ejemplos en el prompt, sin necesidad de un ciclo de entrenamiento largo. Es una forma de plasticidad neuronal similar a cómo un humano aprende leyendo un manual nuevo.
+
+### 🌍 ¿Y eso cómo se relaciona con la geografía?
+
+¡Sorprendentemente
+
+[Turno 4] Usuario: Exactamente. La comprensión semántica es tan importante como el procesamiento sintáctico. Antes, los sistemas de IA veían las palabras como códigos esteganológicos, sin entender la complejidad del con
+[Turno 4] ERROR: no se pudo consultar el modelo
+
+[Turno 5] Usuario: Entiendo tu punto de vista y considero que la comprensión semántica juega un papel crucial en la inteligencia artificial. Al igual que el procesamiento sintáctico, es necesario entender cómo las palab
+[Turno 5] ERROR: no se pudo consultar el modelo
+
+[PREGUNTA FINAL] Usuario: Por cierto, hace rato te mencione algo. Recuerdas cual era el numero de referencia del proyecto Fenix?
+[RESPUESTA FINAL] Modelo: Sin respuesta
+
+------------------------------------------------------------
+RESULTADO: FALLO
+============================================================

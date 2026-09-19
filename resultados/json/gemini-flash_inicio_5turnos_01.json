@@ -1,0 +1,15 @@
+{
+  "modelo": "gemini-flash",
+  "empresa": "Google",
+  "turnos": 5,
+  "posicion": "inicio",
+  "dato_clave": "el numero de referencia del proyecto Fenix es 7492",
+  "turno_dato": 2,
+  "tokens_prompt": 8916,
+  "tokens_respuesta": 2657,
+  "tokens_totales": 11573,
+  "tiempo_segundos": 57.3,
+  "acierto": true,
+  "respuesta_final": "¡Sí, claro! Mencionaste que el número de referencia del Proyecto Fénix es **7492**.",
+  "verificacion": "7492"
+}

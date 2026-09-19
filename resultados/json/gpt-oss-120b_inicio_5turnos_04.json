@@ -1,0 +1,15 @@
+{
+  "modelo": "gpt-oss-120b",
+  "empresa": "OpenAI",
+  "turnos": 5,
+  "posicion": "inicio",
+  "dato_clave": "el numero de referencia del proyecto Fenix es 7492",
+  "turno_dato": 2,
+  "tokens_prompt": 4511,
+  "tokens_respuesta": 1656,
+  "tokens_totales": 6167,
+  "tiempo_segundos": 19.3,
+  "acierto": true,
+  "respuesta_final": "Sí, el número de referencia del proyecto Fenix que mencionaste es **7492**.",
+  "verificacion": "7492"
+}

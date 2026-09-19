@@ -1,0 +1,15 @@
+{
+  "modelo": "google-gemini",
+  "empresa": "Google",
+  "turnos": 5,
+  "posicion": "inicio",
+  "dato_clave": "el numero de registro del laboratorio Nexus es 6037",
+  "turno_dato": 2,
+  "tokens_prompt": 7290,
+  "tokens_respuesta": 2664,
+  "tokens_totales": 9954,
+  "tiempo_segundos": 84.6,
+  "acierto": false,
+  "respuesta_final": "Sin respuesta",
+  "verificacion": "6037"
+}

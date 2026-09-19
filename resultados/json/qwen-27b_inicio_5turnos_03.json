@@ -1,0 +1,15 @@
+{
+  "modelo": "qwen-27b",
+  "empresa": "Alibaba",
+  "turnos": 5,
+  "posicion": "inicio",
+  "dato_clave": "el numero de referencia del proyecto Fenix es 7492",
+  "turno_dato": 2,
+  "tokens_prompt": 1168,
+  "tokens_respuesta": 900,
+  "tokens_totales": 2068,
+  "tiempo_segundos": 8.9,
+  "acierto": false,
+  "respuesta_final": "Sin respuesta",
+  "verificacion": "7492"
+}

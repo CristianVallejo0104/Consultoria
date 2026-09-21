@@ -110,14 +110,22 @@ def consultar_modelo(modelo, historial):
             headers={"Authorization": f"Bearer {NVIDIA_API_KEY}"},
             json={"model": MODELOS_NVIDIA[modelo], "messages": historial}
         )
+        if resp.status_code == 429:
+            return {"contenido": None, "tokens_prompt": 0, "tokens_respuesta": 0,
+                    "estado": "invalida_tecnica", "codigo_http": 429, "tipo_error": "rate_limit"}
+        if resp.status_code == 503:
+            return {"contenido": None, "tokens_prompt": 0, "tokens_respuesta": 0,
+                    "estado": "invalida_tecnica", "codigo_http": 503, "tipo_error": "sobrecarga"}
         if resp.status_code != 200:
-            return None, 0, 0
+            return {"contenido": None, "tokens_prompt": 0, "tokens_respuesta": 0,
+                    "estado": "invalida_tecnica", "codigo_http": resp.status_code, "tipo_error": "desconocido"}
         data = resp.json()
         contenido = data["choices"][0]["message"]["content"]
         usage = data.get("usage", {})
         tokens_prompt = usage.get("prompt_tokens", 0)
         tokens_respuesta = usage.get("completion_tokens", 0)
-        return contenido, tokens_prompt, tokens_respuesta
+        return {"contenido": contenido, "tokens_prompt": tokens_prompt, "tokens_respuesta": tokens_respuesta,
+                "estado": "valida", "codigo_http": 200, "tipo_error": None}
     elif modelo in MODELOS_GROQ:
         limite_tokens = 150 if "qwen" in modelo else 300
         resp = requests.post(
@@ -125,15 +133,22 @@ def consultar_modelo(modelo, historial):
             headers={"Authorization": f"Bearer {GROQ_API_KEY}"},
             json={"model": MODELOS_GROQ[modelo], "messages": historial, "max_tokens": limite_tokens}
         )
+        if resp.status_code == 429:
+            return {"contenido": None, "tokens_prompt": 0, "tokens_respuesta": 0,
+                    "estado": "invalida_tecnica", "codigo_http": 429, "tipo_error": "rate_limit"}
+        if resp.status_code == 503:
+            return {"contenido": None, "tokens_prompt": 0, "tokens_respuesta": 0,
+                    "estado": "invalida_tecnica", "codigo_http": 503, "tipo_error": "sobrecarga"}
         if resp.status_code != 200:
-            print(f"ERROR GROQ: status {resp.status_code} - {resp.text[:200]}")
-            return None, 0, 0
+            return {"contenido": None, "tokens_prompt": 0, "tokens_respuesta": 0,
+                    "estado": "invalida_tecnica", "codigo_http": resp.status_code, "tipo_error": "desconocido"}
         data = resp.json()
         contenido = data["choices"][0]["message"]["content"]
         usage = data.get("usage", {})
         tokens_prompt = usage.get("prompt_tokens", 0)
         tokens_respuesta = usage.get("completion_tokens", 0)
-        return contenido, tokens_prompt, tokens_respuesta   
+        return {"contenido": contenido, "tokens_prompt": tokens_prompt, "tokens_respuesta": tokens_respuesta,
+                "estado": "valida", "codigo_http": 200, "tipo_error": None} 
     elif modelo in MODELOS_GEMINI:
         # Gemini usa "model" en vez de "assistant" como rol
         contenido_gemini = []
@@ -148,31 +163,47 @@ def consultar_modelo(modelo, historial):
             f"https://generativelanguage.googleapis.com/v1beta/models/{MODELOS_GEMINI[modelo]}:generateContent?key={GEMINI_API_KEY}",
             json={"contents": contenido_gemini}
         )
+        if resp.status_code == 429:
+            return {"contenido": None, "tokens_prompt": 0, "tokens_respuesta": 0,
+                    "estado": "invalida_tecnica", "codigo_http": 429, "tipo_error": "rate_limit"}
+        if resp.status_code == 503:
+            return {"contenido": None, "tokens_prompt": 0, "tokens_respuesta": 0,
+                    "estado": "invalida_tecnica", "codigo_http": 503, "tipo_error": "sobrecarga"}
         if resp.status_code != 200:
-            print(f"ERROR GEMINI: status {resp.status_code} - {resp.text[:300]}")
-            return None, 0, 0
+            return {"contenido": None, "tokens_prompt": 0, "tokens_respuesta": 0,
+                    "estado": "invalida_tecnica", "codigo_http": resp.status_code, "tipo_error": "desconocido"}
         data = resp.json()
+        
+        # Gemini puede bloquear la respuesta por seguridad sin dar error HTTP
+        finish_reason = data.get("candidates", [{}])[0].get("finishReason", "")
+        if finish_reason == "SAFETY":
+            return {"contenido": None, "tokens_prompt": 0, "tokens_respuesta": 0,
+                    "estado": "rechazo_seguridad", "codigo_http": 200, "tipo_error": "bloqueo_seguridad"}
+        
         try:
             contenido = data["candidates"][0]["content"]["parts"][0]["text"]
         except (KeyError, IndexError):
-            print(f"GEMINI RESPUESTA INESPERADA: {data}")
-            return None, 0, 0
+            return {"contenido": None, "tokens_prompt": 0, "tokens_respuesta": 0,
+                    "estado": "invalida_tecnica", "codigo_http": 200, "tipo_error": "respuesta_inesperada"}
         usage = data.get("usageMetadata", {})
         tokens_prompt = usage.get("promptTokenCount", 0)
         tokens_respuesta = usage.get("candidatesTokenCount", 0)
-        return contenido, tokens_prompt, tokens_respuesta
+        return {"contenido": contenido, "tokens_prompt": tokens_prompt, "tokens_respuesta": tokens_respuesta,
+                "estado": "valida", "codigo_http": 200, "tipo_error": None}
     else:
         resp = requests.post(
             "http://localhost:11434/api/chat",
             json={"model": modelo, "messages": historial, "stream": False}
         )
         if resp.status_code != 200:
-            return None, 0, 0
+            return {"contenido": None, "tokens_prompt": 0, "tokens_respuesta": 0,
+                    "estado": "invalida_tecnica", "codigo_http": resp.status_code, "tipo_error": "desconocido"}
         data = resp.json()
         contenido = data.get("message", {}).get("content", "Sin respuesta")
         tokens_prompt = data.get("prompt_eval_count", 0)
         tokens_respuesta = data.get("eval_count", 0)
-        return contenido, tokens_prompt, tokens_respuesta
+        return {"contenido": contenido, "tokens_prompt": tokens_prompt, "tokens_respuesta": tokens_respuesta,
+                "estado": "valida", "codigo_http": 200, "tipo_error": None}
 
 
 def generar_nombre_archivo(modelo, posicion, turnos):
@@ -236,27 +267,35 @@ def simular_conversacion(modelo, num_turnos, turno_dato, dato_clave, pregunta_fi
         historial.append({"role": "user", "content": msg_usuario})
         conversacion_texto += f"\n[Turno {i+1}] Usuario: {msg_usuario}\n"
 
-        resp_modelo, tp, tr = consultar_modelo(modelo, historial)
-        if resp_modelo is None:
-            conversacion_texto += f"[Turno {i+1}] ERROR: no se pudo consultar el modelo\n"
+        resultado_llamada = consultar_modelo(modelo, historial)
+        if resultado_llamada["estado"] != "valida":
+            conversacion_texto += (
+                f"[Turno {i+1}] ERROR ({resultado_llamada['estado']}, "
+                f"{resultado_llamada['tipo_error']}): no se pudo consultar el modelo\n"
+            )
             continue
 
-        tokens_prompt_totales += tp
-        tokens_respuesta_totales += tr
+        resp_modelo = resultado_llamada["contenido"]
+        tokens_prompt_totales += resultado_llamada["tokens_prompt"]
+        tokens_respuesta_totales += resultado_llamada["tokens_respuesta"]
         historial.append({"role": "assistant", "content": resp_modelo})
         conversacion_texto += f"[Turno {i+1}] Modelo: {resp_modelo}\n"
 
     historial.append({"role": "user", "content": pregunta_final})
     conversacion_texto += f"\n[PREGUNTA FINAL] Usuario: {pregunta_final}\n"
 
-    respuesta_final, tp_f, tr_f = consultar_modelo(modelo, historial)
-    if respuesta_final is None:
+    resultado_final = consultar_modelo(modelo, historial)
+    if resultado_final["estado"] != "valida":
         respuesta_final = "Sin respuesta"
-    tokens_prompt_totales += tp_f
-    tokens_respuesta_totales += tr_f
+        estado_final = resultado_final["estado"]
+    else:
+        respuesta_final = resultado_final["contenido"]
+        estado_final = "valida"
+    tokens_prompt_totales += resultado_final["tokens_prompt"]
+    tokens_respuesta_totales += resultado_final["tokens_respuesta"]
     conversacion_texto += f"[RESPUESTA FINAL] Modelo: {respuesta_final}\n"
 
-    return conversacion_texto, tokens_prompt_totales, tokens_respuesta_totales, respuesta_final
+    return conversacion_texto, tokens_prompt_totales, tokens_respuesta_totales, respuesta_final, estado_final
 
 
 def verificar_acierto(respuesta_final, verificacion):
@@ -330,11 +369,15 @@ def ejecutar_evaluacion(modelo, posicion, num_turnos):
     pos = posicion.strip().lower()
     turno_dato = resolver_turno_dato(pos, num)
 
-    conversacion_texto, tokens_prompt, tokens_respuesta, respuesta_final = simular_conversacion(
+    conversacion_texto, tokens_prompt, tokens_respuesta, respuesta_final, estado_final = simular_conversacion(
         modelo, num, turno_dato, dato_clave, pregunta_final
     )
 
-    acierto = verificar_acierto(respuesta_final, verificacion)
+    if estado_final == "valida":
+        acierto = verificar_acierto(respuesta_final, verificacion)
+    else:
+        acierto = None  # no es un fallo real, es una corrida invalida/rechazada
+
     tiempo_total = time.time() - inicio_tiempo
 
     resultado = {
@@ -349,6 +392,7 @@ def ejecutar_evaluacion(modelo, posicion, num_turnos):
         "tokens_totales": tokens_prompt + tokens_respuesta,
         "tiempo_segundos": round(tiempo_total, 1),
         "acierto": acierto,
+        "estado_final": estado_final,
         "respuesta_final": respuesta_final[:200],
         "verificacion": verificacion,
         "conversacion_texto": conversacion_texto,
@@ -365,12 +409,18 @@ def evaluar_retencion(modelo: str, posicion: str, num_turnos: Union[str, int]) -
     try:
         resultado = ejecutar_evaluacion(modelo, posicion, num_turnos)
         guardar_resultado(resultado)
+
+        if resultado['acierto'] is None:
+            resultado_texto = f"CORRIDA INVALIDA ({resultado['estado_final']})"
+        else:
+            resultado_texto = 'ACIERTO' if resultado['acierto'] else 'FALLO'
+
         return (
             f"Modelo: {resultado['modelo']} ({resultado['empresa']}) | "
             f"Turnos: {resultado['turnos']} | "
             f"Posicion: {resultado['posicion']} | "
             f"Tokens totales: {resultado['tokens_totales']} | "
-            f"Resultado: {'ACIERTO' if resultado['acierto'] else 'FALLO'} | "
+            f"Resultado: {resultado_texto} | "
             f"Respuesta final: {resultado['respuesta_final'][:100]} | "
             f"Tiempo: {resultado['tiempo_segundos']:.1f}s"
         )

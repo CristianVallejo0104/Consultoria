@@ -233,8 +233,9 @@ def simular_conversacion(modelo, num_turnos, turno_dato, dato_clave, pregunta_fi
     conversacion_texto = ""
     tokens_prompt_totales = 0
     tokens_respuesta_totales = 0
+    errores_por_tipo = {}
 
-    for i in range(num_turnos):
+    for i in range(num_turnos):  
         if i == 0:
             msg_usuario = primer_mensaje
         elif i == turno_dato:
@@ -269,6 +270,8 @@ def simular_conversacion(modelo, num_turnos, turno_dato, dato_clave, pregunta_fi
 
         resultado_llamada = consultar_modelo(modelo, historial)
         if resultado_llamada["estado"] != "valida":
+            tipo = resultado_llamada["tipo_error"]
+            errores_por_tipo[tipo] = errores_por_tipo.get(tipo, 0) + 1
             conversacion_texto += (
                 f"[Turno {i+1}] ERROR ({resultado_llamada['estado']}, "
                 f"{resultado_llamada['tipo_error']}): no se pudo consultar el modelo\n"
@@ -295,7 +298,7 @@ def simular_conversacion(modelo, num_turnos, turno_dato, dato_clave, pregunta_fi
     tokens_respuesta_totales += resultado_final["tokens_respuesta"]
     conversacion_texto += f"[RESPUESTA FINAL] Modelo: {respuesta_final}\n"
 
-    return conversacion_texto, tokens_prompt_totales, tokens_respuesta_totales, respuesta_final, estado_final
+    return conversacion_texto, tokens_prompt_totales, tokens_respuesta_totales, respuesta_final, estado_final, errores_por_tipo
 
 
 def verificar_acierto(respuesta_final, verificacion):
@@ -328,7 +331,7 @@ CONVERSACION COMPLETA:
 {'-'*60}
 {resultado['conversacion_texto']}
 {'-'*60}
-RESULTADO: {'ACIERTO' if resultado['acierto'] else 'FALLO'}
+RESULTADO: {'CORRIDA INVALIDA (' + resultado['estado_final'] + ')' if resultado['acierto'] is None else ('ACIERTO' if resultado['acierto'] else 'FALLO')}
 {'='*60}
 """
     with open(f"resultados/txt/{nombre_archivo}.txt", "w") as f:
@@ -369,7 +372,7 @@ def ejecutar_evaluacion(modelo, posicion, num_turnos):
     pos = posicion.strip().lower()
     turno_dato = resolver_turno_dato(pos, num)
 
-    conversacion_texto, tokens_prompt, tokens_respuesta, respuesta_final, estado_final = simular_conversacion(
+    conversacion_texto, tokens_prompt, tokens_respuesta, respuesta_final, estado_final, errores_por_tipo = simular_conversacion(
         modelo, num, turno_dato, dato_clave, pregunta_final
     )
 
@@ -393,6 +396,7 @@ def ejecutar_evaluacion(modelo, posicion, num_turnos):
         "tiempo_segundos": round(tiempo_total, 1),
         "acierto": acierto,
         "estado_final": estado_final,
+        "errores_por_tipo": errores_por_tipo,
         "respuesta_final": respuesta_final[:200],
         "verificacion": verificacion,
         "conversacion_texto": conversacion_texto,

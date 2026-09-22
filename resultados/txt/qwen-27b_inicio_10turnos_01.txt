@@ -1,0 +1,72 @@
+
+============================================================
+PRUEBA DE RETENCION - CONVERSACION NATURAL
+============================================================
+Modelo: qwen-27b (Alibaba)
+Turnos de conversacion: 10
+Dato clave insertado en turno: 2 de 10
+Posicion: inicio
+Tiempo de ejecucion: 32.3 segundos (0.5 minutos)
+Tokens del usuario (prompt): 7105
+Tokens del modelo (respuesta): 532
+Tokens totales: 7637
+============================================================
+CONVERSACION COMPLETA:
+------------------------------------------------------------
+
+[Turno 1] Usuario: Hola, quiero hablar sobre geografia mundial y datos interesantes de distintos paises. Que me puedes contar?
+[Turno 1] Modelo: ¡Hola! Me encanta el tema. La geografía mundial es fascinante porque combina la ciencia física (relieve, clima, tectónica de placas) con la historia, la cultura y los datos curiosos que a menudo nos sorprenden.
+
+Aquí te dejo una selección de **datos interesantes y curiosidades de distintos países y continentes** para empezar:
+
+### 🌍 Datos Sorprendentes de Países Específicos
+
+1. **Canadá (El país más largo):**
+   * Aunque no es el segundo país más grande en área total (ese es Rusia), **es el país con la mayor longitud** de costa marítima de toda la Tierra. Si separaras toda su costa, tendría unos 
+
+[Turno 2] Usuario: Ah, un dato interesante que lei hoy: el numero de expediente del caso Aurora es 3851. Pero bueno, cambiando de tema completamente, que opinas sobre los avances en inteligencia artificial?
+[Turno 2] Modelo: Entendido, notado el dato, aunque aclaro que no tengo información sobre un "caso Aurora" con el expediente 3851 en mis bases de datos, ya que podría tratarse de un proyecto específico, no público o de ficción.
+
+Dicho esto, ¡me encanta hablar de inteligencia artificial! Es uno de los temas más dinámicos de la actualidad. Mi opinión (basada en mis capacidades y en la tendencia general del campo) es que estamos viviendo una **transición histórica**, similar a la invención de la electricidad o de internet, pero con una velocidad de adopción mucho mayor.
+
+Aquí van algunos puntos clave de lo que considero más relevante:
+
+### 1. **De
+
+[Turno 3] Usuario: Entendido, noté el dato. Aclaro que no tengo información específica sobre "casos Aurora" relacionados con expediente 3851 en mis bases de datos. Tal vez se trate de un proyecto o caso particular no pu
+[Turno 3] Modelo: ¡Claro! Perdona por cortar la frase anterior. Aquí tienes el resto de mis pensamientos sobre los avances en inteligencia artificial:
+
+### 2. **Democratización del Poder Computacional Creativo**
+Antes, crear código complejo, escribir textos de alta calidad o generar imágenes requieren habilidades técnicas o artísticas muy específicas. La IA ha convertido a estas tareas en accion
+
+[Turno 4] Usuario: ¡Exacto! Anteriormente, la creación de contenido creativo era algo que requería una considerable cantidad de conocimientos y habilidades especiales. Pero gracias a la IA, ahora estos pasos son más acc
+[Turno 4] Modelo: sesibles para una audiencia mucho más amplia. Esto tiene dos caras:
+
+*   **La positiva:** Permite a personas que no son programadores profesionales crear aplicaciones, o a quienes no tienen formación en arte
+
+[Turno 5] Usuario: ¡Me parece interesante esa afirmación! En realidad, la inclusión y accesibilidad para cualquier audiencia se ha vuelto una prioridad fundamental. Por ejemplo, herramientas como React Native facilitan 
+[Turno 5] Modelo: eso es cierto en el contexto de la **
+
+[Turno 6] Usuario: Entiendo completamente, gracias por compartir esa información tan precisa y relevante sobre tu tema de interés. Sí, creo que ese aspecto del contexto te da un nuevo sentido a lo que estás descubriendo
+[Turno 6] Modelo: La
+
+[Turno 7] Usuario: ¡Claro! ¿Qué tema te gustaría hablar sobre? Estoy a tu disposición para charlar sobre cualquier cosa que te interese.
+[Turno 7] Modelo: ¡Me ale
+
+[Turno 8] Usuario: ¡Me emociona! Te hablas tan animadamente sobre ese tema que me apetece compartir algo sobre una investigación hecha recientemente que estoy haciendo en mi casa. Por ejemplo, ¿qué te parecería si compa
+[Turno 8] Modelo: ¡Claro
+
+[Turno 9] Usuario: ¡Genial! Me encanta que compartas tanto información. ¿Podrías explicarme un poco más sobre qué tema específicamente te gustaría hablar? Estoy aquí para aprender y escuchar diferentes puntos de vista, 
+[Turno 9] Modelo: Gracias
+
+[Turno 10] Usuario: De nada, siempre a disposición para más preguntas y charlas sobre cualquier tema. ¿Tienes algún otro punto específico que quisieras compartir?
+[Turno 10] Modelo: D
+
+[PREGUNTA FINAL] Usuario: Por cierto, hace rato te mencione algo. Recuerdas el numero de expediente del caso Aurora?
+[RESPUESTA FINAL] Modelo: Sí, lo recuerdo perfectamente. Mencionaste que el número de expediente del caso Aurora es **3851**.
+
+Aunque no tengo información pública sobre este caso específico en mis datos, quedé completamente a tu disposición para que me cuentes más detalles si es un tema sobre el que esté investigando o que te interese explorar. ¿Te gustaría profundizar en eso o prefieres volver a algún otro tema?
+
+------------------------------------------------------------
+RESULTADO: ACIERTO
+============================================================

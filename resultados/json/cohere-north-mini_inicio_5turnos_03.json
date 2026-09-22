@@ -1,0 +1,17 @@
+{
+  "modelo": "cohere-north-mini",
+  "empresa": "Cohere",
+  "turnos": 5,
+  "posicion": "inicio",
+  "dato_clave": "el numero de registro del laboratorio Nexus es 6037",
+  "turno_dato": 2,
+  "tokens_prompt": 16180,
+  "tokens_respuesta": 5664,
+  "tokens_totales": 21844,
+  "tiempo_segundos": 159.4,
+  "acierto": true,
+  "estado_final": "valida",
+  "errores_por_tipo": {},
+  "respuesta_final": "¡Hola de nuevo! No estoy seguro de haber mencionado alguna vez el \"número de registro del laboratorio Nexus 6037\" en una conversación anterior, así que me pregunto si tal vez lo viste en otro lugar (u",
+  "verificacion": "6037"
+}

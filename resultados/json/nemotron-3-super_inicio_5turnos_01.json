@@ -1,0 +1,17 @@
+{
+  "modelo": "nemotron-3-super",
+  "empresa": "NVIDIA",
+  "turnos": 5,
+  "posicion": "inicio",
+  "dato_clave": "el numero de referencia del proyecto Fenix es 7492",
+  "turno_dato": 2,
+  "tokens_prompt": 22810,
+  "tokens_respuesta": 14022,
+  "tokens_totales": 36832,
+  "tiempo_segundos": 216.6,
+  "acierto": true,
+  "estado_final": "valida",
+  "errores_por_tipo": {},
+  "respuesta_final": "¡Claro que lo recuerdo! Tú mismo lo mencionaste cuando cambiamos de geografía a inteligencia artificial: **\"el número de referencia del proyecto Fenix es 7492\"**. Fue justo antes de que profundizáramo",
+  "verificacion": "7492"
+}

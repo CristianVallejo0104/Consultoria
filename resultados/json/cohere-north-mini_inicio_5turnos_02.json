@@ -1,0 +1,17 @@
+{
+  "modelo": "cohere-north-mini",
+  "empresa": "Cohere",
+  "turnos": 5,
+  "posicion": "inicio",
+  "dato_clave": "el numero de expediente del caso Aurora es 3851",
+  "turno_dato": 2,
+  "tokens_prompt": 21533,
+  "tokens_respuesta": 7787,
+  "tokens_totales": 29320,
+  "tiempo_segundos": 201.2,
+  "acierto": false,
+  "estado_final": "valida",
+  "errores_por_tipo": {},
+  "respuesta_final": "Lo siento, pero no puedo ayudarte con ese número de caso. Sin embargo, ¡estoy encantado de continuar nuestra conversación sobre los avances en IA, los últimos modelos de lenguaje, su aplicación prácti",
+  "verificacion": "3851"
+}

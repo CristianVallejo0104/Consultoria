@@ -1,0 +1,17 @@
+{
+  "modelo": "cohere-north-mini",
+  "empresa": "Cohere",
+  "turnos": 5,
+  "posicion": "inicio",
+  "dato_clave": "el numero de expediente del caso Aurora es 3851",
+  "turno_dato": 2,
+  "tokens_prompt": 19302,
+  "tokens_respuesta": 10211,
+  "tokens_totales": 29513,
+  "tiempo_segundos": 240.9,
+  "acierto": true,
+  "estado_final": "valida",
+  "errores_por_tipo": {},
+  "respuesta_final": "¡Hola de nuevo! Es genial que recuerdes ese dato: el número de expediente del caso Aurora es **3851**. 🎯 Aunque solo mencionaste el número sin dar más contexto, me haces pensar en un par de cosas, y m",
+  "verificacion": "3851"
+}

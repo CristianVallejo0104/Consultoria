@@ -1,0 +1,17 @@
+{
+  "modelo": "gemma2:2b",
+  "empresa": "Google",
+  "turnos": 5,
+  "posicion": "inicio",
+  "dato_clave": "el numero de expediente del caso Aurora es 3851",
+  "turno_dato": 2,
+  "tokens_prompt": 6036,
+  "tokens_respuesta": 1836,
+  "tokens_totales": 7872,
+  "tiempo_segundos": 87.1,
+  "acierto": true,
+  "estado_final": "valida",
+  "errores_por_tipo": {},
+  "respuesta_final": "¡Sí, me acuerdo!  🤩 \n\nEl número de expediente del caso Aurora es **3851**. 😁  ¿Te interesa saber más sobre este caso o quieres que lo comparta con información relevante?  \n\n\n \n 😄   \n",
+  "verificacion": "3851"
+}

@@ -1,0 +1,83 @@
+
+============================================================
+PRUEBA DE RETENCION - CONVERSACION NATURAL
+============================================================
+Modelo: gpt-oss-120b (OpenAI)
+Turnos de conversacion: 5
+Dato clave insertado en turno: 2 de 5
+Posicion: inicio
+Tiempo de ejecucion: 585.8 segundos (9.8 minutos)
+Tokens del usuario (prompt): 4436
+Tokens del modelo (respuesta): 1654
+Tokens totales: 6090
+============================================================
+CONVERSACION COMPLETA:
+------------------------------------------------------------
+
+[Turno 1] Usuario: Hola, quiero hablar sobre fisica cuantica y sus aplicaciones. Que me puedes contar?
+[Turno 1] Modelo: ¡Claro! La física cuántica (o mecánica cuántica) es la teoría que describe el comportamiento de la materia y la energía a escalas extremadamente pequeñas: átomos, electrones, fotones y otras partículas subatómicas. A diferencia de la física clásica, donde los objetos tienen posiciones y velocidades bien definidas, en el mundo cuántico predominan fenómenos como la **superposición**, el **entrelaçamento** (entanglement) y la **incertidumbre**. A continuación te ofrezco un panorama general de los conceptos básicos y sus aplicaciones más relevantes hoy en día.
+
+---
+
+## 1. Conceptos fundamentales
+
+| Concepto | Qué significa | Por qué es importante |
+|---|---|---|
+| **Función de onda (Ψ)** | Describe el estado cuántico de un sistema. Su módulo al cuadrado, \|Ψ\|², da la probabilidad de
+
+[Turno 2] Usuario: Ah, un dato interesante que lei hoy: el codigo de referencia del proyecto Fenix es F-7492-X. Pero bueno, cambiando de tema completamente, que opinas sobre los avances en inteligencia artificial?
+[Turno 2] Modelo: **Avances recientes en inteligencia artificial (IA)**  
+
+En los últimos años la IA ha pasado de ser una disciplina de investigación de nicho a una fuerza transformadora en prácticamente todos los sectores. A continuación, presento algunos de los avances más impactantes y sus implicaciones:
+
+---
+
+## 1. Modelos de lenguaje a gran escala (LLM)
+
+| **Tendencia** | **Qué está sucediendo** | **Por qué importa** |
+|---|---|---|
+| **Escalado de parámetros** | Modelos con cientos de miles de millones de parámetros (GPT‑4, Gemini, Claude 3, LLaMA‑2‑70B, etc.) | Mejor capacidad de razonamiento, comprensión de contexto y generación de texto más coherente y creativo. |
+| **Instrucción y alineación** | Técnicas como Reinforcement Learning from Human Feedback (RLHF) y fine‑tuning basado en instrucciones | Reducción de respuestas dañinas, mayor adherencia a la intención del usuario y mejor control de estilo. |
+| **Multimodalidad** | Modelos que procesan texto, imágenes,
+
+[Turno 3] Usuario: De acuerdo, las tendencias del modelo de lenguaje a gran escala (LLM) han impulsado la IA hacia un nuevo nivel. Los modelos de grandes cantidades de parámetros (GPT) y subsequentes no solo han aumenta
+[Turno 3] Modelo: ¡Exacto! La explosión de los **modelos de lenguaje a gran escala (LLM)** ha redefinido lo que la IA puede hacer y ha abierto una nueva era de aplicaciones y desafíos. A continuación, continúo la idea que estabas desarrollando, estructurándola en varios bloques clave:
+
+---
+
+## 1. ¿Por qué el aumento de parámetros marca la diferencia?
+
+| **Aspecto** | **Qué ocurre al escalar** | **Impacto práctico** |
+|-------------|---------------------------|----------------------|
+| **Capacidad de representación** | Cada parámetro es una “pista” que el modelo puede aprender; al pasar de millones a cientos de miles de millones, se capturan regularidades mucho más finas del lenguaje y del mundo. | Respuestas más precisas, matices semánticos más s
+
+[Turno 4] Usuario: De acuerdo, ¡me da gusto que te interese este tema! El aumento en la capacidad de los modelos de lenguaje a gran escala (LLM) no sólo se debe al tamaño del modelo por sí mismo; sino también a cómo ese
+[Turno 4] Modelo: ¡Exacto! El salto de rendimiento que vemos en los LLM no proviene únicamente del número de parámetros; es el resultado de una **sinergia** entre varios factores que, al combinarse, potencian la capacidad del modelo para aprender, generalizar y adaptarse. A continuación desgloso los elementos clave que, junto al tamaño del modelo, impulsan los avances actuales:
+
+---
+
+## 1. Calidad y diversidad de los datos de entrenamiento  
+
+| **Elemento** | **Qué aporta** | **Ejemplo práctico** |
+|---|---|---|
+| **Volumen masivo** | Cuantos más tokens ve el modelo, más patrones lingüísticos y de conocimiento puede absorber. | GPT‑4 se entrenó con varios cientos de miles de millones de tokens extraídos de la web, libros, artículos científicos y diálogos. |
+| **Diversidad de dominios** | Incluir textos de distintas áreas (medicina, derecho, código, literatura, redes sociales) permite que el modelo tenga una “cultura” más amplia. | Los LLM multimodales como Gemini incluyen datos de imágenes, audio y código, no solo texto. |
+| **Curación y filtrado**
+
+[Turno 5] Usuario: ¡Esperaba que llegaras a eso! Claro, la calidad y diversidad de los datos son esenciales para el correcto entrenamiento del modelo. Por ejemplo, si tratamos imágenes para reconocer patrones, no solo n
+[Turno 5] Modelo: ¡Exacto! Cuando hablamos de “calidad y diversidad” de los datos, estamos describiendo todo un ecosistema de procesos que van mucho más allá de simplemente “recoger un montón de texto”. Cada paso del pipeline de datos —desde la recolección hasta la presentación al modelo— influye directamente en la capacidad del LLM para aprender patrones útiles, minimizar sesgos y generalizar de manera fiable. A continuación te detallo los componentes críticos y cómo se interrelacionan.
+
+---
+
+## 2. Pipeline completo de datos para LLMs
+
+| **Etapa** | **Objetivo** | **Técnicas y mejores prácticas** | **Impacto en el modelo** |
+|-----------|--------------|----------------------------------|--------------------------|
+| **1️⃣ Recolección bruta** | Obtener la mayor cantidad posible de texto (y, en el caso de modelos multimodales, imágenes, audio, código, etc.). | • Scraping de la web con reglas de respeto a robots.txt.<br>• Descarga de repositorios
+
+[PREGUNTA FINAL] Usuario: Por cierto, hace rato te mencione algo. Recuerdas cual era el codigo de referencia del proyecto Fenix?
+[RESPUESTA FINAL] Modelo: Claro, el código de referencia que mencionaste para el proyecto Fenix es **F‑7492‑X**.
+
+------------------------------------------------------------
+RESULTADO: ACIERTO
+============================================================

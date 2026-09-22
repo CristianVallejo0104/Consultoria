@@ -10,6 +10,8 @@ import random
 from dotenv import load_dotenv
 
 load_dotenv()
+random.seed(42)  # Semilla fija para reproducibilidad del experimento
+
 
 MODELOS_NVIDIA = {
     "deepseek-v4-flash": "deepseek-ai/deepseek-v4-flash-0731",
@@ -31,6 +33,15 @@ MODELOS_GEMINI = {
 }
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
+MODELOS_OPENROUTER = {
+    "nemotron-3-super": "nvidia/nemotron-3-super-120b-a12b:free",
+    "cohere-north-mini": "cohere/north-mini-code:free",
+    "gemma4-31b": "google/gemma-4-31b-it:free",
+    "gemma4-26b": "google/gemma-4-26b-a4b-it:free",  # ajustar con el nombre exacto que confirmes
+}
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+
 
 # ============================================================
 # DISEÑO DE MODELOS
@@ -55,7 +66,10 @@ MODELOS_EVALUABLES = {
     "gpt-oss-120b": "OpenAI",
     "qwen-27b": "Alibaba",
     "google-gemini": "Google",
-
+    "nemotron-3-super": "NVIDIA",
+    "cohere-north-mini": "Cohere",
+    "gemma4-31b": "Google",
+    "gemma4-26b": "Google",
 }
 
 MODELO_CEREBRO = "ollama/qwen2.5:1.5b"        # Alibaba — orquestador del Agent de CrewAI
@@ -74,12 +88,18 @@ DATOS_CLAVE = [
     {"dato": "el numero de expediente del caso Aurora es 3851",
      "pregunta": "Recuerdas el numero de expediente del caso Aurora?",
      "verificacion": "3851"},
-    {"dato": "el numero de referencia del proyecto Fenix es 7492",
-     "pregunta": "Recuerdas cual era el numero de referencia del proyecto Fenix?",
+    {"dato": "el codigo de referencia del proyecto Fenix es F-7492-X",
+     "pregunta": "Recuerdas cual era el codigo de referencia del proyecto Fenix?",
      "verificacion": "7492"},
     {"dato": "el numero de registro del laboratorio Nexus es 6037",
      "pregunta": "Recuerdas el numero de registro del laboratorio Nexus?",
      "verificacion": "6037"},
+    {"dato": "el resultado del experimento Delta-7 fue exactamente 44295",
+     "pregunta": "Recuerdas cual fue el resultado exacto del experimento Delta-7?",
+     "verificacion": "44295"},
+    {"dato": "la version del algoritmo Centinela que se implemento fue la 9.15.6",
+     "pregunta": "Recuerdas que version del algoritmo Centinela se implemento?",
+     "verificacion": "9.15.6"},
 ]
 
 def seleccionar_dato_clave():
@@ -190,6 +210,28 @@ def consultar_modelo(modelo, historial):
         tokens_respuesta = usage.get("candidatesTokenCount", 0)
         return {"contenido": contenido, "tokens_prompt": tokens_prompt, "tokens_respuesta": tokens_respuesta,
                 "estado": "valida", "codigo_http": 200, "tipo_error": None}
+    elif modelo in MODELOS_OPENROUTER:
+        resp = requests.post(
+            "https://openrouter.ai/api/v1/chat/completions",
+            headers={"Authorization": f"Bearer {OPENROUTER_API_KEY}"},
+            json={"model": MODELOS_OPENROUTER[modelo], "messages": historial}
+        )
+        if resp.status_code == 429:
+            return {"contenido": None, "tokens_prompt": 0, "tokens_respuesta": 0,
+                    "estado": "invalida_tecnica", "codigo_http": 429, "tipo_error": "rate_limit"}
+        if resp.status_code == 503:
+            return {"contenido": None, "tokens_prompt": 0, "tokens_respuesta": 0,
+                    "estado": "invalida_tecnica", "codigo_http": 503, "tipo_error": "sobrecarga"}
+        if resp.status_code != 200:
+            return {"contenido": None, "tokens_prompt": 0, "tokens_respuesta": 0,
+                    "estado": "invalida_tecnica", "codigo_http": resp.status_code, "tipo_error": "desconocido"}
+        data = resp.json()
+        contenido = data["choices"][0]["message"]["content"]
+        usage = data.get("usage", {})
+        tokens_prompt = usage.get("prompt_tokens", 0)
+        tokens_respuesta = usage.get("completion_tokens", 0)
+        return {"contenido": contenido, "tokens_prompt": tokens_prompt, "tokens_respuesta": tokens_respuesta,
+                "estado": "valida", "codigo_http": 200, "tipo_error": None}
     else:
         resp = requests.post(
             "http://localhost:11434/api/chat",
@@ -216,13 +258,13 @@ def generar_nombre_archivo(modelo, posicion, turnos):
     return f"{base}_{replica:02d}"
 
 
-def simular_conversacion(modelo, num_turnos, turno_dato, dato_clave, pregunta_final):
+def simular_conversacion(modelo, num_turnos, turno_dato, dato_clave, pregunta_final, tema_seleccionado=None):
     """Simula la conversacion completa turno a turno e inserta el dato clave
     en el turno indicado. Devuelve: conversacion_texto, tokens_prompt_totales,
-    tokens_respuesta_totales, respuesta_final"""
-    primer_mensaje = ("Hola, quiero hablar sobre geografia mundial "
-                      "y datos interesantes de distintos paises. "
-                      "Que me puedes contar?")
+    tokens_respuesta_totales, respuesta_final, estado_final, errores_por_tipo"""
+    if tema_seleccionado is None:
+        tema_seleccionado = seleccionar_tema()
+    primer_mensaje = tema_seleccionado["inicio"]
     mensaje_con_dato = (
         f"Ah, un dato interesante que lei hoy: {dato_clave}. "
         "Pero bueno, cambiando de tema completamente, "
@@ -300,11 +342,36 @@ def simular_conversacion(modelo, num_turnos, turno_dato, dato_clave, pregunta_fi
 
     return conversacion_texto, tokens_prompt_totales, tokens_respuesta_totales, respuesta_final, estado_final, errores_por_tipo
 
+TEMAS_CONVERSACION = [
+    {"tema": "geografia", "inicio": "Hola, quiero hablar sobre geografia mundial y datos interesantes de distintos paises. Que me puedes contar?"},
+    {"tema": "matematicas", "inicio": "Hola, quiero hablar sobre calculo diferencial y sus aplicaciones en la vida real. Que me puedes contar?"},
+    {"tema": "programacion", "inicio": "Hola, quiero hablar sobre Python y estructuras de datos. Que me puedes contar?"},
+    {"tema": "historia", "inicio": "Hola, quiero hablar sobre la Segunda Guerra Mundial y sus consecuencias. Que me puedes contar?"},
+    {"tema": "economia", "inicio": "Hola, quiero hablar sobre inflacion y politica monetaria. Que me puedes contar?"},
+    {"tema": "ciencia", "inicio": "Hola, quiero hablar sobre fisica cuantica y sus aplicaciones. Que me puedes contar?"},
+]
+
+def seleccionar_tema():
+    """Selecciona aleatoriamente un tema de conversacion del banco."""
+    return random.choice(TEMAS_CONVERSACION)
+
 
 def verificar_acierto(respuesta_final, verificacion):
-    """Verificacion deterministica: el dato clave exacto debe aparecer
-    en la respuesta del modelo."""
-    return verificacion in respuesta_final.lower()
+    """Verificacion mas estricta: el dato debe aparecer sin estar
+    negado por frases como 'no recuerdo', 'no estoy seguro', etc."""
+    respuesta_lower = respuesta_final.lower()
+    if verificacion not in respuesta_lower:
+        return False
+    
+    frases_negacion = [
+        "no recuerdo", "no estoy seguro", "no tengo esa información",
+        "no mencionaste", "no creo haber", "no logro recordar",
+        "no puedo confirmar", "no sé si"
+    ]
+    for frase in frases_negacion:
+        if frase in respuesta_lower:
+            return False
+    return True
 
 
 def guardar_resultado(resultado):
@@ -371,9 +438,10 @@ def ejecutar_evaluacion(modelo, posicion, num_turnos):
 
     pos = posicion.strip().lower()
     turno_dato = resolver_turno_dato(pos, num)
-
+    
+    tema_seleccionado = seleccionar_tema()
     conversacion_texto, tokens_prompt, tokens_respuesta, respuesta_final, estado_final, errores_por_tipo = simular_conversacion(
-        modelo, num, turno_dato, dato_clave, pregunta_final
+        modelo, num, turno_dato, dato_clave, pregunta_final, tema_seleccionado
     )
 
     if estado_final == "valida":
@@ -388,6 +456,7 @@ def ejecutar_evaluacion(modelo, posicion, num_turnos):
         "empresa": MODELOS_EVALUABLES[modelo],
         "turnos": num,
         "posicion": pos,
+        "tema": tema_seleccionado["tema"],
         "dato_clave": dato_clave,
         "turno_dato": turno_dato + 1,
         "tokens_prompt": tokens_prompt,

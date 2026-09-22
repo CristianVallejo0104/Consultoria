@@ -1,0 +1,16 @@
+{
+  "modelo": "qwen-27b",
+  "empresa": "Alibaba",
+  "turnos": 20,
+  "posicion": "inicio",
+  "dato_clave": "el numero de expediente del caso Aurora es 3851",
+  "turno_dato": 2,
+  "tokens_prompt": 14940,
+  "tokens_respuesta": 1053,
+  "tokens_totales": 15993,
+  "tiempo_segundos": 90.2,
+  "acierto": null,
+  "estado_final": "invalida_tecnica",
+  "respuesta_final": "Sin respuesta",
+  "verificacion": "3851"
+}

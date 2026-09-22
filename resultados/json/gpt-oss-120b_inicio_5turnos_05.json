@@ -1,0 +1,17 @@
+{
+  "modelo": "gpt-oss-120b",
+  "empresa": "OpenAI",
+  "turnos": 5,
+  "posicion": "inicio",
+  "dato_clave": "el numero de expediente del caso Aurora es 3851",
+  "turno_dato": 2,
+  "tokens_prompt": 4370,
+  "tokens_respuesta": 1673,
+  "tokens_totales": 6043,
+  "tiempo_segundos": 13.8,
+  "acierto": true,
+  "estado_final": "valida",
+  "errores_por_tipo": {},
+  "respuesta_final": "Sí, el número de expediente del caso Aurora que mencionaste es **3851**.",
+  "verificacion": "3851"
+}

@@ -1,0 +1,16 @@
+{
+  "modelo": "qwen-27b",
+  "empresa": "Alibaba",
+  "turnos": 10,
+  "posicion": "inicio",
+  "dato_clave": "el numero de expediente del caso Aurora es 3851",
+  "turno_dato": 2,
+  "tokens_prompt": 7105,
+  "tokens_respuesta": 532,
+  "tokens_totales": 7637,
+  "tiempo_segundos": 32.3,
+  "acierto": true,
+  "estado_final": "valida",
+  "respuesta_final": "Sí, lo recuerdo perfectamente. Mencionaste que el número de expediente del caso Aurora es **3851**.\n\nAunque no tengo información pública sobre este caso específico en mis datos, quedé completamente a ",
+  "verificacion": "3851"
+}

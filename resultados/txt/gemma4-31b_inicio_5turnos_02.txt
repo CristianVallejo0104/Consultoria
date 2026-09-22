@@ -1,0 +1,37 @@
+
+============================================================
+PRUEBA DE RETENCION - CONVERSACION NATURAL
+============================================================
+Modelo: gemma4-31b (Google)
+Turnos de conversacion: 5
+Dato clave insertado en turno: 2 de 5
+Posicion: inicio
+Tiempo de ejecucion: 7.5 segundos (0.1 minutos)
+Tokens del usuario (prompt): 0
+Tokens del modelo (respuesta): 0
+Tokens totales: 0
+============================================================
+CONVERSACION COMPLETA:
+------------------------------------------------------------
+
+[Turno 1] Usuario: Hola, quiero hablar sobre geografia mundial y datos interesantes de distintos paises. Que me puedes contar?
+[Turno 1] ERROR (invalida_tecnica, rate_limit): no se pudo consultar el modelo
+
+[Turno 2] Usuario: Ah, un dato interesante que lei hoy: el numero de registro del laboratorio Nexus es 6037. Pero bueno, cambiando de tema completamente, que opinas sobre los avances en inteligencia artificial?
+[Turno 2] ERROR (invalida_tecnica, rate_limit): no se pudo consultar el modelo
+
+[Turno 3] Usuario: ¡Qué interesante información nueva sobre Nexus! De hecho, estoy impresionado con cómo estas tecnologías están evolucionando rápidamente. Creo que el futuro de la IA es realmente prometedor si se sigue
+[Turno 3] ERROR (invalida_tecnica, rate_limit): no se pudo consultar el modelo
+
+[Turno 4] Usuario: ¡Exactamente! La inteligencia artificial está demostrando su potencial a un ritmo increíble y eso me inspira mucho. Creo que en los próximos años veremos una conexión aún más íntima entre estos asiste
+[Turno 4] ERROR (invalida_tecnica, rate_limit): no se pudo consultar el modelo
+
+[Turno 5] Usuario: ¡Eso sí que es motivador, verdad? Siento que la inteligencia artificial está demostrando ser mucho más capaz de entender contextos y emociones. Me gustaría que entendamos mejor cómo esta tecnología po
+[Turno 5] ERROR (invalida_tecnica, rate_limit): no se pudo consultar el modelo
+
+[PREGUNTA FINAL] Usuario: Por cierto, hace rato te mencione algo. Recuerdas el numero de registro del laboratorio Nexus?
+[RESPUESTA FINAL] Modelo: Sin respuesta
+
+------------------------------------------------------------
+RESULTADO: CORRIDA INVALIDA (invalida_tecnica)
+============================================================

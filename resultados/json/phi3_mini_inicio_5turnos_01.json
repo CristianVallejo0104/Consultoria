@@ -1,0 +1,17 @@
+{
+  "modelo": "phi3:mini",
+  "empresa": "Microsoft",
+  "turnos": 5,
+  "posicion": "inicio",
+  "dato_clave": "el numero de expediente del caso Aurora es 3851",
+  "turno_dato": 2,
+  "tokens_prompt": 8083,
+  "tokens_respuesta": 2221,
+  "tokens_totales": 10304,
+  "tiempo_segundos": 143.3,
+  "acierto": false,
+  "estado_final": "valida",
+  "errores_por_tipo": {},
+  "respuesta_final": "Lo siento por no poder recordar la información específica sobre un número de expediente o cualquier otro detalle sin acceso a datos actuales y confiables. Por favor, si desea obtener esta información ",
+  "verificacion": "3851"
+}

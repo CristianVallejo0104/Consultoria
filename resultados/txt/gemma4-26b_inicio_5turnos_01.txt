@@ -1,0 +1,37 @@
+
+============================================================
+PRUEBA DE RETENCION - CONVERSACION NATURAL
+============================================================
+Modelo: gemma4-26b (Google)
+Turnos de conversacion: 5
+Dato clave insertado en turno: 2 de 5
+Posicion: inicio
+Tiempo de ejecucion: 7.9 segundos (0.1 minutos)
+Tokens del usuario (prompt): 0
+Tokens del modelo (respuesta): 0
+Tokens totales: 0
+============================================================
+CONVERSACION COMPLETA:
+------------------------------------------------------------
+
+[Turno 1] Usuario: Hola, quiero hablar sobre geografia mundial y datos interesantes de distintos paises. Que me puedes contar?
+[Turno 1] ERROR (invalida_tecnica, rate_limit): no se pudo consultar el modelo
+
+[Turno 2] Usuario: Ah, un dato interesante que lei hoy: el numero de expediente del caso Aurora es 3851. Pero bueno, cambiando de tema completamente, que opinas sobre los avances en inteligencia artificial?
+[Turno 2] ERROR (invalida_tecnica, rate_limit): no se pudo consultar el modelo
+
+[Turno 3] Usuario: ¡Eso suena interesante! Desde luego, la inteligencia artificial ha estado creciendo exponencialmente y está revolucionando muchas áreas del mundo. Creo que es muy importante seguir explorando sus posi
+[Turno 3] ERROR (invalida_tecnica, rate_limit): no se pudo consultar el modelo
+
+[Turno 4] Usuario: Sí, exactamente. Es increíble ver cómo se ha adaptado a nuestras vidas cotidianas. La IA no solo mejora la experiencia de usuario en software y aplicaciones móviles, sino que también está cambiando el
+[Turno 4] ERROR (invalida_tecnica, rate_limit): no se pudo consultar el modelo
+
+[Turno 5] Usuario: ¡Qué interesante es eso! He notado cómo las inteligencias artificiales han evolucionado mucho desde que llegaron a la gente común. Creo que van a tener un papel cada vez más importante en nuestras vid
+[Turno 5] ERROR (invalida_tecnica, rate_limit): no se pudo consultar el modelo
+
+[PREGUNTA FINAL] Usuario: Por cierto, hace rato te mencione algo. Recuerdas el numero de expediente del caso Aurora?
+[RESPUESTA FINAL] Modelo: Sin respuesta
+
+------------------------------------------------------------
+RESULTADO: CORRIDA INVALIDA (invalida_tecnica)
+============================================================

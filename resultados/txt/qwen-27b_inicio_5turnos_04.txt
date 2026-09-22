@@ -1,0 +1,55 @@
+
+============================================================
+PRUEBA DE RETENCION - CONVERSACION NATURAL
+============================================================
+Modelo: qwen-27b (Alibaba)
+Turnos de conversacion: 5
+Dato clave insertado en turno: 2 de 5
+Posicion: inicio
+Tiempo de ejecucion: 10.5 segundos (0.2 minutos)
+Tokens del usuario (prompt): 2427
+Tokens del modelo (respuesta): 453
+Tokens totales: 2880
+============================================================
+CONVERSACION COMPLETA:
+------------------------------------------------------------
+
+[Turno 1] Usuario: Hola, quiero hablar sobre geografia mundial y datos interesantes de distintos paises. Que me puedes contar?
+[Turno 1] Modelo: ¡Hola! Me encanta esa propuesta. La geografía mundial está llena de paradojas, datos contraintuitivos y fenómenos naturales asombrosos que a menudo pasan desapercibidos en las aulas.
+
+Para empezar, aquí tienes una selección de datos fascinantes organizados por categorías:
+
+### 🌍 Datos Geográficos que Suelen Sorprender
+
+1. **El país más pequeño no es el que más se piensa**:
+   Mucha gente cree que es Mónaco o Liechtenstein, pero el estado soberano más pequeño del mundo es **Vaticano** (0.44 km²). Sin embargo, el *país* más pequeño de facto (con reconocimiento general pero sin microestados
+
+[Turno 2] Usuario: Ah, un dato interesante que lei hoy: el numero de expediente del caso Aurora es 3851. Pero bueno, cambiando de tema completamente, que opinas sobre los avances en inteligencia artificial?
+[Turno 2] Modelo: Entendido, notado el cambio de tema.
+
+En cuanto a los avances en inteligencia artificial, la situación es fascinante y compleja. Podría resumir mi opinión (o más bien, mi análisis basado en las tendencias actuales) en estos puntos clave:
+
+### 1. **Velocidad de adopción sin precedentes**
+Lo más notable de la última década, y especialmente de los últimos años, no es solo la potencia de los modelos, sino la velocidad con la que las empresas y las personas están integrando la IA en sus flujos de trabajo diarios. Ha pasado de ser algo experimental a una utilidad básica, similar a cómo lo fue la computadora personal o internet móvil.
+
+### 2. **
+
+[Turno 3] Usuario: Entendido, notado el cambio de tema. Me encanta cómo cambia la situación para siempre mejorándonos día a día. ¿Tienes alguna pregunta sobre los avances en inteligencia artificial que te gustaría compa
+[Turno 3] Modelo: Parece que tu mensaje se cort
+
+[Turno 4] Usuario: Entiendo, parece haber algo en el mensaje que no completaste. Me disculpo por eso y espero que puedas continuar para poder seguir hablando sobre cualquier tema con interés mutuo. ¿Hay algún punto espe
+[Turno 4] Modelo: No te preocupes, no pasa nada. A veces las conexiones o las interfaces pueden cortar el texto accidentalmente. N
+
+[Turno 5] Usuario: Entiendo lo que has dicho y eso suena bastante útil para ayudarnos a manejar los fallos técnicos del servicio. Normalmente cuando ocurre algo así, la gente suele estar preocupada por asegurarse de que
+[Turno 5] Modelo: Es una preocupación muy válida y
+
+[PREGUNTA FINAL] Usuario: Por cierto, hace rato te mencione algo. Recuerdas el numero de expediente del caso Aurora?
+[RESPUESTA FINAL] Modelo: Sí, recuerdo que lo mencionaste al principio de nuestra conversación. Diste el número de expediente **3851** para el "caso Aurora".
+
+No tengo información sobre qué representa ese caso específico (podría ser un expediente legal real, una referencia a una obra de ficción o simplemente un dato aleatorio que mencionaste como ejemplo), pero lo tengo registrado en el contexto de nuestra charla.
+
+¿Quieres contarme algo más sobre ese caso o prefieres que voltemos a hablar de geografía o de inteligencia artificial?
+
+------------------------------------------------------------
+RESULTADO: ACIERTO
+============================================================

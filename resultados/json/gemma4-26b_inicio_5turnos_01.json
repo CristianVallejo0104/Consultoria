@@ -1,0 +1,19 @@
+{
+  "modelo": "gemma4-26b",
+  "empresa": "Google",
+  "turnos": 5,
+  "posicion": "inicio",
+  "dato_clave": "el numero de expediente del caso Aurora es 3851",
+  "turno_dato": 2,
+  "tokens_prompt": 0,
+  "tokens_respuesta": 0,
+  "tokens_totales": 0,
+  "tiempo_segundos": 7.9,
+  "acierto": null,
+  "estado_final": "invalida_tecnica",
+  "errores_por_tipo": {
+    "rate_limit": 5
+  },
+  "respuesta_final": "Sin respuesta",
+  "verificacion": "3851"
+}

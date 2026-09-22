@@ -1,0 +1,18 @@
+{
+  "modelo": "gpt-oss-120b",
+  "empresa": "OpenAI",
+  "turnos": 5,
+  "posicion": "inicio",
+  "tema": "ciencia",
+  "dato_clave": "el codigo de referencia del proyecto Fenix es F-7492-X",
+  "turno_dato": 2,
+  "tokens_prompt": 4436,
+  "tokens_respuesta": 1654,
+  "tokens_totales": 6090,
+  "tiempo_segundos": 585.8,
+  "acierto": true,
+  "estado_final": "valida",
+  "errores_por_tipo": {},
+  "respuesta_final": "Claro, el código de referencia que mencionaste para el proyecto Fenix es **F‑7492‑X**.",
+  "verificacion": "7492"
+}

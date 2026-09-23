@@ -8,6 +8,8 @@ import time
 import os
 import random
 from dotenv import load_dotenv
+import traceback
+
 
 load_dotenv()
 random.seed(42)  # Semilla fija para reproducibilidad del experimento
@@ -42,6 +44,11 @@ MODELOS_OPENROUTER = {
 }
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 
+TIMEOUT_SEGUNDOS = 180  # tiempo maximo de espera por llamada a un modelo
+TEMPERATURA = 0.7              # igual para todos los modelos evaluados y el generador de relleno
+TEMPERATURA_ORQUESTADOR = 0.0  # el orquestador solo copia parametros: sin aleatoriedad
+NUM_CTX_OLLAMA = 8192          # provisional: se ajusta al definir los niveles de tokens
+
 
 # ============================================================
 # DISEÑO DE MODELOS
@@ -60,6 +67,7 @@ OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 MODELOS_EVALUABLES = {
     "phi3:mini": "Microsoft",
     "gemma2:2b": "Google",
+    "gemma3:4b": "Google",
     "llama3.2:3b": "Meta",
     "deepseek-v4-flash": "DeepSeek",
     "gpt-oss-20b": "OpenAI",
@@ -77,7 +85,8 @@ MODELO_GENERADOR_RELLENO = "qwen2.5:1.5b"     # Alibaba — genera los turnos de
 
 llm = LLM(
     model=MODELO_CEREBRO,
-    base_url="http://localhost:11434"
+    base_url="http://localhost:11434",
+    temperature=TEMPERATURA_ORQUESTADOR
 )
 
 # ============================================================
@@ -121,54 +130,66 @@ def resolver_turno_dato(posicion, num_turnos):
         return num_turnos // 2
 
 
-def consultar_modelo(modelo, historial):
+def _invalida(estado, codigo_http, tipo_error):
+    """Diccionario estandar de una llamada que NO produjo respuesta utilizable."""
+    return {"contenido": None, "tokens_prompt": 0, "tokens_respuesta": 0,
+            "estado": estado, "codigo_http": codigo_http, "tipo_error": tipo_error}
+
+
+def _valida(contenido, tokens_prompt, tokens_respuesta):
+    """Diccionario estandar de una llamada exitosa."""
+    return {"contenido": contenido, "tokens_prompt": tokens_prompt,
+            "tokens_respuesta": tokens_respuesta, "estado": "valida",
+            "codigo_http": 200, "tipo_error": None}
+
+
+def _procesar_openai_compat(resp):
+    """Interpreta la respuesta de APIs con formato OpenAI (NVIDIA, Groq, OpenRouter)."""
+    if resp.status_code == 429:
+        return _invalida("invalida_tecnica", 429, "rate_limit")
+    if resp.status_code == 503:
+        return _invalida("invalida_tecnica", 503, "sobrecarga")
+    if resp.status_code != 200:
+        return _invalida("invalida_tecnica", resp.status_code, "desconocido")
+
+    data = resp.json()
+    try:
+        eleccion = data["choices"][0]
+    except (KeyError, IndexError, TypeError):
+        return _invalida("invalida_tecnica", 200, "respuesta_inesperada")
+
+    mensaje = eleccion.get("message") or {}
+    if eleccion.get("finish_reason") == "content_filter" or mensaje.get("refusal"):
+        return _invalida("rechazo_seguridad", 200, "bloqueo_seguridad")
+
+    contenido = mensaje.get("content")
+    if contenido is None:
+        return _invalida("invalida_tecnica", 200, "respuesta_inesperada")
+
+    usage = data.get("usage", {})
+    return _valida(contenido, usage.get("prompt_tokens", 0), usage.get("completion_tokens", 0))
+
+
+def _despachar_modelo(modelo, historial):
     """Decide si consultar Ollama (local) o NVIDIA API (cloud) o GROQ API (cloud) o GEMINI API (cloud) segun el modelo.
     Devuelve: contenido, tokens_prompt, tokens_respuesta"""
     if modelo in MODELOS_NVIDIA:
         resp = requests.post(
             "https://integrate.api.nvidia.com/v1/chat/completions",
             headers={"Authorization": f"Bearer {NVIDIA_API_KEY}"},
-            json={"model": MODELOS_NVIDIA[modelo], "messages": historial}
+            json={"model": MODELOS_NVIDIA[modelo], "messages": historial, "temperature": TEMPERATURA},
+            timeout=TIMEOUT_SEGUNDOS
         )
-        if resp.status_code == 429:
-            return {"contenido": None, "tokens_prompt": 0, "tokens_respuesta": 0,
-                    "estado": "invalida_tecnica", "codigo_http": 429, "tipo_error": "rate_limit"}
-        if resp.status_code == 503:
-            return {"contenido": None, "tokens_prompt": 0, "tokens_respuesta": 0,
-                    "estado": "invalida_tecnica", "codigo_http": 503, "tipo_error": "sobrecarga"}
-        if resp.status_code != 200:
-            return {"contenido": None, "tokens_prompt": 0, "tokens_respuesta": 0,
-                    "estado": "invalida_tecnica", "codigo_http": resp.status_code, "tipo_error": "desconocido"}
-        data = resp.json()
-        contenido = data["choices"][0]["message"]["content"]
-        usage = data.get("usage", {})
-        tokens_prompt = usage.get("prompt_tokens", 0)
-        tokens_respuesta = usage.get("completion_tokens", 0)
-        return {"contenido": contenido, "tokens_prompt": tokens_prompt, "tokens_respuesta": tokens_respuesta,
-                "estado": "valida", "codigo_http": 200, "tipo_error": None}
+        return _procesar_openai_compat(resp)
     elif modelo in MODELOS_GROQ:
         limite_tokens = 150 if "qwen" in modelo else 300
         resp = requests.post(
             "https://api.groq.com/openai/v1/chat/completions",
             headers={"Authorization": f"Bearer {GROQ_API_KEY}"},
-            json={"model": MODELOS_GROQ[modelo], "messages": historial, "max_tokens": limite_tokens}
+            json={"model": MODELOS_GROQ[modelo], "messages": historial,"max_tokens": limite_tokens, "temperature": TEMPERATURA},
+            timeout=TIMEOUT_SEGUNDOS
         )
-        if resp.status_code == 429:
-            return {"contenido": None, "tokens_prompt": 0, "tokens_respuesta": 0,
-                    "estado": "invalida_tecnica", "codigo_http": 429, "tipo_error": "rate_limit"}
-        if resp.status_code == 503:
-            return {"contenido": None, "tokens_prompt": 0, "tokens_respuesta": 0,
-                    "estado": "invalida_tecnica", "codigo_http": 503, "tipo_error": "sobrecarga"}
-        if resp.status_code != 200:
-            return {"contenido": None, "tokens_prompt": 0, "tokens_respuesta": 0,
-                    "estado": "invalida_tecnica", "codigo_http": resp.status_code, "tipo_error": "desconocido"}
-        data = resp.json()
-        contenido = data["choices"][0]["message"]["content"]
-        usage = data.get("usage", {})
-        tokens_prompt = usage.get("prompt_tokens", 0)
-        tokens_respuesta = usage.get("completion_tokens", 0)
-        return {"contenido": contenido, "tokens_prompt": tokens_prompt, "tokens_respuesta": tokens_respuesta,
-                "estado": "valida", "codigo_http": 200, "tipo_error": None} 
+        return _procesar_openai_compat(resp)
     elif modelo in MODELOS_GEMINI:
         # Gemini usa "model" en vez de "assistant" como rol
         contenido_gemini = []
@@ -181,72 +202,65 @@ def consultar_modelo(modelo, historial):
         
         resp = requests.post(
             f"https://generativelanguage.googleapis.com/v1beta/models/{MODELOS_GEMINI[modelo]}:generateContent?key={GEMINI_API_KEY}",
-            json={"contents": contenido_gemini}
+            json={"contents": contenido_gemini, "generationConfig": {"temperature": TEMPERATURA}},
+            timeout=TIMEOUT_SEGUNDOS
         )
         if resp.status_code == 429:
-            return {"contenido": None, "tokens_prompt": 0, "tokens_respuesta": 0,
-                    "estado": "invalida_tecnica", "codigo_http": 429, "tipo_error": "rate_limit"}
+            return _invalida("invalida_tecnica", 429, "rate_limit")
         if resp.status_code == 503:
-            return {"contenido": None, "tokens_prompt": 0, "tokens_respuesta": 0,
-                    "estado": "invalida_tecnica", "codigo_http": 503, "tipo_error": "sobrecarga"}
+            return _invalida("invalida_tecnica", 503, "sobrecarga")
         if resp.status_code != 200:
-            return {"contenido": None, "tokens_prompt": 0, "tokens_respuesta": 0,
-                    "estado": "invalida_tecnica", "codigo_http": resp.status_code, "tipo_error": "desconocido"}
+            return _invalida("invalida_tecnica", resp.status_code, "desconocido")
         data = resp.json()
-        
+
         # Gemini puede bloquear la respuesta por seguridad sin dar error HTTP
         finish_reason = data.get("candidates", [{}])[0].get("finishReason", "")
         if finish_reason == "SAFETY":
-            return {"contenido": None, "tokens_prompt": 0, "tokens_respuesta": 0,
-                    "estado": "rechazo_seguridad", "codigo_http": 200, "tipo_error": "bloqueo_seguridad"}
-        
+            return _invalida("rechazo_seguridad", 200, "bloqueo_seguridad")
+
         try:
             contenido = data["candidates"][0]["content"]["parts"][0]["text"]
         except (KeyError, IndexError):
-            return {"contenido": None, "tokens_prompt": 0, "tokens_respuesta": 0,
-                    "estado": "invalida_tecnica", "codigo_http": 200, "tipo_error": "respuesta_inesperada"}
+            return _invalida("invalida_tecnica", 200, "respuesta_inesperada")
         usage = data.get("usageMetadata", {})
         tokens_prompt = usage.get("promptTokenCount", 0)
         tokens_respuesta = usage.get("candidatesTokenCount", 0)
-        return {"contenido": contenido, "tokens_prompt": tokens_prompt, "tokens_respuesta": tokens_respuesta,
-                "estado": "valida", "codigo_http": 200, "tipo_error": None}
+        return _valida(contenido, tokens_prompt, tokens_respuesta)
     elif modelo in MODELOS_OPENROUTER:
         resp = requests.post(
             "https://openrouter.ai/api/v1/chat/completions",
             headers={"Authorization": f"Bearer {OPENROUTER_API_KEY}"},
-            json={"model": MODELOS_OPENROUTER[modelo], "messages": historial}
+            json={"model": MODELOS_OPENROUTER[modelo], "messages": historial, "temperature": TEMPERATURA},
+            timeout=TIMEOUT_SEGUNDOS
         )
-        if resp.status_code == 429:
-            return {"contenido": None, "tokens_prompt": 0, "tokens_respuesta": 0,
-                    "estado": "invalida_tecnica", "codigo_http": 429, "tipo_error": "rate_limit"}
-        if resp.status_code == 503:
-            return {"contenido": None, "tokens_prompt": 0, "tokens_respuesta": 0,
-                    "estado": "invalida_tecnica", "codigo_http": 503, "tipo_error": "sobrecarga"}
-        if resp.status_code != 200:
-            return {"contenido": None, "tokens_prompt": 0, "tokens_respuesta": 0,
-                    "estado": "invalida_tecnica", "codigo_http": resp.status_code, "tipo_error": "desconocido"}
-        data = resp.json()
-        contenido = data["choices"][0]["message"]["content"]
-        usage = data.get("usage", {})
-        tokens_prompt = usage.get("prompt_tokens", 0)
-        tokens_respuesta = usage.get("completion_tokens", 0)
-        return {"contenido": contenido, "tokens_prompt": tokens_prompt, "tokens_respuesta": tokens_respuesta,
-                "estado": "valida", "codigo_http": 200, "tipo_error": None}
+        return _procesar_openai_compat(resp)
     else:
         resp = requests.post(
             "http://localhost:11434/api/chat",
-            json={"model": modelo, "messages": historial, "stream": False}
+            json={"model": modelo, "messages": historial, "stream": False,"options": {"temperature": TEMPERATURA, "num_ctx": NUM_CTX_OLLAMA}},
+            timeout=TIMEOUT_SEGUNDOS
         )
         if resp.status_code != 200:
-            return {"contenido": None, "tokens_prompt": 0, "tokens_respuesta": 0,
-                    "estado": "invalida_tecnica", "codigo_http": resp.status_code, "tipo_error": "desconocido"}
+            return _invalida("invalida_tecnica", resp.status_code, "desconocido")
         data = resp.json()
         contenido = data.get("message", {}).get("content", "Sin respuesta")
         tokens_prompt = data.get("prompt_eval_count", 0)
         tokens_respuesta = data.get("eval_count", 0)
-        return {"contenido": contenido, "tokens_prompt": tokens_prompt, "tokens_respuesta": tokens_respuesta,
-                "estado": "valida", "codigo_http": 200, "tipo_error": None}
+        return _valida(contenido, tokens_prompt, tokens_respuesta)
 
+def consultar_modelo(modelo, historial):
+    """Punto de entrada unico para consultar un modelo. Nunca lanza excepciones
+    de red: las convierte en una corrida invalida con su tipo de error."""
+    try:
+        return _despachar_modelo(modelo, historial)
+    except requests.exceptions.Timeout:
+        return _invalida("invalida_tecnica", None, "timeout")
+    except requests.exceptions.ConnectionError:
+        return _invalida("invalida_tecnica", None, "conexion")
+    except ValueError:
+        return _invalida("invalida_tecnica", 200, "respuesta_inesperada")
+    except requests.exceptions.RequestException:
+        return _invalida("invalida_tecnica", None, "error_red")
 
 def generar_nombre_archivo(modelo, posicion, turnos):
     """Genera un nombre unico basado en modelo, posicion, turnos y replica."""
@@ -257,11 +271,43 @@ def generar_nombre_archivo(modelo, posicion, turnos):
         replica += 1
     return f"{base}_{replica:02d}"
 
+def _generar_relleno(historial):
+    """Pide al modelo generador (local) el siguiente mensaje del 'usuario'.
+    Devuelve el texto, o None si el generador fallo."""
+    prompt_generar = (
+        "Eres una persona curiosa que disfruta conversar sobre "
+        "cualquier tema. Responde de forma natural a lo que te "
+        "acaban de decir: puedes opinar, compartir algo que sabes, "
+        "hacer una pregunta sobre un detalle especifico que "
+        "mencionaron, contar algo relacionado, o llevar la "
+        "conversacion hacia otro tema que te interese. "
+        "Habla como en una conversacion real entre amigos. "
+        "Escribe 2 a 4 oraciones. No seas repetitivo ni uses "
+        "frases como 'eso suena interesante' o 'cuentame mas'. "
+        "Responde en español. "
+        f"El asistente acaba de decir: {historial[-1]['content'][:500]}"
+    )
+    try:
+        resp = requests.post(
+            "http://localhost:11434/api/generate",
+            json={"model": MODELO_GENERADOR_RELLENO, "prompt": prompt_generar, "stream": False,
+                  "options": {"temperature": TEMPERATURA}},
+            timeout=TIMEOUT_SEGUNDOS
+        )
+        if resp.status_code != 200:
+            return None
+        texto = resp.json().get("response", "").strip()
+    except (requests.exceptions.RequestException, ValueError):
+        return None
+    return texto[:200] or None
+
 
 def simular_conversacion(modelo, num_turnos, turno_dato, dato_clave, pregunta_final, tema_seleccionado=None):
     """Simula la conversacion completa turno a turno e inserta el dato clave
-    en el turno indicado. Devuelve: conversacion_texto, tokens_prompt_totales,
-    tokens_respuesta_totales, respuesta_final, estado_final, errores_por_tipo"""
+    en el turno indicado. Si cualquier turno falla, la corrida se aborta como
+    invalida (una conversacion con huecos no es el tratamiento que se quiere medir).
+    Devuelve: conversacion_texto, tokens_prompt_totales, tokens_respuesta_totales,
+    respuesta_final, estado_final, errores_por_tipo"""
     if tema_seleccionado is None:
         tema_seleccionado = seleccionar_tema()
     primer_mensaje = tema_seleccionado["inicio"]
@@ -277,35 +323,21 @@ def simular_conversacion(modelo, num_turnos, turno_dato, dato_clave, pregunta_fi
     tokens_respuesta_totales = 0
     errores_por_tipo = {}
 
-    for i in range(num_turnos):  
+    for i in range(num_turnos):
         if i == 0:
             msg_usuario = primer_mensaje
         elif i == turno_dato:
             msg_usuario = mensaje_con_dato
         else:
-            prompt_generar = (
-                "Eres una persona curiosa que disfruta conversar sobre "
-                "cualquier tema. Responde de forma natural a lo que te "
-                "acaban de decir: puedes opinar, compartir algo que sabes, "
-                "hacer una pregunta sobre un detalle especifico que "
-                "mencionaron, contar algo relacionado, o llevar la "
-                "conversacion hacia otro tema que te interese. "
-                "Habla como en una conversacion real entre amigos. "
-                "Escribe 2 a 4 oraciones. No seas repetitivo ni uses "
-                "frases como 'eso suena interesante' o 'cuentame mas'. "
-                "Responde en español. "
-                f"El asistente acaba de decir: {historial[-1]['content'][:500]}"
-            )
-            resp_gen = requests.post(
-                "http://localhost:11434/api/generate",
-                json={
-                    "model": MODELO_GENERADOR_RELLENO,
-                    "prompt": prompt_generar,
-                    "stream": False
-                }
-            )
-            msg_usuario = resp_gen.json().get("response", "Interesante, cuentame mas.")
-            msg_usuario = msg_usuario.strip()[:200]
+            msg_usuario = _generar_relleno(historial)
+            if msg_usuario is None:
+                errores_por_tipo["generador_relleno"] = 1
+                conversacion_texto += (
+                    f"\n[Turno {i+1}] ERROR: el generador de relleno no respondio. "
+                    "CORRIDA ABORTADA\n"
+                )
+                return (conversacion_texto, tokens_prompt_totales, tokens_respuesta_totales,
+                        "Sin respuesta", "invalida_tecnica", errores_por_tipo)
 
         historial.append({"role": "user", "content": msg_usuario})
         conversacion_texto += f"\n[Turno {i+1}] Usuario: {msg_usuario}\n"
@@ -315,10 +347,11 @@ def simular_conversacion(modelo, num_turnos, turno_dato, dato_clave, pregunta_fi
             tipo = resultado_llamada["tipo_error"]
             errores_por_tipo[tipo] = errores_por_tipo.get(tipo, 0) + 1
             conversacion_texto += (
-                f"[Turno {i+1}] ERROR ({resultado_llamada['estado']}, "
-                f"{resultado_llamada['tipo_error']}): no se pudo consultar el modelo\n"
+                f"[Turno {i+1}] ERROR ({resultado_llamada['estado']}, {tipo}): "
+                "no se pudo consultar el modelo. CORRIDA ABORTADA\n"
             )
-            continue
+            return (conversacion_texto, tokens_prompt_totales, tokens_respuesta_totales,
+                    "Sin respuesta", resultado_llamada["estado"], errores_por_tipo)
 
         resp_modelo = resultado_llamada["contenido"]
         tokens_prompt_totales += resultado_llamada["tokens_prompt"]
@@ -333,6 +366,8 @@ def simular_conversacion(modelo, num_turnos, turno_dato, dato_clave, pregunta_fi
     if resultado_final["estado"] != "valida":
         respuesta_final = "Sin respuesta"
         estado_final = resultado_final["estado"]
+        tipo = resultado_final["tipo_error"]
+        errores_por_tipo[tipo] = errores_por_tipo.get(tipo, 0) + 1
     else:
         respuesta_final = resultado_final["contenido"]
         estado_final = "valida"
@@ -440,9 +475,20 @@ def ejecutar_evaluacion(modelo, posicion, num_turnos):
     turno_dato = resolver_turno_dato(pos, num)
     
     tema_seleccionado = seleccionar_tema()
-    conversacion_texto, tokens_prompt, tokens_respuesta, respuesta_final, estado_final, errores_por_tipo = simular_conversacion(
-        modelo, num, turno_dato, dato_clave, pregunta_final, tema_seleccionado
-    )
+    detalle_error = None
+    try:
+        (conversacion_texto, tokens_prompt, tokens_respuesta,
+         respuesta_final, estado_final, errores_por_tipo) = simular_conversacion(
+            modelo, num, turno_dato, dato_clave, pregunta_final, tema_seleccionado
+        )
+    except Exception:
+        detalle_error = traceback.format_exc()
+        print(f"[ERROR INTERNO] {modelo} | {pos} | {num} turnos\n{detalle_error}")
+        conversacion_texto = "\n[EXCEPCION INTERNA] La corrida se interrumpio por un error de codigo.\n"
+        tokens_prompt = tokens_respuesta = 0
+        respuesta_final = "Sin respuesta"
+        estado_final = "invalida_tecnica"
+        errores_por_tipo = {"excepcion_interna": 1}
 
     if estado_final == "valida":
         acierto = verificar_acierto(respuesta_final, verificacion)
@@ -450,7 +496,7 @@ def ejecutar_evaluacion(modelo, posicion, num_turnos):
         acierto = None  # no es un fallo real, es una corrida invalida/rechazada
 
     tiempo_total = time.time() - inicio_tiempo
-
+    es_local = modelo not in (MODELOS_NVIDIA | MODELOS_GROQ | MODELOS_GEMINI | MODELOS_OPENROUTER)
     resultado = {
         "modelo": modelo,
         "empresa": MODELOS_EVALUABLES[modelo],
@@ -469,6 +515,9 @@ def ejecutar_evaluacion(modelo, posicion, num_turnos):
         "respuesta_final": respuesta_final[:200],
         "verificacion": verificacion,
         "conversacion_texto": conversacion_texto,
+        "detalle_error": detalle_error,
+        "temperatura": TEMPERATURA,
+        "num_ctx": NUM_CTX_OLLAMA if es_local else None,
     }
     return resultado
 

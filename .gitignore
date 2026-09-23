@@ -1,7 +1,6 @@
 venv/
 __pycache__/
 *.pyc
-/home/cristian/2026-2/consultoria-investigacion/arquitecturas
 RepositorioConsultoria.txt
 .env
 *.pptx
@@ -9,3 +8,5 @@ RepositorioConsultoria.txt
 apitokennvidia.txt
 *.pdf
 agente_backup.py
+medir_tokens.py
+test_paso*.py

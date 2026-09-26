@@ -2,7 +2,7 @@
 
 Este archivo le da contexto a Claude Code (o cualquier asistente) que revise este repositorio. Es un proyecto académico en curso, con decisiones ya tomadas y justificadas. **Este asesor solo revisa y sugiere — no edita código directamente.** El código real lo escriben Cristian y Juan Pablo en su propio flujo de trabajo.
 
-*Última actualización: 2026-09-23.*
+*Última actualización: 2026-09-26.*
 
 ## Qué es este proyecto
 
@@ -85,6 +85,8 @@ Para operar el experimento desde un agente de terminal hay dos plantillas en la 
 
 El agente solo ejecuta y reporta; la medición la hace el código Python. opencode lee este `CLAUDE.md` como respaldo de `AGENTS.md`, por eso **no debe crearse un `AGENTS.md`** (lo ignoraría).
 
+Ambas plantillas incluyen el comando para correr `evaluar_calidad_texto.py` (ver más abajo), además de las corridas de retención.
+
 ## Modelos
 
 **Locales (Diseño A):** `phi3:mini` (Microsoft, 3.8B, ventana 131,072, Q4_0), `llama3.2:3b` (Meta, 3.2B, 131,072, Q4_K_M), `gemma3:4b` (Google, 4.3B, 131,072, Q4_K_M). `gemma2:2b` (Google, 2.6B, ventana 8,192, Q4_0) queda como referencia a un nivel bajo. Un modelo por empresa.
@@ -123,6 +125,14 @@ El agente solo ejecuta y reporta; la medición la hace el código Python. openco
 - **Decisión abierta (A/B):** con o sin tope común de tokens por respuesta. A favor del tope: comparabilidad entre modelos verbosos y concisos, y entre local y cloud. En contra: altera el comportamiento de los modelos verbosos, corta frases y puede dejar vacíos a los modelos que razonan.
 - Análisis previsto: regresión logística (modelo, posición, nivel, interacciones); chi-cuadrado solo para tablas marginales con frecuencias esperadas suficientes; verificación de supuestos.
 - Límite del alcance: el estudio solo dice algo sobre los niveles de contexto medidos, no sobre contextos mayores aunque el modelo los soporte. La diferencia local–cloud mezcla tamaño del modelo, entrenamiento y ventana; no se atribuye a una sola causa.
+- Justificación del diseño factorial: sigue la misma estructura experimental de Liu et al. (2023, "Lost in the Middle") y su extensión en Zhang et al. (2024, "Found in the Middle") — ver "Hallazgos de exploración" abajo.
+
+## Hallazgos de exploración (2026-09-26)
+
+- **Laya (convaiinnovations/laya, checkpoint inglés) explorado como clasificador de tipo de fallo:** zero-shot, `choice` (5 categorías) da 38% de coincidencia con `verificar_acierto()` (cercano al azar); `noul` (sí/no binario) da 100%, con separación clara de probabilidad. El checkpoint `laya-multilingual` rindió peor (62%/62%) pese a estar en español — usar el inglés como base si se hace fine-tuning más adelante. Checkpoint reporta temperaturas de calibración inválidas; tratar su confianza como no calibrada. Bloqueado por falta de datos (solo 2 fallos reales en 13 corridas válidas del primer corte).
+- **Taxonomía de tipos de fallo, respaldada con 3 fuentes:** "alucinación" → Huang et al. (2023) *Context Inconsistency* y Zhang et al. (2023, "Siren's Song") *Context-Conflicting Hallucination*; "admisión"/"negación de capacidad" → Wen et al. (2025) perspectiva de conocimiento del modelo, y Zhang et al. (2023) *Under-informativeness* (explícitamente NO alucinación); "rechazo de seguridad" → Wen et al. (2025) perspectiva de valores humanos; "alucinación narrativa" → Huang et al. (2023) *Factual Fabrication*, adaptada. Fuentes en `docs/fuentes/`.
+- **Evaluador de calidad de texto** (`evaluar_calidad_texto.py`, nuevo): evalúa solo los turnos de "Usuario" (generador de relleno) en naturalidad/coherencia/interés, adaptando las dimensiones de Mehri y Eskenazi (2020, USR) medidas con el mecanismo de G-Eval (LLM juez con razonamiento paso a paso) en vez del método de modelos entrenados del paper original — decisión explícita, no equivalencia. Respaldo del método: Zheng et al. (2023, "Judging LLM-as-a-Judge"), que documenta sesgos conocidos (verbosidad, posición, auto-preferencia). Hallazgo real: se detectaron cortes de frase a mitad de palabra en el generador de relleno que el LLM juez no penalizó consistentemente — evidencia de sesgo de verbosidad. Validación manual (comparar notas del LLM contra lectura propia) sigue pendiente. Pendiente de confirmar con el profesor si la calidad a evaluar es del generador de relleno, del modelo evaluado, o ambos.
+- **Justificación del diseño factorial:** el diseño (modelo × posición × nivel × réplicas) sigue la misma estructura de Liu et al. (2023, "Lost in the Middle") — 2,655 preguntas, k=10/20/30 documentos, posición variada, 6 modelos — y su extensión en Zhang et al. (2024, "Found in the Middle") — 7 modelos, posición variada, con estudio de ablación. Verificado directamente contra los PDF: ninguno de los dos usa el término "diseño de bloques"; describir como variación sistemática de factores, no forzar terminología estadística que las fuentes no usan.
 
 ## Trabajo pendiente (por prioridad)
 
@@ -132,9 +142,10 @@ El agente solo ejecuta y reporta; la medición la hace el código Python. openco
 4. Decidir el tope de tokens por respuesta (A/B).
 5. Script del diseño factorial con réplicas, con manejo de excepciones por corrida.
 6. Cerrar los modelos cloud y calcular el costo real con los precios vigentes.
-7. Tres agentes planeados, aún sin implementar: verificador de checkpoints, clasificador de tipo de fallo (reglas deterministas primero; validado con kappa entre los dos estudiantes y el agente) y analista de hallazgos.
-8. Checkpoints de verificación intermedios (curva de retención).
-9. Documentación: `README.md`, `docs/DISEÑO.md`, `docs/decisiones.md`, `docs/REPLICAR.md`.
+7. Tres agentes planeados: verificador de checkpoints, clasificador de tipo de fallo (Laya bloqueado por falta de datos — retomar tras el piloto/270 corridas), analista de hallazgos.
+8. Documentación: `docs/DISEÑO.md` (tabla de taxonomía + justificación de diseño, con las fuentes de hoy), `docs/decisiones.md` (D-01 a D-05), `docs/REPLICAR.md`.
+9. Validar manualmente las notas del evaluador de calidad de texto contra lectura propia (comparar con las 5 conversaciones ya evaluadas).
+10. Confirmar con el profesor: ¿calidad de texto pedida es del generador de relleno, del modelo evaluado, o ambos? (hoy se implementó solo para el generador de relleno).
 
 ## Pendiente de confirmar con el profesor
 

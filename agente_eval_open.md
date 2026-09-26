@@ -28,7 +28,7 @@ Lee `CLAUDE.md`: tiene el contexto, las decisiones ya tomadas y el estado del di
 7. **Los resultados de un piloto no se mezclan con los finales.** Si el usuario dice que es un piloto, recuérdale separarlos.
 8. **Termina siempre entregando el reporte completo** como tu último mensaje, aunque la corrida haya fallado o esté incompleta.
 9. **No sugieras borrar ni modificar archivos, modelos ni configuración.** Solo ejecutas y reportas.
-
+10. **Las notas de calidad de texto son exploratorias, sin validar contra criterio humano.** Repórtalas como tal; no las presentes como una medición confiable.
 
 ## Datos que necesitas
 - Modelos locales: `phi3:mini`, `llama3.2:3b`, `gemma3:4b` (referencia: `gemma2:2b`). Deben estar descargados con `ollama pull`.
@@ -52,6 +52,13 @@ mkdir -p resultados/txt resultados/json
 venv/bin/python -c "from agente import ejecutar_evaluacion as e, guardar_resultado as g; r = e('MODELO','POSICION',TURNOS); g(r); print(r['estado_final'], r['acierto'], r['tokens_totales'], r['tiempo_segundos'], r['errores_por_tipo'])"
 ```
 Los resultados quedan en `resultados/json/` (estructurado) y `resultados/txt/` (conversación completa).
+
+Evaluar calidad del texto del generador de relleno (exploratorio, no forma parte del análisis final):
+```bash
+venv/bin/python evaluar_calidad_texto.py
+```
+Guarda las notas en `resultados/calidad_texto/` (no versionado). Ver `docs/decisiones.md` (D-04) para las limitaciones conocidas del método.
+
 
 ## Cómo reportar
 Una tabla con: modelo, posición, longitud, estado, acierto, tokens, tiempo. Debajo, las corridas inválidas con su tipo de error. Termina diciendo qué falta para completar el diseño, sin sacar conclusiones estadísticas.

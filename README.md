@@ -12,6 +12,8 @@ Estudiantes y profesionales de estadística que usan modelos de lenguaje locales
 
 G-Eval (Liu et al., 2023) usa un modelo de lenguaje como juez para calificar la calidad de un texto aislado, y RAGAS (Es et al., 2023) evalúa sistemas de recuperación de documentos sobre interacciones individuales. Ninguno mide la **retención de información a lo largo de una conversación de varios turnos**. Este proyecto sí, con datos inventados que el modelo no puede conocer de su entrenamiento, evaluación determinista (sin modelo juez) y ejecución local reproducible.
 
+*(Nota: para verificar la calidad del texto del generador de relleno se usa un LLM juez de forma exploratoria — ver "Diseño experimental". La medición de retención, en cambio, sigue siendo 100% determinista.)*
+
 ## Línea base: cómo se hace sin el agente
 
 Sin esta herramienta, una persona tendría que:
@@ -86,28 +88,31 @@ Campos del JSON: `modelo, empresa, turnos, posicion, tema, dato_clave, turno_dat
 
 - **Factores:** modelo × posición del dato (inicio, mitad, final) × nivel de tokens × réplicas.
 - **Niveles de tokens: pendiente.** La longitud pasa de turnos a tokens porque "5 turnos" no es comparable entre modelos (`phi3:mini` generó ~10,000 tokens en 5 turnos; `gemma2:2b`, ~1,900). Los niveles se fijarán con un piloto local cuyos datos no entran al análisis final.
+- **Justificación del diseño factorial:** sigue la misma estructura experimental de Liu et al. (2023, "Lost in the Middle": posición × longitud del contexto × modelo) y su extensión en Zhang et al. (2024, "Found in the Middle": 7 modelos, posición variada, estudio de ablación). Nuestra variante inserta el dato dentro de la conversación misma, en vez de en un documento recuperado externamente.
 - **Análisis previsto:** regresión logística (modelo, posición, nivel, interacciones); chi-cuadrado solo para tablas marginales con frecuencias esperadas suficientes; verificación de supuestos.
 - **Alcance:** el estudio solo dice algo sobre los niveles de contexto medidos, no sobre contextos mayores aunque el modelo los soporte.
 
 ## Decisiones de diseño
 
-Cada decisión se documenta con su alternativa descartada.
+Cada decisión se documenta con su alternativa descartada. Registro completo en `docs/decisiones.md`.
 
 - **Agente CrewAI con una herramienta.** El agente es una capa delgada para uso interactivo: recibe instrucciones en lenguaje natural y llama a la herramienta. La lógica del experimento es código determinista, y las corridas masivas no usan el agente. Alternativa descartada: tres herramientas separadas, porque pasar el texto de la conversación por el agente entre cada una saturaba su contexto.
 - **Agentes solo donde hay juicio de lenguaje.** No hay agente selector local/nube (un diccionario lo resuelve) ni agente para verificar supuestos estadísticos (código plano). Están planeados tres agentes con juicio real: un verificador de checkpoints intermedios, un clasificador de tipo de fallo y un analista de hallazgos.
 - **CrewAI.** Alternativas descartadas: LangChain (más componentes para el mismo formato ReAct), LangGraph (grafo nodo por nodo, sobrediseño para un flujo lineal) y AutoGen (complejidad sin beneficio para este caso).
 - **Datos inventados, no conocimiento general.** La primera versión usaba "la capital de Australia es Canberra" y todos acertaban por conocimiento de entrenamiento, no por retención.
-- **Evaluación determinista, no LLM-juez.** Se busca la cadena exacta en la respuesta. Alternativa descartada: otro modelo como evaluador (ruido y circularidad).
+- **Evaluación determinista, no LLM-juez (para retención).** Se busca la cadena exacta en la respuesta. Alternativa descartada: otro modelo como evaluador (ruido y circularidad). Nota: sí se usa un LLM juez, de forma separada y exploratoria, para calidad de texto (ver más abajo).
 - **Manejo de errores unificado.** Un solo punto (`consultar_modelo`) convierte errores de red en corridas inválidas tipadas; una sola función interpreta las APIs compatibles con OpenAI. Alternativa descartada: copiar el parche en cada rama.
 - **D-01: `gemma2:2b` → `gemma3:4b`.** La ventana de 8,192 tokens de `gemma2:2b` impide niveles de 10K o más. Se decidió por una restricción de diseño, antes de correr datos con el modelo nuevo. Se conserva `gemma2:2b` como referencia y su hallazgo original como resultado preliminar.
 - **D-02: pagar créditos de OpenRouter (~US$20).** Los planes gratuitos produjeron corridas inválidas: Groq (límites de 8,000 y 1,000 tokens por minuto según el modelo), NVIDIA (~7 min por corrida de 5 turnos y un endpoint anunciado como deprecado), Gemini (503 intermitentes) y OpenRouter `:free` (límites propios). Por eso no recomendamos depender de APIs gratuitas para corridas masivas. Alternativa descartada: seguir con los planes gratuitos.
+- **D-03: Laya explorado y pospuesto como clasificador de tipo de fallo.** Zero-shot rinde cerca del azar en clasificación de 5 categorías (38%); bloqueado por falta de datos de fallo reales. Ver `docs/decisiones.md`.
+- **D-04: evaluador de calidad de texto con LLM juez (exploratorio).** Adapta dimensiones de Mehri y Eskenazi (2020) medidas con mecanismo de G-Eval. Ver `docs/decisiones.md` para hallazgos y limitaciones.
 
 ## Guardarraíles
 
 - No genera conclusiones estadísticas ni decide qué modelo es "mejor": ejecuta pruebas y reporta.
 - No accede a datos personales ni confidenciales.
 - No modifica los modelos evaluados.
-- La verificación es determinista: no se usa un LLM como evaluador.
+- La verificación de retención es determinista: no se usa un LLM como evaluador para esa parte.
 
 ## Iteraciones del diseño
 
@@ -117,6 +122,11 @@ Cada decisión se documenta con su alternativa descartada.
 - **v4, dato inventado con banco rotativo:** los datos de conocimiento general medían conocimiento previo, no retención.
 - **v5, orquestador liviano y temporizador:** `qwen2.5:1.5b` (986 MB) en lugar de `qwen2.5` (4.7 GB), para correr con 8 GB de RAM.
 - **v6, control de variables y errores tipados:** temperatura fija, timeout, clasificación de corridas inválidas, detección de rechazos de seguridad, banco reescrito con frases neutras ("número de expediente") porque "código secreto" activaba filtros de seguridad.
+
+## Herramientas exploratorias añadidas (fuera del núcleo de `agente.py`)
+
+- **`evaluar_calidad_texto.py`:** evaluador de calidad conversacional (naturalidad, coherencia, interés) para el generador de relleno, con LLM juez. Vive en este repositorio. Ver D-04.
+- **Exploración de Laya** (clasificador de tipo de fallo): se probó en un entorno y carpeta separados (`venv-laya`, fuera de este repositorio, por conflicto de dependencias con `torch`/`transformers`), leyendo los JSON ya generados en `resultados/json/`. Pospuesto por falta de datos de fallo reales. Ver D-03. El código de esa exploración no está versionado aquí.
 
 ## Resultados preliminares (primer corte)
 
@@ -200,7 +210,15 @@ python3 -c "from agente import ejecutar_evaluacion as e, guardar_resultado as g;
 
 `ejecutar_evaluacion()` devuelve un diccionario; `guardar_resultado()` escribe los archivos. La longitud sigue en turnos hasta que termine la migración a tokens.
 
-**3. Con un agente de terminal (Claude Code u opencode):** ver la sección siguiente.
+**3. Evaluar la calidad del texto del generador de relleno** (exploratorio, no forma parte del análisis final aún):
+
+```bash
+python3 evaluar_calidad_texto.py
+```
+
+Evalúa naturalidad, coherencia e interés de los turnos de "Usuario" en una muestra de `resultados/txt/`, usando `qwen2.5:1.5b` como LLM juez (mecanismo de G-Eval, dimensiones de Mehri y Eskenazi, 2020). Guarda en `resultados/calidad_texto/` (no versionado). Ver limitaciones en `docs/decisiones.md`.
+
+**4. Con un agente de terminal (Claude Code u opencode):** ver la sección siguiente.
 
 ## Usar el proyecto con Claude Code u opencode
 
@@ -226,15 +244,22 @@ Después:
 ## Estructura del proyecto
 
 ```
-├── agente.py                # Núcleo y agente evaluador
-├── agente_eval_claude.md    # Plantilla de agente operador para Claude Code
-├── agente_eval_open.md      # Plantilla de agente operador para opencode
-├── CLAUDE.md                # Contexto del proyecto para agentes de IA
-├── requirements.txt         # Todas las dependencias con versiones fijadas (pip freeze)
-├── .env.example             # Nombres de las variables (sin valores)
+├── agente.py                    # Núcleo y agente evaluador
+├── evaluar_calidad_texto.py     # Evalúa naturalidad/coherencia/interés del generador de relleno
+├── agente_eval_claude.md        # Plantilla de agente operador para Claude Code
+├── agente_eval_open.md          # Plantilla de agente operador para opencode
+├── CLAUDE.md                    # Contexto del proyecto para agentes de IA
+├── requirements.txt             # Todas las dependencias con versiones fijadas (pip freeze)
+├── .env.example                 # Nombres de las variables (sin valores)
+├── docs/
+│   ├── DISENO.md                 # Diseño experimental y taxonomía (pendiente de escribir)
+│   ├── decisiones.md             # Registro D-01, D-02, D-03...
+│   ├── fuentes/                  # Papers descargados y verificados
+│   └── informes/                 # PDF del primer corte
 ├── resultados/
-│   ├── txt/                 # Conversación completa de cada corrida
-│   └── json/                # Resultado estructurado de cada corrida
+│   ├── txt/                      # Conversación completa de cada corrida
+│   ├── json/                     # Resultado estructurado de cada corrida
+│   └── calidad_texto/            # Notas de calidad conversacional (exploratorio, no versionado)
 └── README.md
 ```
 
@@ -248,6 +273,7 @@ Después:
 - `top_k` y `top_p` no están fijados.
 - Resultados del primer corte: una réplica y solo posición *inicio*.
 - El orquestador pequeño puede confundir nombres de modelos.
+- El evaluador de calidad de texto es exploratorio: no validado contra criterio humano, y con evidencia de sesgo de verbosidad (no penalizó cortes de frase abruptos).
 
 ## Autores
 

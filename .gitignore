@@ -3,10 +3,10 @@ __pycache__/
 *.pyc
 RepositorioConsultoria.txt
 .env
-*.pptx
 *html
 apitokennvidia.txt
-*.pdf
 agente_backup.py
 medir_tokens.py
 test_paso*.py
+*.pptx
+resultados/calidad_texto/

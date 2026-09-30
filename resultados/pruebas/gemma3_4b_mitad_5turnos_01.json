@@ -1,0 +1,21 @@
+{
+  "modelo": "gemma3:4b",
+  "empresa": "Google",
+  "turnos": 5,
+  "posicion": "mitad",
+  "tema": "geografia",
+  "dato_clave": "el numero de expediente del caso Aurora es 3851",
+  "turno_dato": 3,
+  "tokens_prompt": 9718,
+  "tokens_respuesta": 2553,
+  "tokens_totales": 12271,
+  "tiempo_segundos": 136.2,
+  "acierto": true,
+  "estado_final": "valida",
+  "errores_por_tipo": {},
+  "respuesta_final": "¡Absolutamente! ¡Me has hecho recordar! El número de expediente del caso Aurora es 3851.  ¡Qué curioso que lo mencionaras! Siempre es bueno tener esos detalles en la memoria, ¿verdad?\n\n¿Hay algo más r",
+  "verificacion": "3851",
+  "detalle_error": null,
+  "temperatura": 0.7,
+  "num_ctx": 8192
+}

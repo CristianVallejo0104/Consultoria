@@ -1,0 +1,10 @@
+modelo,posicion,nivel_tokens,replica,estado_final,acierto,turnos_reales,contexto_al_dato,contexto_final,contexto_decreciente,tokens_totales,tiempo_segundos,errores,tema,dato_clave
+gemma3:4b,mitad,4000,1,valida,True,13,2137,4413,False,36295,175.0,{},geografia,el numero de expediente del caso Aurora es 3851
+gemma3:4b,mitad,8000,1,valida,True,30,4054,8260,False,132794,352.5,{},matematicas,el numero de registro del laboratorio Nexus es 6037
+gemma3:4b,mitad,12000,1,valida,True,38,6020,12203,False,254670,456.8,{},matematicas,el codigo de referencia del proyecto Fenix es F-7492-X
+llama3.2:3b,mitad,4000,1,valida,True,11,2337,4185,False,29403,142.0,{},ciencia,el numero de expediente del caso Aurora es 3851
+llama3.2:3b,mitad,8000,1,valida,True,26,4304,8369,False,126056,212.9,{},geografia,la version del algoritmo Centinela que se implemento fue la 9.15.6
+llama3.2:3b,mitad,12000,1,valida,True,33,6215,12375,False,219716,567.7,{},historia,la version del algoritmo Centinela que se implemento fue la 9.15.6
+phi3:mini,mitad,4000,1,valida,False,14,2275,4153,False,39563,310.2,{},geografia,el numero de expediente del caso Aurora es 3851
+phi3:mini,mitad,8000,1,valida,False,28,4153,8085,False,139859,872.9,{},matematicas,el numero de expediente del caso Aurora es 3851
+phi3:mini,mitad,12000,1,valida,False,57,6113,12061,False,392765,1777.8,{},economia,el codigo de referencia del proyecto Fenix es F-7492-X

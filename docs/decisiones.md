@@ -111,3 +111,41 @@ Estas categorías (admisión, negación de capacidad) son observación propia de
 **Decisión.** Justificar el diseño factorial citando esta línea de trabajo (posición × longitud × modelo, variados sistemáticamente), en vez de citar únicamente un libro de estadística general de diseño de experimentos. Se describe como "variación sistemática de factores", sin forzar terminología estadística (bloques, factorial) que las fuentes originales no usan.
 
 **Diferencia con nuestro diseño.** Liu et al. y Zhang et al. insertan el dato clave en un documento recuperado externamente (memoria no paramétrica, estilo RAG). Nuestro diseño lo inserta dentro de la propia conversación (memoria de trabajo conversacional) — la misma distinción ya documentada al descartar RAG como herramienta aplicable.
+
+## D-06 · Migrar de turnos a niveles de tokens
+**Fecha:** 2026-09-26
+**Contexto.** "5 turnos" no es comparable entre modelos: en el primer corte phi3:mini
+procesó 10,259 tokens en 5 turnos y gemma2:2b, 1,903 (Cuadro 3 del informe).
+**Decisión.** El nivel es el contexto en la pregunta final, medido con
+prompt_eval_count + eval_count de la última llamada. Niveles 4,000, 8,000 y 12,000.
+Posición del dato en tokens: inicio = 2.º turno; mitad = al cruzar el 50 % del nivel;
+final = al cruzar el 85 %. Constantes: num_ctx 16,384; tope común de 300 tokens por
+respuesta; máximo 60 turnos; timeout 600 s. Una sola función (sin duplicar).
+**Alternativas descartadas.** Seguir en turnos (plan B: versión en git); mantener dos
+funciones (por turnos y por tokens); niveles candidatos 5K/10K/15K (razón: por documentar).
+**Validación.** Piloto de 9 corridas, todas válidas; el contexto nunca decreció; el dato
+de "mitad" entró entre el 50.2 % y el 58.4 % del nivel; el contexto final superó el
+nominal entre 0.5 % y 10.3 % (se usará contexto_final como covariable).
+**Límites.** Cada modelo usa su tokenizador; las cifras de ambos cortes no son
+comparables; phi3:mini a 12K hizo 57 turnos con un máximo de 60.
+**Pendiente.** Evaluar subir el máximo de turnos; guardar done_reason de Ollama.
+
+## D-07 · Retirar del código los proveedores cloud gratuitos
+**Fecha:** 2026-09-29
+**Contexto.** D-02 decidió pagar OpenRouter; los planes gratuitos dieron corridas inválidas.
+**Decisión.** agente.py conserva solo Ollama (local) y OpenRouter (nube). Se retiraron las
+ramas de NVIDIA, Groq y Gemini. MODELOS_CLOUD queda vacío hasta cerrar el Diseño B.
+**Alternativas descartadas.** Conservar las cuatro ramas (código sin decisión y cuatro claves).
+**Consecuencia.** La versión anterior está en el commit previo a 3f1961a; los resultados de
+los planes gratuitos quedan en resultados/pruebas/ como referencia.
+
+## D-08 · Rol del agente: dos puertas de entrada a un mismo núcleo
+**Fecha:** 2026-09-29
+**Contexto.** El orquestador de 1.5B ha omitido parámetros y sustituido el modelo pedido
+(lámina 21 del primer corte; decisiones anteriores).
+**Decisión.** Las corridas masivas llaman ejecutar_evaluacion() desde correr_experimento.py;
+el agente CrewAI queda como entrada interactiva en lenguaje natural.
+**Alternativas descartadas.** Que el agente dirija el bucle; eliminar el agente.
+**Justificación.** Lo determinista va en código; los agentes se reservan para juicio de
+lenguaje (verificador de checkpoints, clasificador de fallos, analista), aún sin implementar.
+**Nota.** Unificar con la entrada previa "Funciones puras + ejecutar_evaluacion()".

@@ -1,0 +1,18 @@
+>>> gemma3:4b | mitad | 4000 tokens | réplica 1
+    valida True 4413 175.0 s
+>>> gemma3:4b | mitad | 8000 tokens | réplica 1
+    valida True 8260 352.5 s
+>>> gemma3:4b | mitad | 12000 tokens | réplica 1
+    valida True 12203 456.8 s
+>>> llama3.2:3b | mitad | 4000 tokens | réplica 1
+    valida True 4185 142.0 s
+>>> llama3.2:3b | mitad | 8000 tokens | réplica 1
+    valida True 8369 212.9 s
+>>> llama3.2:3b | mitad | 12000 tokens | réplica 1
+    valida True 12375 567.7 s
+>>> phi3:mini | mitad | 4000 tokens | réplica 1
+    valida False 4153 310.2 s
+>>> phi3:mini | mitad | 8000 tokens | réplica 1
+    valida False 8085 872.9 s
+>>> phi3:mini | mitad | 12000 tokens | réplica 1
+    valida False 12061 1777.8 s

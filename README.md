@@ -275,6 +275,20 @@ Después:
 - El orquestador pequeño puede confundir nombres de modelos.
 - El evaluador de calidad de texto es exploratorio: no validado contra criterio humano, y con evidencia de sesgo de verbosidad (no penalizó cortes de frase abruptos).
 
+
+| Archivo | Origen | Versión | Fecha de obtención | Licencia | Verificó |
+|---|---|---|---|---|---|
+| RAG.pdf (renombrar: lewis2020_rag.pdf) | arxiv.org/abs/2005.11401 | v4 (12 abr. 2021) | [fecha] | [por confirmar] | [nombre] |
+| liu2023_GEVAL.pdf | arxiv.org/abs/2303.16634 | v3 (23 may. 2023) | [fecha] | [por confirmar] | [nombre] |
+| RAGAS.pdf (es2023_ragas.pdf) | arxiv.org/abs/2309.15217 | v2 (28 abr. 2025) | [fecha] | [por confirmar] | [nombre] |
+| huang2023_hallucination_survey.pdf | arxiv.org/abs/2311.05232 | v2 (19 nov. 2024) | [fecha] | [por confirmar] | [nombre] |
+| zhang2023_sirens_song.pdf | arxiv.org/abs/2309.01219 | v3 (14 sep. 2025) | [fecha] | [por confirmar] | [nombre] |
+| KnowYourLimits...pdf (wen2024_know_your_limits.pdf) | arxiv.org/abs/2407.18418 | v3 (12 feb. 2025) | [fecha] | [por confirmar] | [nombre] |
+| mehri2020_user.pdf | arxiv.org/abs/2005.00456 | v1 (1 may. 2020) | [fecha] | [por confirmar] | [nombre] |
+| zheng2023_llm_as_judge.pdf | arxiv.org/abs/2306.05685 | v4 (24 dic. 2023) | [fecha] | [por confirmar] | [nombre] |
+| zhang2024_found_in_the_middle.pdf | arxiv.org/abs/2403.04797 | v1 (5 mar. 2024) | [fecha] | [por confirmar] | [nombre] |
+| liu2023_lost_in_the_middle.pdf | arxiv.org/abs/2307.03172 | [por confirmar] | [fecha] | [por confirmar] | [nombre] |
+
 ## Autores
 
 - Juan Pablo Tibamoso

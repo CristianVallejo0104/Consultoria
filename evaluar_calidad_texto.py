@@ -47,8 +47,9 @@ Fragmento:
 """
     resp = requests.post(
         "http://localhost:11434/api/generate",
-        json={"model": modelo, "prompt": prompt, "stream": False},
-        timeout=180
+        json={"model": modelo, "prompt": prompt, "stream": False,
+              "options": {"temperature": 0, "num_ctx": 8192, "num_predict": 600}},
+        timeout=600
     )
     return resp.json().get("response", "")
 

@@ -10,6 +10,12 @@ CONFIGS = {
         "niveles": [4000, 8000, 12000],
         "replicas": 1,
     },
+    "piloto_phi4": {
+        "modelos": ["phi4-mini"],
+        "posiciones": ["mitad"],
+        "niveles": [4000, 8000, 12000],
+        "replicas": 1,
+    },
 }
 
 COLUMNAS = ["modelo", "posicion", "nivel_tokens", "replica", "estado_final", "acierto",

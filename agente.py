@@ -51,7 +51,7 @@ OLLAMA_URL = "http://localhost:11434"
 # auto-preferencia hacia modelos de su propia familia.
 # ============================================================
 MODELOS_LOCALES = {
-    "phi3:mini": "Microsoft",
+    "phi4-mini": "Microsoft",
     "llama3.2:3b": "Meta",
     "gemma3:4b": "Google",  # reemplazo a gemma2:2b (D-01)
 }
@@ -566,7 +566,7 @@ RESULTADO: {texto_resultado(resultado)}
 @tool("evaluar_retencion")
 def evaluar_retencion(modelo: str, posicion: str, nivel_tokens: Union[str, int]) -> str:
     """Evalua si un modelo local retiene un dato inventado dentro de una conversacion larga.
-    modelo: nombre exacto, por ejemplo phi3:mini, llama3.2:3b o gemma3:4b
+    modelo: nombre exacto, por ejemplo phi4-mini, llama3.2:3b o gemma3:4b
     posicion: inicio, mitad o final (donde se inserta el dato)
     nivel_tokens: 4000, 8000 o 12000 (tamano del contexto; numero o texto, ambos son validos)"""
     try:

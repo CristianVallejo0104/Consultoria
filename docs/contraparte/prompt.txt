@@ -1,0 +1,53 @@
+Primera pasada: Opus recibió los cuatro archivos pero solo pudo leer dos (correr_experimento.py y evaluar_calidad_texto.py). La segunda pasada ya leyó los cuatro.
+=== MENSAJE 1 (prompt inicial) ===
+[el prompt completo]
+
+Eres un revisor metodológico independiente (una "contraparte") de un proyecto de consultoría estadística. No conoces el proyecto ni a las personas: todo lo que sabes viene de este mensaje y de los archivos adjuntos. No uses herramientas, búsqueda web, conectores ni memoria; trabaja solo con este material. Responde en español neutro.
+
+TU TAREA
+Evaluar si los procedimientos y los prompts del proyecto tienen sentido metodológico y estadístico, y señalar debilidades que puedan invalidar o sesgar sus resultados. Se espera una revisión crítica y concreta, no una validación de cortesía: si algo es sólido, di por qué; si algo falla, dilo y propón una mejora. A propósito no se te dan resultados experimentales: revisas el método, no los números.
+
+RESUMEN DEL PROYECTO
+Pregunta: ¿en qué punto de una conversación larga los modelos de lenguaje locales (ejecutados con Ollama) dejan de retener un dato dado antes, y cómo varía según el modelo, la posición del dato y la longitud del contexto? Contexto: quienes usan LLMs locales en conversaciones largas no tienen una forma sistemática de saber cuándo el modelo deja de ser confiable. Equipo: dos estudiantes de Estadística, un solo computador (GPU de 6 GB).
+
+Procedimiento de una corrida:
+1. Se elige modelo, posición del dato (inicio, mitad, final) y nivel de contexto (4 000, 8 000 o 12 000 tokens).
+2. Se simula una conversación turno a turno. El primer mensaje del usuario abre un tema (hay 6). En los demás turnos, otro modelo pequeño (el "generador de relleno") escribe el mensaje del usuario a partir del último mensaje del modelo evaluado. El modelo evaluado responde con un tope de 300 tokens y temperatura 0.7.
+3. En un turno determinado se inserta un dato inventado (banco rotativo de 5; por ejemplo, "el número de expediente del caso Aurora es 3851"), seguido de un cambio de tema. Posición: inicio = turno 2; mitad = primer turno en que el contexto medido cruza el 50 % del nivel; final = 85 %.
+4. La conversación continúa hasta que el contexto medido llega al nivel. El contexto se mide con los tokens que reporta el propio modelo (tokens del prompt más los de la respuesta de la última llamada). Entonces se hace una única pregunta final por el dato.
+5. Verificación (sin modelo juez): la cifra exacta debe aparecer en la respuesta y no debe aparecer ninguna frase de una lista de negaciones ("no recuerdo", "no estoy seguro", etc.).
+6. Si una llamada falla (red, tiempo de espera, rechazo de seguridad, o el nivel no se alcanza en 60 turnos), la corrida se marca como inválida y no cuenta como fallo del modelo.
+7. Se guarda la conversación (TXT) y un resultado estructurado (JSON).
+
+Diseño: factores = modelo (3 locales de empresas distintas; modelos de nube por definir), posición (3), nivel (3), réplicas (5 previstas). Respuesta binaria (acierto/fallo). Dato y tema se eligen al azar con una semilla. Análisis previsto: regresión logística con interacciones; chi-cuadrado solo en tablas marginales; verificación de supuestos. Ya se hizo un piloto de 9 corridas (una posición, una réplica); sus resultados no se comparten.
+Parámetros fijos: temperatura 0.7 (modelos evaluados y generador), ventana de contexto 16 384 tokens, tope de 300 tokens por respuesta, máximo 60 turnos, tiempo de espera 600 s.
+Evaluador de calidad (exploratorio): un modelo pequeño actúa de juez y califica de 1 a 5 la naturalidad, coherencia e interés de los mensajes del "usuario" generados por el relleno (temperatura 0).
+Decisiones registradas (en decisiones.md): D-01 cambio de gemma2 a gemma3 por ventana de contexto; D-02 pagar créditos de OpenRouter para los modelos de nube; D-03 clasificador de tipo de fallo (Laya) pospuesto; D-04 evaluador de calidad con LLM juez, exploratorio; D-05 diseño justificado con Liu et al. (2023); D-06 nivel = contexto medido en tokens; D-07 retirar proveedores gratuitos del código; D-08 el agente solo es una entrada interactiva; D-09 RAG, G-Eval y RAGAS contrastados y no usados para medir retención; D-10 selección de modelos (uno por empresa; orquestador y relleno de una cuarta empresa); D-11 dato inventado, verificación exacta y corridas inválidas tipadas.
+Literatura: el diseño se inspira en Liu et al. (2023, "Lost in the Middle"), que muestra que los modelos usan peor la información ubicada en el medio de un contexto largo. Ellos la colocan en documentos recuperados; este proyecto la coloca dentro de la propia conversación.
+
+ADJUNTOS
+agente.py (núcleo, prompts, banco de datos, verificación y parámetros), correr_experimento.py (ejecuta las corridas y escribe un CSV), evaluar_calidad_texto.py (prompt del juez de calidad) y decisiones.md (decisiones con alternativas descartadas). Si el código se desvía de este resumen, señálalo.
+
+REGLAS
+1. Cita siempre la evidencia: archivo y función, línea o sección. Si algo no está en el material, escribe "no está en el material".
+2. No inventes referencias, cifras ni páginas. Si usas conocimiento general (estadística, diseño de experimentos), márcalo como "conocimiento general, no verificado con el material".
+3. Clasifica cada hallazgo como ERROR (invalida o sesga resultados), RIESGO (podría sesgar según cómo se use) o MEJORA (no afecta la validez).
+4. Si no estás seguro, indica tu grado de confianza.
+
+FORMATO DE RESPUESTA (máximo 1 500 palabras)
+0. Lista los archivos que recibiste y di si llegaron completos.
+Para cada área, da: Veredicto (sólido / con reservas / problemático) · Evidencia · Riesgo para la validez · Mejora concreta · Severidad (alta/media/baja).
+A1. Construcción del tratamiento (niveles de tokens, posiciones, inserción del dato).
+A2. Banco de datos inventados y pregunta final.
+A3. Generador de relleno (su prompt y cómo se alimenta).
+A4. Verificación por cadena exacta.
+A5. Corridas inválidas y criterios de parada.
+A6. Parámetros de generación (temperatura, ventana de contexto, tope de tokens, semilla).
+A7. Diseño experimental y análisis previsto (factores, réplicas, asignación de dato y tema, orden de las corridas).
+A8. Evaluador de calidad de texto (prompt del juez, parámetros, validez).
+Al final: (a) las 3 debilidades más graves, en orden; (b) qué cambiarías antes de ejecutar las 270 corridas finales; (c) si el código hace lo que el resumen dice y dónde difiere; (d) qué información adicional necesitarías para dar un veredicto más firme.
+
+=== MENSAJE 2 (aclaración para leer los archivos) ===
+[el segundo mensaje]
+
+Aclaración: la restricción de herramientas no te impedía abrir los archivos adjuntos. Puedes leer los cuatro adjuntos, en especial agente.py y decisiones.md, que antes no pudiste ver; sigue sin usar búsqueda web, conectores ni memoria. Con ese contenido, revisa de nuevo A1 a A7 y el punto (c) (diferencias entre el código y el resumen). Marca solo lo que cambia respecto a tu respuesta anterior, con el mismo formato, y di si ahora el veredicto de cada área sube o baja de confianza. Máximo 900 palabras.

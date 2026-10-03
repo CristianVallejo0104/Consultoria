@@ -1,0 +1,6 @@
+>>> phi4-mini | mitad | 4000 tokens | réplica 1
+    valida False 4260 241.3 s
+>>> phi4-mini | mitad | 8000 tokens | réplica 1
+    valida True 8115 522.7 s
+>>> phi4-mini | mitad | 12000 tokens | réplica 1
+    valida True 12328 914.5 s

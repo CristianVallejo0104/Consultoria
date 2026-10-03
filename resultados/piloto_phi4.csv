@@ -1,0 +1,4 @@
+modelo,posicion,nivel_tokens,replica,estado_final,acierto,turnos_reales,contexto_al_dato,contexto_final,contexto_decreciente,tokens_totales,tiempo_segundos,errores,tema,dato_clave
+phi4-mini,mitad,4000,1,valida,False,12,2089,4260,False,31648,241.3,{},geografia,el numero de expediente del caso Aurora es 3851
+phi4-mini,mitad,8000,1,valida,True,23,4145,8115,False,104103,522.7,{},matematicas,el numero de registro del laboratorio Nexus es 6037
+phi4-mini,mitad,12000,1,valida,True,37,6203,12328,False,239565,914.5,{},matematicas,el codigo de referencia del proyecto Fenix es F-7492-X

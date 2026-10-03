@@ -212,3 +212,32 @@ lenguaje (verificador de checkpoints, clasificador de fallos, analista), aún si
 **Alternativas descartadas.** (a) Mantener `phi3:mini`: 9.0 GB, corre en parte en CPU, su tiempo domina el cómputo y su cuantización difiere. (b) Reducir `num_ctx` o comprimir el caché KV (`OLLAMA_KV_CACHE_TYPE`) para que `phi3:mini` quepa: cambia las condiciones de medición (truncamiento silencioso del contexto, posible efecto sobre la retención). (c) Un modelo de otra empresa: rompe la regla de un modelo por empresa.
 **Límites.** (1) Cambiar un modelo después de ver resultados del anterior puede leerse como selección por resultados; por eso la razón se documenta antes y el dato previo se conserva. (2) Que `phi4-mini` quepa en la GPU es una predicción: se espera que `ollama ps` muestre un tamaño cercano a 5 GB con `num_ctx` 16,384; con `qwen2.5:1.5b` cargado a la vez puede haber reparto entre CPU y GPU. (3) El metadato indica 4,096 como longitud original antes del escalado de posiciones en ambos modelos: a 8K y 12K operan con posiciones extendidas, y el cambio no elimina ese factor; no se ha verificado en la ficha oficial. (4) `architecture phi3` es el nombre de la familia de arquitectura en Ollama, no indica que sea el mismo modelo.
 **Pendiente.** Repetir el piloto (3 corridas, posición «mitad») con `phi4-mini` y medir `ollama ps`; comparar `rope.scaling.original_context_length` de `llama3.2:3b` y `gemma3:4b`.
+
+---
+
+## D-14 · Diseño estadístico: factorial completo en bloques completos aleatorizados
+**Fecha:** 2026-10-02
+**Contexto.** La literatura revisada (Liu et al. 2023; Zhang et al. 2024) varía los factores de forma sistemática, pero no formaliza el diseño en términos de diseño de experimentos (D-05). Se elige el diseño desde los principios del diseño de experimentos.
+**Decisión.**
+- **Factores fijos:** modelo (3 locales; 6 con la nube), posición del dato (inicio, mitad, final) y nivel de tokens (4,000, 8,000, 12,000). Factorial completo: 27 tratamientos (54 con la nube).
+- **Unidad experimental:** una conversación (una corrida).
+- **Réplicas y bloques:** 5 réplicas por tratamiento, organizadas en 5 bloques completos. El bloque es el dato inventado (5 datos): cada dato aparece una vez en cada tratamiento. Son 135 corridas (270 con la nube).
+- **Tema (6):** asignado por rotación, para balancearlo en lo posible entre tratamientos (no es un bloque completo: 6 temas frente a 5 réplicas).
+- **Aleatorización:** dentro de cada bloque se aleatoriza el orden de los 27 tratamientos. La semilla se deriva de (modelo, posición, nivel, réplica).
+**Razones.**
+1. *Factorial completo:* la hipótesis central es una interacción: la «U» de Liu depende de la longitud del contexto (Fig. 5, p. 5). Un diseño sin interacción no la estima. Con 3 niveles se puede ver la forma de U (la mitad por debajo de los extremos) y la curvatura del nivel; con 2 niveles, no.
+2. *Bloque por dato:* el dato es una fuente de variabilidad conocida (cifras de 4 y 5 dígitos y una versión; D-12) y la asignación al azar dejó desbalances en el piloto (el mismo dato en dos celdas de `phi3:mini`).
+3. *Orden aleatorio:* evita confundir modelo o nivel con la deriva de la máquina (temperatura de la GPU, estado de Ollama).
+4. *Factores fijos:* los modelos son la población de interés, no una muestra de modelos; las conclusiones se limitan a ellos.
+**Alternativas descartadas.**
+- Un factor a la vez: no estima la interacción posición × nivel.
+- Factorial 2ᵏ: con 2 niveles no se observa la forma de U ni la curvatura; sirve para cribar, y el piloto cumplió esa función informal.
+- Factorial fraccionado: confunde interacciones; el costo es el tiempo, no el número de celdas.
+- Completamente aleatorizado sin bloques: válido, pero deja la dificultad del dato como ruido y permite desbalances.
+- Cuadrado latino: supone ausencia de interacciones.
+- Medidas repetidas en una conversación: la pregunta previa es una nueva mención del dato; queda como trabajo futuro (puntos de control).
+- Niveles continuos de tokens (superficie de respuesta): útil para ubicar un punto de quiebre, requiere más niveles; trabajo futuro.
+**Límites.** Cinco réplicas por celda dan poca potencia (con respuesta binaria, 5 de 5 aciertos da un intervalo exacto al 95 % de 0.48 a 1.00). La interacción triple probablemente no es estimable. Las corridas inválidas rompen el balance de los bloques (hallazgo A5 de D-12). «Inicio» es una posición absoluta (turno 2). El nivel de tokens es nominal.
+**Independencia de la respuesta.** El diseño no depende de cómo se codifique la respuesta (binaria, puntaje u ordinal). Cómo se mide la respuesta y qué análisis le corresponde (ANOVA, modelo logístico u ordinal) se decide en una entrada posterior (D-15, pendiente).
+**Estado.** Decidido. **No está implementado:** hoy el código usa una semilla global, asigna dato y tema al azar y corre en orden fijo por modelo.
+**Fuente de respaldo.** Liu et al. (2023), Fig. 5 y p. 3. [Texto de diseño de experimentos: por citar]

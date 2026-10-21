@@ -14,18 +14,18 @@ c1C2,1,C,2,,
 c1C3,1,C,3,,
 c1C4,1,C,4,,
 c1C5,1,C,5,,
-c2A1,2,A,1,,
-c2A2,2,A,2,,
-c2A3,2,A,3,,
-c2A4,2,A,4,,
-c2A5,2,A,5,,
-c2B1,2,B,1,,
-c2B2,2,B,2,,
-c2B3,2,B,3,,
-c2B4,2,B,4,,
-c2B5,2,B,5,,
-c2C1,2,C,1,,
-c2C2,2,C,2,,
-c2C3,2,C,3,,
-c2C4,2,C,4,,
-c2C5,2,C,5,,
+c2A1,2,A,1,"Nelson F. Liu, Kevin Lin, John Hewitt, Ashwin Paranjape, Michele Bevilacqua, Fabio Petroni y Percy Liang (2024). Lost in the Middle: How Language Models Use Long Contexts. https://arxiv.org/abs/2307.03172","Dificultad para usar información relevante en el medio de un contexto largo; el rendimiento suele ser mejor al principio o al final"
+c2A2,2,A,2,"Yuhui Zhang y colaboradores (2025). NoLiMa: Long-Context Evaluation Beyond Literal Matching. https://arxiv.org/abs/2502.05167","Limitaciones de los LLM para recuperar información en contextos largos cuando la respuesta no se obtiene por coincidencias literales"
+c2A3,2,A,3,"Cheng-Ping Hsieh y colaboradores (2024). RULER: What's the Real Context Size of Your Long-Context Language Models? https://arxiv.org/abs/2404.06654","Admitir una ventana de contexto extensa no significa poder usar toda la información de forma fiable"
+c2A4,2,A,4,"Alex L. Zhang y colaboradores (2025). Recursive Language Models. https://arxiv.org/abs/2512.24601","Enfoque para procesar contextos muy extensos mediante operaciones recursivas sobre el contenido"
+c2A5,2,A,5,"Charles Packer y colaboradores (2023). MemGPT: Towards LLMs as Operating Systems. https://arxiv.org/abs/2310.08560","Arquitectura de gestión de memoria que mueve información entre niveles de almacenamiento"
+c2B1,2,B,1,"Nelson F. Liu et al. (2023). Lost in the Middle: How Language Models Use Long Contexts. arXiv:2307.03172","El acceso a datos decae significativamente en la zona intermedia del contexto largo"
+c2B2,2,B,2,"Philippe Laban et al. (2025). LLMs Get Lost In Multi-Turn Conversation. arXiv:2505.09387","Rendimiento cae un 39% en múltiples turnos por asunciones tempranas y verbosidad"
+c2B3,2,B,3,"Wai-Chung Kwan et al. (2024). MT-Eval: A Multi-Turn Capabilities Evaluation Benchmark for LLMs. arXiv:2401.16876","La distancia al contenido relevante y la propagación de errores deterioran el diálogo"
+c2B4,2,B,4,"Adyasha Maharana et al. (2024). Evaluating Very Long-Term Conversational Memory of LLM Agents. arXiv:2402.17753","Dificultad para retener dinámicas temporales y causales en diálogos de hasta 300 turnos"
+c2B5,2,B,5,"Vardhan Dongre et al. (2026). When Attention Closes: How LLMs Lose the Thread in Multi-Turn Interaction. arXiv:2605.13280","El canal de atención a los tokens de instrucciones decae progresivamente con los turnos"
+c2C1,2,C,1,"Liu et al. (2023). Lost in the Middle: How Language Models Use Long Contexts. arXiv:2307.03172","Curva en U: la precisión cae cuando la información está en la parte media; sesgo de primacía y recencia"
+c2C2,2,C,2,"Zhenyu Zhang, Runjin Chen, Shiwei Liu, Zhewei Yao, Olatunji Ruwase, Beidi Chen, Xiaoxia Wu y Zhangyang Wang (2024). Found in the Middle: How Language Models Use Long Contexts Better via Plug-and-Play Positional Encoding. arXiv:2403.04797","RoPE sufre un efecto de decaimiento a largo plazo que lleva a ignorar la parte central; propone Ms-PoE"
+c2C3,2,C,3,"Lei Huang et al. (2024). A Survey on Hallucination in Large Language Models: Principles, Taxonomy, Challenges, and Open Questions. 10.1145/3703155","La atención localizada de los Transformers causa olvido de instrucciones y menor atención al contexto general"
+c2C4,2,C,4,"Yue Zhang, Leyang Cui, Wei Bi, Shuming Shi, et al. (2023). Siren's Song in the AI Ocean: A Survey on Hallucination in Large Language Models. arXiv:2309.01219","Alucinaciones por conflicto de contexto en respuestas largas o diálogos multiturno, por limitaciones de memoria a largo plazo"
+c2C5,2,C,5,"Zihao Yi, Jiarui Ouyang, Yuwen Liu, Tianhao Liao, Zhe Xu y Ying Shen (2024). A survey on recent advances in LLM-Based multi-turn dialogue systems. arXiv:2402.18013","Revisión de sistemas de diálogo multiturno basados en LLM; cómo el contexto acumulado impacta juicios y decisiones"

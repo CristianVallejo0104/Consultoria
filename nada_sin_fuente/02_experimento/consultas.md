@@ -18,9 +18,10 @@
 
 | Tratamiento | Herramienta | Versión / modelo | Configuración | Fecha |
 |---|---|---|---|---|
-| A | [p. ej. ChatGPT / Claude / Gemini] | | chat nuevo, sin búsqueda web, sin archivos | |
-| B | [p. ej. Consensus / Elicit / Semantic Scholar] | | | |
-| C | NotebookLM | | cuaderno con los 11 PDF de `docs/fuentes/` | |
+| A | ChatGPT (plan gratis) | [mira el modelo en ChatGPT; si no se ve, escribe «no visible en pantalla»] | chat nuevo, sin archivos. La búsqueda web no se pudo apagar con un interruptor: se pidió en un primer mensaje no usarla («No uses la búsqueda web ni navegues...»). Un primer intento sin ese mensaje usó búsqueda y se descartó como control | 21 oct 2026 |
+| B | Consensus (plan gratis) | no aplica | consulta idéntica; la respuesta apareció marcada como «Pro» sin que lo pidiera | 21 oct 2026 |
+| C | NotebookLM | [plan que tengas; en pantalla aparece «PLUS»] | cuaderno con los 11 PDF de `docs/fuentes/`, sin protocolo ni instrucciones personalizadas | 21 oct 2026 |
+
 
 ## Consulta 1 — Juan Pablo Tibamoso
 
@@ -34,6 +35,6 @@ Respuestas completas guardadas en: `respuestas/c1_A.md`, `respuestas/c1_B.md`, `
 
 **Texto exacto de la consulta** (el mismo en A, B y C):
 
-> [escribir aquí]
+> Dame 5 referencias académicas, con autores, año y DOI o enlace, sobre cómo los modelos de lenguaje pierden información en conversaciones largas.
 
 Respuestas completas guardadas en: `respuestas/c2_A.md`, `respuestas/c2_B.md`, `respuestas/c2_C.md`

@@ -24,8 +24,8 @@ c2B2,E,"Título, primer autor, año (2025) y hallazgo (39%) coinciden con el pap
 c2B3,E,"Título, primer autor (Wai-Chung Kwan), año (2024) y hallazgo coinciden con el paper real, que es arXiv:2401.16745. El identificador que dio Consensus (arXiv:2401.16876) es un paper de clasificación zero-shot (Ruffino et al.)."
 c2B4,U,"Título, primer autor, año (2024), identificador y hallazgo coinciden. Detalle: Consensus dijo 'hasta 300 turnos'; el abstract dice 300 turnos en promedio (hasta 35 sesiones)."
 c2B5,E,"Título, primer autor (Vardhan Dongre), año (2026) y hallazgo coinciden con el paper real, que es arXiv:2605.12922. El identificador que dio Consensus (arXiv:2605.13280) es un paper de legibilidad de código (Ye et al.)."
-c2C1,,
-c2C2,,
-c2C3,,
-c2C4,,
-c2C5,,
+c2C1,U,"Título, autores y año (2023) coinciden. El PDF muestra la curva en U (Figura 1)."
+c2C2,U,"Título, primer autor (Zhenyu Zhang), año (2024) y Ms-PoE/decaimiento de RoPE coinciden con el PDF."
+c2C3,U,"Título, autores, DOI y contenido (atención localizada, instruction forgetting) coinciden. Año: el PDF dice 2024; la página de ACM dice publicado 24 ene 2025."
+c2C4,U,"Título, primer autor (Yue Zhang), año (2023) y la afirmación sobre respuestas multi-turno y memoria a largo plazo están en el PDF."
+c2C5,U,"No es uno de los 11 PDF; sale de la bibliografía de Wen et al. Título, arXiv:2402.18013 y año coinciden. Autores: NotebookLM puso 6 (igual que la bibliografía); arXiv v2 lista 7 (falta Haohao Luo). Caso límite."

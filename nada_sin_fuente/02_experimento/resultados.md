@@ -6,7 +6,7 @@
 
 ### Clasificación de Juan Pablo
 
-| Tratamiento | U | E | N | n | Proporción U | IC Wilson 95 % |
+| Tratamiento | U | E | N | n | Proporción U | IC exacto 95 % |
 |---|---|---|---|---|---|---|
 | A · control | | | | 10 | | |
 | B · búsqueda | | | | 10 | | |
@@ -14,14 +14,16 @@
 
 ### Clasificación de Cristian
 
-| Tratamiento | U | E | N | n | Proporción U | IC Wilson 95 % |
+| Tratamiento | U | E | N | n | Proporción U | IC exacto 95 % |
 |---|---|---|---|---|---|---|
 | A · control | | | | 10 | | |
 | B · búsqueda | | | | 10 | | |
 | C · anclaje | | | | 10 | | |
 
-**Por qué Wilson:** con n = 10 el intervalo de Wald puede salirse de [0, 1] o tener ancho
-cero cuando la proporción es 0 o 1; Wilson no tiene ese problema.
+**Intervalo usado: exacto de Clopper-Pearson**, el mismo del proyecto (D-14). Con n = 10 la aproximación
+normal (Wald) puede salirse de [0, 1] o dar ancho cero cuando la proporción es 0 o 1; el exacto sale directamente
+de la distribución binomial. Es conservador: algo más ancho que el de Wilson. Comprobación en R:
+`binom.test(k, 10)$conf.int` debe dar los mismos límites.
 
 ## Acuerdo entre clasificadores
 

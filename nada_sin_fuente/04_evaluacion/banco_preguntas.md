@@ -3,33 +3,39 @@
 - Entre 15 y 20 preguntas en total.
 - Al menos 3 cuya respuesta **no** está en el corpus (marcadas «Fuera»): miden si el sistema se abstiene o inventa.
 - La respuesta conocida y su ubicación se escriben **antes** de preguntarle al sistema.
-- Tratamiento = con qué se preguntó: `C-v1` (sistema con protocolo v1). Si hay v2, repetir en `C-v2`.
-  Opcional: repetir algunas en `A` (chat sin fuentes) para comparar contra el control.
+- Cada pregunta se hace **dos veces**: en `A` (chat sin fuentes, el control) y en `C-v1` (el sistema con
+  protocolo v1). Si hay v2, repetir en `C-v2`. Sin `A` no se puede decir cuánto mejoró el sistema.
 
 ## Resumen
 
-- Preguntas dentro del corpus: __. Respuestas correctas y sostenidas por un fragmento real: __ de __ (__ %, IC Wilson 95 % [__, __]).
-- Preguntas fuera del corpus: __. Se abstuvo: __ de __. Inventó: __ de __.
+| | A · control | C-v1 · sistema |
+|---|---|---|
+| Dentro del corpus: correctas y sostenidas por fragmento real | __ de __ (IC exacto 95 % [__, __]) | __ de __ (IC exacto 95 % [__, __]) |
+| Fuera del corpus: se abstuvo | __ de __ | __ de __ |
+| Fuera del corpus: inventó | __ de __ | __ de __ |
+
+En A no hay fragmento que citar: ahí «correcta» es que coincida con la respuesta conocida.
+Los intervalos se calculan en R con `binom.test(k, n)$conf.int`.
 
 ## Preguntas
 
-| # | Pregunta | Respuesta conocida | Dónde está (documento, página) | Tratamiento | Respuesta obtenida (resumen) | ¿Sostenida por un fragmento real? |
-|---|---|---|---|---|---|---|
-| 1 | | | | C-v1 | | sí / no |
-| 2 | | | | C-v1 | | |
-| 3 | | | | C-v1 | | |
-| 4 | | | | C-v1 | | |
-| 5 | | | | C-v1 | | |
-| 6 | | | | C-v1 | | |
-| 7 | | | | C-v1 | | |
-| 8 | | | | C-v1 | | |
-| 9 | | | | C-v1 | | |
-| 10 | | | | C-v1 | | |
-| 11 | | | | C-v1 | | |
-| 12 | | | | C-v1 | | |
-| 13 | | | | C-v1 | | |
-| 14 | | | | C-v1 | | |
-| 15 | | | | C-v1 | | |
-| 16 | [Fuera] | No está en el corpus | — | C-v1 | | se abstuvo / inventó |
-| 17 | [Fuera] | No está en el corpus | — | C-v1 | | |
-| 18 | [Fuera] | No está en el corpus | — | C-v1 | | |
+| # | Pregunta | Respuesta conocida | Dónde está (documento, página) | A: respuesta obtenida | A: ¿correcta? | C-v1: respuesta obtenida | C-v1: ¿sostenida por un fragmento real? |
+|---|---|---|---|---|---|---|---|
+| 1 | | | | | sí / no | | sí / no |
+| 2 | | | | | sí / no | | sí / no |
+| 3 | | | | | sí / no | | sí / no |
+| 4 | | | | | sí / no | | sí / no |
+| 5 | | | | | sí / no | | sí / no |
+| 6 | | | | | sí / no | | sí / no |
+| 7 | | | | | sí / no | | sí / no |
+| 8 | | | | | sí / no | | sí / no |
+| 9 | | | | | sí / no | | sí / no |
+| 10 | | | | | sí / no | | sí / no |
+| 11 | | | | | sí / no | | sí / no |
+| 12 | | | | | sí / no | | sí / no |
+| 13 | | | | | sí / no | | sí / no |
+| 14 | | | | | sí / no | | sí / no |
+| 15 | | | | | sí / no | | sí / no |
+| 16 | [Fuera] | No está en el corpus | — | | se abstuvo / inventó | | se abstuvo / inventó |
+| 17 | [Fuera] | No está en el corpus | — | | se abstuvo / inventó | | se abstuvo / inventó |
+| 18 | [Fuera] | No está en el corpus | — | | se abstuvo / inventó | | se abstuvo / inventó |

@@ -2,7 +2,7 @@
 
 Lee las dos clasificaciones independientes y calcula:
   1. Por clasificador y tratamiento: cuántas referencias son U, E y N, y la
-     proporción de utilizables (U) con su intervalo de Wilson al 95 %.
+     proporción de utilizables (U) con su intervalo exacto de Clopper-Pearson al 95 %.
   2. El acuerdo entre los dos clasificadores: porcentaje de coincidencia y
      kappa de Cohen (tres categorías).
   3. La lista de referencias donde no coincidieron, para discutir por qué.
@@ -40,18 +40,48 @@ def leer_clasificacion(ruta):
     return datos
 
 
-def wilson(exitos, n, z=1.96):
-    """Intervalo de Wilson al 95 % para una proporción.
+def prob_acumulada(k, n, p):
+    """P(X <= k) para X ~ Binomial(n, p)."""
+    return sum(math.comb(n, i) * p**i * (1 - p) ** (n - i) for i in range(k + 1))
 
-    Se prefiere al intervalo de Wald (p ± z·raíz(p(1-p)/n)) porque con n
-    pequeño Wald puede salirse de [0, 1] o dar ancho cero cuando p = 0 o 1.
+
+def biseccion(f, objetivo, creciente):
+    """Busca p en [0, 1] tal que f(p) = objetivo, partiendo el intervalo a la mitad."""
+    bajo, alto = 0.0, 1.0
+    for _ in range(100):
+        medio = (bajo + alto) / 2
+        valor = f(medio)
+        if (valor < objetivo) == creciente:
+            bajo = medio
+        else:
+            alto = medio
+    return (bajo + alto) / 2
+
+
+def exacto(exitos, n, alfa=0.05):
+    """Intervalo exacto de Clopper-Pearson al 95 % para una proporción.
+
+    Es el mismo que usa el proyecto en D-14 (5 de 5 da 0,48 a 1,00) y el que
+    devuelve binom.test() en R. Se basa directamente en la distribución
+    binomial, sin aproximación normal, así que no se sale de [0, 1] con n
+    pequeño. Es conservador: suele ser algo más ancho que el de Wilson.
+
+    Límite inferior: el p para el que P(X >= exitos) = alfa/2.
+    Límite superior: el p para el que P(X <= exitos) = alfa/2.
     """
     if n == 0:
         return float("nan"), float("nan")
-    p = exitos / n
-    centro = (p + z**2 / (2 * n)) / (1 + z**2 / n)
-    margen = z * math.sqrt(p * (1 - p) / n + z**2 / (4 * n**2)) / (1 + z**2 / n)
-    return max(0.0, centro - margen), min(1.0, centro + margen)
+    if exitos == 0:
+        inferior = 0.0
+    else:
+        # P(X >= exitos) = 1 - P(X <= exitos - 1), que crece con p
+        inferior = biseccion(lambda p: 1 - prob_acumulada(exitos - 1, n, p), alfa / 2, creciente=True)
+    if exitos == n:
+        superior = 1.0
+    else:
+        # P(X <= exitos) decrece con p
+        superior = biseccion(lambda p: prob_acumulada(exitos, n, p), alfa / 2, creciente=False)
+    return inferior, superior
 
 
 def kappa_cohen(a, b):
@@ -82,12 +112,12 @@ def main():
     print("=" * 66)
     for quien, datos in clasif.items():
         print(f"\nClasificó: {quien}")
-        print(f"{'Trat.':<6}{'U':>4}{'E':>4}{'N':>4}{'n':>5}   {'p(U)':>6}   IC Wilson 95 %")
+        print(f"{'Trat.':<6}{'U':>4}{'E':>4}{'N':>4}{'n':>5}   {'p(U)':>6}   IC exacto 95 %")
         for t in TRATAMIENTOS:
             cats = [datos[i] for i in ids if refs[i]["tratamiento"] == t]
             cuenta = Counter(cats)
             n = len(cats)
-            li, ls = wilson(cuenta["U"], n)
+            li, ls = exacto(cuenta["U"], n)
             print(f"{t:<6}{cuenta['U']:>4}{cuenta['E']:>4}{cuenta['N']:>4}{n:>5}   "
                   f"{cuenta['U'] / n:>6.2f}   [{li:.2f}, {ls:.2f}]")
 

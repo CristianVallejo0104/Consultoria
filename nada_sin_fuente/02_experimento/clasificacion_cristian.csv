@@ -19,11 +19,11 @@ c2A2,E,"Título, año y contenido coinciden. ChatGPT dijo 'Yuhui Zhang y colabor
 c2A3,U,"Título, primer autor, año (2024, COLM) y abstract coinciden con lo que dijo ChatGPT."
 c2A4,U,"Título, primer autor, año (v1 dic 2025) y abstract coinciden con lo que dijo ChatGPT."
 c2A5,U,"Título, primer autor, año (v1 oct 2023) y abstract coinciden con lo que dijo ChatGPT."
-c2B1,,
-c2B2,,
-c2B3,,
-c2B4,,
-c2B5,,
+c2B1,U,"Título, primer autor, año (2023) y hallazgo (pérdida en el medio) coinciden con el PDF."
+c2B2,E,"Título, primer autor, año (2025) y hallazgo (39%) coinciden con el paper real, que es arXiv:2505.06120. El identificador que dio Consensus (arXiv:2505.09387) es un paper de matemáticas de Hedong Hou."
+c2B3,E,"Título, primer autor (Wai-Chung Kwan), año (2024) y hallazgo coinciden con el paper real, que es arXiv:2401.16745. El identificador que dio Consensus (arXiv:2401.16876) es un paper de clasificación zero-shot (Ruffino et al.)."
+c2B4,U,"Título, primer autor, año (2024), identificador y hallazgo coinciden. Detalle: Consensus dijo 'hasta 300 turnos'; el abstract dice 300 turnos en promedio (hasta 35 sesiones)."
+c2B5,E,"Título, primer autor (Vardhan Dongre), año (2026) y hallazgo coinciden con el paper real, que es arXiv:2605.12922. El identificador que dio Consensus (arXiv:2605.13280) es un paper de legibilidad de código (Ye et al.)."
 c2C1,,
 c2C2,,
 c2C3,,

@@ -18,9 +18,9 @@
 
 | Tratamiento | Herramienta | Versión / modelo | Configuración | Fecha |
 |---|---|---|---|---|
-| A | ChatGPT (plan gratis) | [mira el modelo en ChatGPT; si no se ve, escribe «no visible en pantalla»] | chat nuevo, sin archivos. La búsqueda web no se pudo apagar con un interruptor: se pidió en un primer mensaje no usarla («No uses la búsqueda web ni navegues...»). Un primer intento sin ese mensaje usó búsqueda y se descartó como control | 21 oct 2026 |
+| A | ChatGPT (plan gratis) | no visible en pantalla | chat nuevo, sin archivos. La búsqueda web no se pudo apagar con un interruptor: se pidió en un primer mensaje no usarla («No uses la búsqueda web ni navegues...»). Un primer intento sin ese mensaje usó búsqueda y se descartó como control | 21 oct 2026 |
 | B | Consensus (plan gratis) | no aplica | consulta idéntica; la respuesta apareció marcada como «Pro» sin que lo pidiera | 21 oct 2026 |
-| C | NotebookLM | [plan que tengas; en pantalla aparece «PLUS»] | cuaderno con los 11 PDF de `docs/fuentes/`, sin protocolo ni instrucciones personalizadas | 21 oct 2026 |
+| C | NotebookLM | plan indicado como «PLUS» en pantalla | cuaderno con los 11 PDF de `docs/fuentes/`, sin protocolo ni instrucciones personalizadas | 21 oct 2026 |
 
 
 ## Consulta 1 — Juan Pablo Tibamoso
@@ -40,4 +40,7 @@ Respuestas completas guardadas en: `respuestas/c1_A.md`, `respuestas/c1_B.md`, `
 
 > Dame 5 referencias académicas, con autores, año y DOI o enlace, sobre cómo los modelos de lenguaje pierden información en conversaciones largas.
 
+**Diferencias de configuración respecto a la consulta 1:** en A se usó un chat nuevo de ChatGPT con sesión iniciada (plan gratis); en B, la respuesta de Consensus apareció marcada como «Pro» sin que se pidiera; en C, el cuaderno de Cristian con los mismos 11 PDF y sin instrucciones.
+
 Respuestas completas guardadas en: `respuestas/c2_A.md`, `respuestas/c2_B.md`, `respuestas/c2_C.md`
+

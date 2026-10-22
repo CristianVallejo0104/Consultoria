@@ -74,7 +74,7 @@ Cada entrada documenta una decisión de diseño con su alternativa descartada, c
 
 Estas categorías (admisión, negación de capacidad) son observación propia del primer corte — los papers dan el marco conceptual bajo el que encajan, no las nombran textualmente.
 
-**Pendiente.** Etiquetado manual (Cristian y Juan Pablo, por separado, con kappa de Cohen) de las respuestas del piloto y de las 270 corridas finales, para construir el dataset de entrenamiento.
+**Pendiente.** Etiquetado manual (Cristian y Juan Pablo, por separado, con kappa de Cohen) de las respuestas del piloto y de las 135 corridas finales del diseño local (270 si se agrega el diseño con la nube), para construir el dataset de entrenamiento.
 
 ---
 
@@ -83,7 +83,7 @@ Estas categorías (admisión, negación de capacidad) son observación propia de
 **Fecha:** 2026-09-26
 **Archivo.** `evaluar_calidad_texto.py`, en la raíz de este repositorio.
 
-**Contexto.** El profesor pidió verificar la calidad del texto generado en las conversaciones. Se decidió evaluar los turnos de "Usuario" (generador de relleno, `qwen2.5:1.5b`), no los del modelo evaluado, porque es el texto enteramente artificial y donde existe riesgo real de invalidar el experimento si suena poco natural. **Pendiente de confirmar con el profesor** si también se espera evaluar el lado del modelo evaluado.
+**Contexto.** El equipo decidió verificar la calidad del texto generado en las conversaciones. Se decidió evaluar los turnos de "Usuario" (generador de relleno, `qwen2.5:1.5b`), no los del modelo evaluado, porque es el texto enteramente artificial y donde existe riesgo real de invalidar el experimento si suena poco natural. **Pendiente de confirmar con el profesor** si también se espera evaluar el lado del modelo evaluado.
 
 **Método.** Se adaptaron tres dimensiones de USR (Mehri y Eskenazi, 2020, pp. 2–3): *Natural*, *Maintains Context* e *Interesting* (naturalidad, coherencia, interés). Se omite *Uses Knowledge*, que se solaparía con la retención.
 
@@ -121,8 +121,7 @@ Estas categorías (admisión, negación de capacidad) son observación propia de
 **Fecha:** 2026-09-26
 **Contexto.** "5 turnos" no es comparable entre modelos: en el primer corte phi3:mini
 procesó 10,259 tokens en 5 turnos y gemma2:2b, 1,903 (Cuadro 3 del informe).
-**Decisión.** El nivel es el contexto en la pregunta final, medido con
-prompt_eval_count + eval_count de la última llamada. Niveles 4,000, 8,000 y 12,000.
+**Decisión.** El nivel es el contexto en la pregunta final, medido con el `prompt_eval_count` de la llamada de la pregunta final (historial completo más la pregunta). El criterio de parada del bucle sí usa `prompt_eval_count + eval_count` del turno anterior. Corregido el 2026-10-21 (ver D-16 y D-17): la redacción anterior sumaba la respuesta, que se genera después de la pregunta. Niveles 4,000, 8,000 y 12,000.
 Posición del dato en tokens: inicio = 2.º turno; mitad = al cruzar el 50 % del nivel;
 final = al cruzar el 85 %. Constantes: num_ctx 16,384; tope común de 300 tokens por
 respuesta; máximo 60 turnos; timeout 600 s. Una sola función (sin duplicar).
@@ -133,7 +132,7 @@ de "mitad" entró entre el 50.2 % y el 58.4 % del nivel; el contexto final super
 nominal entre 0.5 % y 10.3 % (se usará contexto_final como covariable).
 **Límites.** Cada modelo usa su tokenizador; las cifras de ambos cortes no son
 comparables; phi3:mini a 12K hizo 57 turnos con un máximo de 60.
-**Pendiente.** Evaluar subir el máximo de turnos; guardar done_reason de Ollama.
+**Pendiente.** Evaluar subir el máximo de turnos. `done_reason` ya se guarda (D-16).
 
 ---
 
@@ -198,7 +197,7 @@ lenguaje (verificador de checkpoints, clasificador de fallos, analista), aún si
 **Medición propia.** Sobre las 9 corridas del piloto, el relleno no repitió el dato (0 de 9) y el modelo lo repitió en 2 de 9. El conteo busca la cifra exacta, así que no detecta variantes de formato ni paráfrasis, y solo cubre la posición «mitad».
 **Alternativas descartadas.** (a) Contraparte recomendadora (sugerir qué modelo usar según los parámetros): requiere resultados con más réplicas, que aún no existen. (b) Revisión en la misma conversación de trabajo: no es independiente. (c) Una segunda contraparte de otra familia de modelos: aplazada por costo y tiempo.
 **Límites.** La IA es de la misma familia que el asistente que ayudó a desarrollar el proyecto; Zheng et al. (2023, p. 5) describen el sesgo de autopreferencia de los jueces LLM pero no pudieron confirmarlo. Solo leyó el código, no lo ejecutó. Vio los resultados del primer corte que aparecen en este archivo (D-01, D-03). Sus números de línea y sus afirmaciones de estadística general no están verificados. Es una sola revisión, con esfuerzo medio. No se conservan capturas de la prueba de limpieza ni de la desactivación de Gmail y de la búsqueda web, por privacidad: constan por declaración del equipo.
-**Pendiente.** Decidir qué cambios se adoptan antes de las corridas finales.
+**Seguimiento (2026-10-21).** Adoptados e implementados en `main`: orden aleatorio por bloque, dato por bloque y tema por rotación (D-14, D-15); registro de `done_reason` y de la posición lograda, y guardado determinista (D-16); aclaración de `contexto_final` (D-06). Sin decidir: política de reintentos y tratamiento de `no_alcanzo_nivel`, medida de respuesta y método de análisis (Firth o enfoque bayesiano, Fisher, covariables).
 
 ---
 
@@ -226,7 +225,7 @@ lenguaje (verificador de checkpoints, clasificador de fallos, analista), aún si
 - **Unidad experimental:** una conversación (una corrida).
 - **Réplicas y bloques:** 5 réplicas por tratamiento, organizadas en 5 bloques completos. El bloque es el dato inventado (5 datos): cada dato aparece una vez en cada tratamiento. Son 135 corridas (270 con la nube).
 - **Tema (6):** asignado por rotación, para balancearlo en lo posible entre tratamientos (no es un bloque completo: 6 temas frente a 5 réplicas).
-- **Aleatorización:** dentro de cada bloque se aleatoriza el orden de los 27 tratamientos. La semilla se deriva de (modelo, posición, nivel, réplica).
+- **Aleatorización:** dentro de cada bloque se aleatoriza el orden de los 27 tratamientos. Una semilla maestra registrada (`SEMILLA_EXPERIMENTO` = 42) y el número de bloque determinan el orden de cada bloque (ver D-15).
 **Razones.**
 1. *Factorial completo:* la hipótesis central es una interacción: la «U» de Liu depende de la longitud del contexto (Fig. 5, p. 5). Un diseño sin interacción no la estima. Con 3 niveles se puede ver la forma de U (la mitad por debajo de los extremos) y la curvatura del nivel; con 2 niveles, no.
 2. *Bloque por dato:* el dato es una fuente de variabilidad conocida (cifras de 4 y 5 dígitos y una versión; D-12) y la asignación al azar dejó desbalances en el piloto (el mismo dato en dos celdas de `phi3:mini`).
@@ -240,7 +239,52 @@ lenguaje (verificador de checkpoints, clasificador de fallos, analista), aún si
 - Cuadrado latino: supone ausencia de interacciones.
 - Medidas repetidas en una conversación: la pregunta previa es una nueva mención del dato; queda como trabajo futuro (puntos de control).
 - Niveles continuos de tokens (superficie de respuesta): útil para ubicar un punto de quiebre, requiere más niveles; trabajo futuro.
-**Límites.** Cinco réplicas por celda dan poca potencia (con respuesta binaria, 5 de 5 aciertos da un intervalo exacto al 95 % de 0.48 a 1.00). La interacción triple probablemente no es estimable. Las corridas inválidas rompen el balance de los bloques (hallazgo A5 de D-12). «Inicio» es una posición absoluta (turno 2). El nivel de tokens es nominal.
-**Independencia de la respuesta.** El diseño no depende de cómo se codifique la respuesta (binaria, puntaje u ordinal). Cómo se mide la respuesta y qué análisis le corresponde (ANOVA, modelo logístico u ordinal) se decide en una entrada posterior (D-15, pendiente).
-**Estado.** Decidido. **No está implementado:** hoy el código usa una semilla global, asigna dato y tema al azar y corre en orden fijo por modelo.
+**Límites.** Cinco réplicas por celda dan poca potencia (con respuesta binaria, 5 de 5 aciertos da un intervalo exacto al 95 % de 0.48 a 1.00). La interacción triple probablemente no es estimable. Las corridas inválidas rompen el balance de los bloques (hallazgo A5 de D-12). «Inicio» es una posición absoluta (turno 2). El nivel de tokens es nominal.Balance del tema (medido sobre el plan el 2026-10-21): con tema = (posición en el bloque + bloque) mod 6, las corridas por tema dentro de cada posición del dato no quedan parejas (45 por posición): inicio [10, 8, 5, 9, 7, 6], mitad [2, 6, 7, 8, 12, 10], final [10, 8, 10, 6, 4, 7]. El tema puede mezclarse en parte con la posición. Propuesta de análisis, aún no decidida: tratarlo como covariable o efecto aleatorio y reportar el desbalance.
+**Independencia de la respuesta.** El diseño no depende de cómo se codifique la respuesta (binaria, puntaje u ordinal). Cómo se mide la respuesta y qué análisis le corresponde (ANOVA, modelo logístico u ordinal) se decide en una entrada posterior (entrada posterior, pendiente).
+**Estado (2026-10-21).** Implementado en `main` (commits `8a821f8`, `9c4270f` y `b8a8fa7`; unión `de2dfff`): bloques, orden aleatorio por bloque, dato por bloque y tema por rotación (D-15), guardado por corrida y campos de registro (D-16). Verificado sin ejecutar modelos: el plan tiene 135 corridas con 135 claves únicas y cada bloque contiene los 27 tratamientos. **Pendiente antes de lanzar las 135:** política de corridas inválidas y reintentos. `final_D14` aún no se ha lanzado.
 **Fuente de respaldo.** Liu et al. (2023), Fig. 5 y p. 3. [Texto de diseño de experimentos: por citar]
+
+---
+
+## D-15 · Alcance de la semilla y asignación de dato y tema
+**Fecha:** 2026-10-21
+**Contexto.** D-14 decía que la semilla se derivaba de (modelo, posición, nivel, réplica), pero lo aleatorio es el orden de los 27 tratamientos dentro de cada bloque, que necesita una semilla por bloque. El código usaba `random.seed(42)` global y sorteaba dato y tema en cada corrida.
+**Decisión.**
+- La semilla solo fija el diseño: orden de los tratamientos, dato y tema. No siembra el muestreo de Ollama ni el del generador de relleno. Las salidas del modelo no se prometen reproducibles bit a bit; esa variabilidad es la que miden las réplicas.
+- Orden: `random.Random(zlib.crc32(f"orden|{SEMILLA_EXPERIMENTO}|{bloque}".encode()))` baraja una copia de la lista de 27 tratamientos. Se usa `crc32` y no `hash()` porque el `hash()` de cadenas de Python cambia entre ejecuciones.
+- Dato = bloque (índice `bloque - 1`). Tema = (posición `i` del tratamiento en el orden del bloque + bloque) mod 6.
+- `ejecutar_evaluacion` recibe `indice_dato` e `indice_tema` opcionales; sin ellos conserva el sorteo anterior (agente interactivo y corridas previas).
+**Alternativas descartadas.**
+- Sembrar también Ollama con una semilla por tratamiento: parte del cómputo corre en CPU y parte en GPU (D-13), y no se probó que Ollama repita la salida; además, hipótesis no probada, repetir una corrida fallida con la misma semilla probablemente repetiría la falla.
+- Mantener `random.seed(42)` global: una corrida cortada y retomada no vuelve a salir igual, porque depende de cuántos sorteos hubo antes.
+- Tema atado al número fijo del tratamiento: queda parejo, pero el tema se confunde con el tratamiento en todos los bloques.
+- Seguir sorteando el tema por corrida: deja desbalances (visto en el piloto, D-14).
+**Verificación (2026-10-21).** `orden_del_bloque` devolvió el mismo orden para el mismo bloque y otro distinto para otro bloque; el plan de 135 corridas no repite claves (modelo, posición, nivel, réplica).
+**Límites.** Si cambian `SEMILLA_EXPERIMENTO` o la lista de modelos, posiciones o niveles, cambian órdenes e índices: no retomar una corrida cortada tras cambiarlos. Hay 5 datos para 5 bloques: con más réplicas habría `IndexError`. `random.seed(42)` sigue en `agente.py` para el modo interactivo y no afecta a `final_D14`. Balance del tema: ver D-14.
+
+---
+
+## D-16 · Registro por corrida: guardado determinista y campos de validez
+**Fecha:** 2026-10-21
+**Contexto.** La revisión previa a las 135 corridas (D-17) señaló que el nombre de archivo salía de contar archivos existentes (repetir una corrida la duplicaba), que un fallo de escritura mataba el resto de la corrida, y que no se registraban `done_reason` ni la posición lograda del dato.
+**Decisión.**
+- `guardar_resultado(resultado, carpeta_salida=None, replica=None)`: con carpeta guarda JSON y TXT en `resultados/<config>/` con nombre `modelo_posicion_NIVELtok_replica` (por ejemplo `llama3_2_3b_mitad_4000tok_01`); repetir una corrida sobrescribe. Sin carpeta, comportamiento anterior. El parámetro `replica` lo agregó Claude Code sin pedirlo; el equipo lo aceptó porque el nombre determinista la necesita.
+- Runner: el guardado y la fila CSV van dentro de `try/except Exception` que registra en `resultados/<config>_errores.log` y continúa. Sin argumento de configuración imprime las disponibles y sale con error (antes corría `preliminares_tokens`).
+- Campos nuevos al final del CSV (26 columnas en total): `bloque`, `orden_en_bloque`, `indice_dato`, `indice_tema`, `done_reason_final`, `respuesta_final_vacia`, `contexto_tras_dato`, `contexto_antes_pregunta`, `turnos_dato_a_pregunta`, `dato_sobre_nivel`, `turnos_relleno_cortados`.
+- No cambia la lógica de validez (D-11): estos campos solo registran. Las respuestas vacías o cortadas por `length` no se marcan inválidas; se analizarán como sensibilidad, con y sin ellas.
+**Alternativas descartadas.** Marcar inválidas las respuestas vacías o cortadas (cambia D-11, y el tope de 300 tokens es parte del tratamiento, D-06); guardar `replica` dentro del diccionario de resultado (cambia el esquema del JSON); mantener el nombre por conteo de archivos.
+**Verificación (una réplica por prueba, `llama3.2:3b`, posición «mitad», 4K; sin inferencia).** Campos llenos con valores reales; `done_reason_final` = `stop`; CSV con 26 columnas en encabezado y fila. `contexto_final` menos `contexto_antes_pregunta` fue 33 y 34 tokens en dos corridas distintas: coherente con que el `prompt_eval_count` de la llamada final sea el contexto al preguntar (corrección de D-06). `turnos_relleno_cortados` fue 3 y 10 (de 11 turnos): el tope de 300 tokens puede truncar casi todas las respuestas de este modelo. En la corrida del runner, `contexto_al_dato` fue 2,236 (56 % del nivel) y `contexto_tras_dato` 2,589 (65 %) frente al 50 % nominal.
+**Límites.** `contexto_al_dato` se mide antes de insertar el dato y `contexto_tras_dato` al cierre de ese turno. Hipótesis, no medida con estos datos: la posición lograda se aparta más de la nominal en niveles bajos, porque un turno pesa más. `contexto_final` depende de la verbosidad del modelo (parte del efecto modelo): usarlo como covariable solo en análisis de sensibilidad [propuesta del consultor, pendiente]. `turnos_relleno_cortados` cuenta respuestas del modelo evaluado, no del generador de relleno. Los CSV de `preliminares_tokens` y `piloto_phi4` tienen 15 columnas: no volver a correr esas configuraciones con el código nuevo.
+
+---
+
+## D-17 · Revisión con agentes de Claude Code y reparto de trabajo en la implementación
+**Fecha:** 2026-10-21
+**Contexto.** Antes de las 135 corridas se revisaron `agente.py`, `correr_experimento.py`, `evaluar_calidad_texto.py` y `decisiones.md` con dos subagentes de solo lectura en Claude Code: `revisor-codigo-python` y `consultor-estadistico` (ambos con `model: sonnet` en su archivo de configuración; el esfuerzo no se registró).
+**Resultado.** Ambos coinciden en que D-14 no estaba implementado (semilla global, dato y tema sorteados, orden fijo, corridas inválidas contadas como hechas, sin `done_reason`, sin posición lograda). Discrepancia: el revisor marcó `contexto_final` como error del código (falta sumar `eval_count`); el consultor señaló que el código es correcto y que lo que estaba mal era la redacción de D-06. El equipo contrastó con `agente.py:416-424` y con las mediciones de D-16 y corrigió el texto de D-06, no el código. Nuevos hallazgos del consultor: el tema queda parcialmente mezclado con la posición, `no_alcanzo_nivel` es un resultado del tratamiento y no un dato faltante, y `contexto_final` como covariable es posterior al tratamiento.
+**Reparto de trabajo (para la sustentación).**
+- Cristian: decisiones de diseño (semilla solo del diseño; tema por posición en el orden), tecleó y probó `orden_del_bloque`, revisó cada diff, ejecutó las pruebas y los commits.
+- Claude (chat): redactó la especificación de cada tarea, las explicaciones, la función `orden_del_bloque` y las pruebas de verificación.
+- Claude Code: escribió el cambio mecánico en `agente.py` (`indice_dato`, `indice_tema`, `done_reason`, campos nuevos, guardado determinista) y en `correr_experimento.py` (configuración `final_D14`, bucle por bloques, columnas, manejo de errores), con permiso por edición y sin commit.
+**Alternativas descartadas.** Que Claude Code implemente también la lógica de diseño (`orden_del_bloque`): es lo que se sustenta línea por línea. Aceptar los resúmenes de los agentes sin revisar el `git diff`: sus resúmenes llegaron incompletos.
+**Límites.** Los dos agentes son de la misma familia que el asistente del chat: que coincidan no equivale a verificación independiente (ver D-12). Solo se contrastaron los números de línea citados que coincidían con el código mostrado; el resto no se verificó.

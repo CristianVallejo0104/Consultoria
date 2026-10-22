@@ -1,9 +1,9 @@
 id,categoria,nota
-c1A1,,
-c1A2,,
-c1A3,,
-c1A4,,
-c1A5,,
+c1A1,U,"DOI abre el paper correcto. Título, los diez autores, ACM Computing Surveys 55(12), art. 248 y año 2023 coinciden. Las palabras clave incluyen intrinsic hallucination y extrinsic hallucination."
+c1A2,E,"El paper existe (arXiv:2310.07521, año 2023) y el tema coincide. ChatGPT dijo 'Yuxia Wang y colaboradores'; el primer autor real es Cunxiang Wang y Yuxia Wang no aparece entre los autores. El título difiere ligeramente."
+c1A3,U,"Título, primer autor (Lei Huang), arXiv:2311.05232 y año (v1, nov 2023) coinciden. El paper define faithfulness (instruction y context inconsistency) y factuality hallucination. Detalle: la v2 y la publicación en ACM TOIS son posteriores (2024-2025)."c1A4,,
+c1A4,U,"El DOI abre el paper correcto en ACL Anthology. Título, los tres autores, EMNLP 2023 y lo que aporta (detección por consistencia entre muestras, sin base de datos externa) coinciden. ChatGPT aclaró que no es una taxonomía y el resumen lo confirma."
+c1A5,U,"El DOI abre el paper correcto en ACL Anthology. Título, los tres autores, ACL 2022 (mayo, Dublín) y contenido (benchmark de respuestas falsas que imitan creencias humanas) coinciden. Es un benchmark, no una taxonomía, como dijo ChatGPT."
 c1B1,,
 c1B2,,
 c1B3,,

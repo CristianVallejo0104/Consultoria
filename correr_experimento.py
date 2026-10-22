@@ -1,7 +1,11 @@
 import csv
 import os
 import sys
+import zlib
+import random
 from agente import ejecutar_evaluacion, guardar_resultado, validar_parametros
+
+SEMILLA_EXPERIMENTO = 42
 
 CONFIGS = {
     "preliminares_tokens": {
@@ -22,6 +26,15 @@ COLUMNAS = ["modelo", "posicion", "nivel_tokens", "replica", "estado_final", "ac
             "turnos_reales", "contexto_al_dato", "contexto_final", "contexto_decreciente",
             "tokens_totales", "tiempo_segundos", "errores", "tema", "dato_clave"]
 
+
+def orden_del_bloque(bloque, tratamientos):
+    """Devuelve los tratamientos en orden aleatorio, siempre el mismo para el mismo bloque."""
+    texto = f"orden|{SEMILLA_EXPERIMENTO}|{bloque}"
+    entero = zlib.crc32(texto.encode())
+    generador = random.Random(entero)
+    copia = list(tratamientos)
+    generador.shuffle(copia)
+    return copia
 
 def ya_hechas(ruta):
     """Combinaciones que ya están en el CSV (para retomar una corrida cortada)."""

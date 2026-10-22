@@ -179,11 +179,11 @@ def _invalida(estado, codigo_http, tipo_error):
             "estado": estado, "codigo_http": codigo_http, "tipo_error": tipo_error}
 
 
-def _valida(contenido, tokens_prompt, tokens_respuesta):
-    """Llamada exitosa."""
+def _valida(contenido, tokens_prompt, tokens_respuesta, done_reason=None):
+    """Llamada exitosa. done_reason es informativo ('stop', 'length'...); None si la API no lo da."""
     return {"contenido": contenido, "tokens_prompt": tokens_prompt,
             "tokens_respuesta": tokens_respuesta, "estado": "valida",
-            "codigo_http": 200, "tipo_error": None}
+            "codigo_http": 200, "tipo_error": None, "done_reason": done_reason}
 
 
 def _procesar_openai_compat(resp):
@@ -210,7 +210,8 @@ def _procesar_openai_compat(resp):
         return _invalida("invalida_tecnica", 200, "respuesta_inesperada")
 
     usage = data.get("usage", {})
-    return _valida(contenido, usage.get("prompt_tokens", 0), usage.get("completion_tokens", 0))
+    return _valida(contenido, usage.get("prompt_tokens", 0), usage.get("completion_tokens", 0),
+                   eleccion.get("finish_reason"))
 
 
 def _consultar_ollama(modelo, historial):
@@ -235,7 +236,8 @@ def _consultar_ollama(modelo, historial):
     contenido = data.get("message", {}).get("content")
     if contenido is None:
         return _invalida("invalida_tecnica", 200, "respuesta_inesperada")
-    return _valida(contenido, data.get("prompt_eval_count", 0), data.get("eval_count", 0))
+    return _valida(contenido, data.get("prompt_eval_count", 0), data.get("eval_count", 0),
+                   data.get("done_reason"))
 
 
 def _consultar_openrouter(modelo, historial):
@@ -318,6 +320,14 @@ def _resultado_vacio():
         "turnos_reales": 0,
         "contextos_por_turno": [],
         "contexto_decreciente": False, # True = la medición de tokens es sospechosa (¿caché?)
+        # Campos de registro (no intervienen en la validez de la corrida)
+        "done_reason_final": None,         # done_reason de la respuesta a la pregunta final
+        "respuesta_final_vacia": None,     # True si la respuesta final es vacía o solo espacios
+        "contexto_tras_dato": None,        # contexto al cierre del turno en que se insertó el dato
+        "contexto_antes_pregunta": None,   # contexto del último turno antes de la pregunta final
+        "turnos_dato_a_pregunta": None,    # turnos entre el turno del dato y la pregunta final
+        "dato_sobre_nivel": None,          # True si contexto_tras_dato >= nivel_tokens
+        "turnos_relleno_cortados": 0,      # respuestas de turnos sin dato con done_reason "length"
     }
 
 
@@ -390,6 +400,11 @@ def simular_conversacion(modelo, nivel_tokens, posicion, dato_clave,
         contexto = llamada["tokens_prompt"] + llamada["tokens_respuesta"]
         r["turnos_reales"] = turno
         r["contextos_por_turno"].append(contexto)
+        if turno == r["turno_dato"]:
+            r["contexto_tras_dato"] = contexto
+            r["dato_sobre_nivel"] = contexto >= nivel_tokens
+        elif llamada.get("done_reason") == "length":
+            r["turnos_relleno_cortados"] += 1
         if contexto < contexto_previo:
             r["contexto_decreciente"] = True
         if verbose:
@@ -410,6 +425,9 @@ def simular_conversacion(modelo, nivel_tokens, posicion, dato_clave,
     if r["estado_final"] != "valida":
         return r
 
+    r["contexto_antes_pregunta"] = contexto
+    r["turnos_dato_a_pregunta"] = r["turnos_reales"] - r["turno_dato"]
+
     # Pregunta final
     historial.append({"role": "user", "content": pregunta_final})
     r["conversacion_texto"] += f"\n[PREGUNTA FINAL] Usuario: {pregunta_final}\n"
@@ -422,6 +440,8 @@ def simular_conversacion(modelo, nivel_tokens, posicion, dato_clave,
     else:
         r["respuesta_final"] = final["contenido"]
         r["contexto_final"] = final["tokens_prompt"]
+        r["done_reason_final"] = final.get("done_reason")
+        r["respuesta_final_vacia"] = not final["contenido"].strip()
     r["conversacion_texto"] += f"[RESPUESTA FINAL] Modelo: {r['respuesta_final']}\n"
     return r
 
@@ -447,15 +467,18 @@ def verificar_acierto(respuesta_final, verificacion):
 # ============================================================
 # 7. NUCLEO DEL EXPERIMENTO Y GUARDADO (sin CrewAI de por medio)
 # ============================================================
-def ejecutar_evaluacion(modelo, posicion, nivel_tokens, verbose=False):
+def ejecutar_evaluacion(modelo, posicion, nivel_tokens, verbose=False,
+                        indice_dato=None, indice_tema=None):
     """Núcleo del experimento. Es lo que llama el runner en las corridas
     masivas (sin pasar por el LLM orquestador). Devuelve un dict completo."""
     inicio_tiempo = time.time()
     modelo, pos, nivel = validar_parametros(modelo, posicion, nivel_tokens)
 
-    seleccion = seleccionar_dato_clave()
+    seleccion = (DATOS_CLAVE[indice_dato] if indice_dato is not None
+                 else seleccionar_dato_clave())
     pregunta_final = f"Por cierto, hace rato te mencione algo. {seleccion['pregunta']}"
-    tema = seleccionar_tema()
+    tema = (TEMAS_CONVERSACION[indice_tema] if indice_tema is not None
+            else seleccionar_tema())
 
     detalle_error = None
     try:
@@ -496,6 +519,13 @@ def ejecutar_evaluacion(modelo, posicion, nivel_tokens, verbose=False):
         "estado_final": sim["estado_final"],
         "errores_por_tipo": sim["errores_por_tipo"],
         "contexto_decreciente": sim["contexto_decreciente"],
+        "done_reason_final": sim["done_reason_final"],
+        "respuesta_final_vacia": sim["respuesta_final_vacia"],
+        "contexto_tras_dato": sim["contexto_tras_dato"],
+        "contexto_antes_pregunta": sim["contexto_antes_pregunta"],
+        "turnos_dato_a_pregunta": sim["turnos_dato_a_pregunta"],
+        "dato_sobre_nivel": sim["dato_sobre_nivel"],
+        "turnos_relleno_cortados": sim["turnos_relleno_cortados"],
         "respuesta_final": sim["respuesta_final"],
         "conversacion_texto": sim["conversacion_texto"],
         "detalle_error": detalle_error,
@@ -521,13 +551,27 @@ def generar_nombre_archivo(modelo, posicion, nivel_tokens):
     return f"{base}_{replica:02d}"
 
 
-def guardar_resultado(resultado):
+def guardar_resultado(resultado, carpeta_salida=None, replica=None):
     """Guarda en resultados/txt/ (legible) y resultados/json/ (para el análisis).
-    Devuelve el nombre de archivo usado."""
-    os.makedirs("resultados/txt", exist_ok=True)
-    os.makedirs("resultados/json", exist_ok=True)
-    nombre = generar_nombre_archivo(
-        resultado["modelo"], resultado["posicion"], resultado["nivel_tokens"])
+    Con carpeta_salida guarda ambos archivos ahí, con nombre determinista
+    modelo_posicion_NIVELtok_réplica (repetir una corrida lo sobrescribe);
+    en ese caso `replica` es obligatoria. Devuelve el nombre de archivo usado."""
+    if carpeta_salida is None:
+        os.makedirs("resultados/txt", exist_ok=True)
+        os.makedirs("resultados/json", exist_ok=True)
+        nombre = generar_nombre_archivo(
+            resultado["modelo"], resultado["posicion"], resultado["nivel_tokens"])
+        ruta_txt = f"resultados/txt/{nombre}.txt"
+        ruta_json = f"resultados/json/{nombre}.json"
+    else:
+        if replica is None:
+            raise ValueError("guardar_resultado: con carpeta_salida hay que indicar la réplica")
+        os.makedirs(carpeta_salida, exist_ok=True)
+        modelo_limpio = resultado["modelo"].replace(":", "_").replace(".", "_")
+        nombre = (f"{modelo_limpio}_{resultado['posicion']}_"
+                  f"{resultado['nivel_tokens']}tok_{replica:02d}")
+        ruta_txt = f"{carpeta_salida}/{nombre}.txt"
+        ruta_json = f"{carpeta_salida}/{nombre}.json"
 
     reporte = f"""
 {'='*60}
@@ -550,11 +594,11 @@ CONVERSACION COMPLETA:
 RESULTADO: {texto_resultado(resultado)}
 {'='*60}
 """
-    with open(f"resultados/txt/{nombre}.txt", "w", encoding="utf-8") as f:
+    with open(ruta_txt, "w", encoding="utf-8") as f:
         f.write(reporte)
 
     resultado_json = {k: v for k, v in resultado.items() if k != "conversacion_texto"}
-    with open(f"resultados/json/{nombre}.json", "w", encoding="utf-8") as f:
+    with open(ruta_json, "w", encoding="utf-8") as f:
         json.dump(resultado_json, f, indent=2, ensure_ascii=False)
 
     return nombre

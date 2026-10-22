@@ -27,7 +27,10 @@
 
 **Texto exacto de la consulta** (el mismo en A, B y C):
 
-> [escribir aquí]
+> Dame 5 referencias académicas, con autores, año y DOI o enlace, sobre taxonomías de alucinaciones en modelos de lenguaje.
+
+**Diferencias de configuración respecto a la consulta 2:** en A se usó chat temporal (sin memoria); en B, Consensus sin
+iniciar sesión; en C, un cuaderno propio de NotebookLM con los mismos 11 PDF y sin instrucciones.
 
 Respuestas completas guardadas en: `respuestas/c1_A.md`, `respuestas/c1_B.md`, `respuestas/c1_C.md`
 

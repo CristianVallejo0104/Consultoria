@@ -1,19 +1,19 @@
 id,consulta,tratamiento,n,referencia,afirmacion_atribuida
-c1A1,1,A,1,,
-c1A2,1,A,2,,
-c1A3,1,A,3,,
-c1A4,1,A,4,,
-c1A5,1,A,5,,
-c1B1,1,B,1,,
-c1B2,1,B,2,,
-c1B3,1,B,3,,
-c1B4,1,B,4,,
-c1B5,1,B,5,,
-c1C1,1,C,1,,
-c1C2,1,C,2,,
-c1C3,1,C,3,,
-c1C4,1,C,4,,
-c1C5,1,C,5,,
+c1A1,1,A,1,"Ziwei Ji, Nayeon Lee, Rita Frieske, Tiezheng Yu, Dan Su, Yan Xu, Etsuko Ishii, Ye Jin Bang, Andrea Madotto y Pascale Fung (2023). Survey of Hallucination in Natural Language Generation. ACM Computing Surveys, 55(12), artículo 248. DOI: 10.1145/3571730","Distingue alucinaciones intrínsecas y extrínsecas respecto de la fuente; revisión de definiciones, tipos, detección y evaluación en NLG"
+c1A2,1,A,2,"Yuxia Wang y colaboradores (2023). A Survey on the Factuality of Large Language Models: Knowledge, Retrieval and Domain-Specificity. Preprint de arXiv. https://arxiv.org/abs/2310.07521","Examina la factualidad de los LLM desde el conocimiento paramétrico, la recuperación y la especificidad de dominio; organiza errores factuales y sus causas"
+c1A3,1,A,3,"Lei Huang y colaboradores (2023). A Survey on Hallucination in Large Language Models: Principles, Taxonomy, Challenges, and Open Questions. Preprint de arXiv. https://arxiv.org/abs/2311.05232","Organiza las alucinaciones en categorías de fidelidad a la instrucción o al contexto y de factualidad; analiza causas, detección y mitigación"
+c1A4,1,A,4,"Potsawee Manakul, Adian Liusie y Mark J. F. Gales (2023). SelfCheckGPT: Zero Resource Black-Box Hallucination Detection for Generative Large Language Models. EMNLP 2023. https://doi.org/10.18653/v1/2023.emnlp-main.557","Método para identificar alucinaciones mediante la consistencia entre varias respuestas del mismo modelo; no es principalmente una taxonomía"
+c1A5,1,A,5,"Stephanie Lin, Jacob Hilton y Owain Evans (2022). TruthfulQA: Measuring How Models Mimic Human Falsehoods. ACL 2022. https://doi.org/10.18653/v1/2022.acl-long.229","Estudia respuestas falsas que imitan creencias erróneas humanas; útil para alucinaciones factuales, sin taxonomía general"
+c1B1,1,B,1,"Huang, L., Yu, W., Ma, W.-T., Zhong, W., Feng, Z.-Y., Wang, H., Chen, Q., Peng, W., Feng, X.-C., Qin, B., & Liu, T. (2023). A Survey on Hallucination in Large Language Models: Principles, Taxonomy, Challenges, and Open Questions. ACM Transactions on Information Systems. https://doi.org/10.1145/3703155","Taxonomía que distingue factuality hallucination de faithfulness hallucination, sobre el trabajo de Ji et al."
+c1B2,1,B,2,"Zhang, Y., Li, Y., Cui, L., Cai, D., Liu, L.-M., Fu, T., Huang, X., Zhao, E., Zhang, Y., Xu, C., Chen, Y., Wang, L., Lưu, A., Bi, W., Shi, F., & Shi, S. (2023). Siren's Song in the AI Ocean: A Survey on Hallucination in Large Language Models. ArXiv. https://doi.org/10.48550/arXiv.2309.01219","Presenta taxonomías de los fenómenos de alucinación en LLM junto con benchmarks de evaluación"
+c1B3,1,B,3,"Rawte, V., Chakraborty, S., Pathak, A., Sarkar, A., Tonmoy, S., Chadha, A., Sheth, A., & Das, A. (2023). The Troubling Emergence of Hallucination in Large Language Models — An Extensive Definition, Quantification, and Prescriptive Remediations. ArXiv. https://doi.org/10.48550/arXiv.2310.04988","Dos orientaciones (factual mirage y silver lining), intrínseca/extrínseca con tres grados de severidad y seis tipos específicos"
+c1B4,1,B,4,"Cossio, M. (2025). A Comprehensive Taxonomy of Hallucinations in Large Language Models. ArXiv. https://doi.org/10.48550/arXiv.2508.01957","Diferencia alucinaciones intrínsecas y extrínsecas, y factuality vs. faithfulness, con manifestaciones específicas"
+c1B5,1,B,5,"Mishra, A., Asai, A., Balachandran, V., Wang, Y., Neubig, G., Tsvetkov, Y., & Hajishirzi, H. (2024). Fine-grained Hallucination Detection and Editing for Language Models. ArXiv. https://doi.org/10.48550/arXiv.2401.06855","Taxonomía jerárquica de seis tipos fine-grained: contradicciones con el conocimiento del mundo (entidad, relación) y declaraciones no verificables"
+c1C1,1,C,1,"Lei Huang, Weijiang Yu, Weitao Ma, Weihong Zhong, Zhangyin Feng, Haotian Wang, Qianglong Chen, Weihua Peng, Xiaocheng Feng, Bing Qin y Ting Liu (2024). A Survey on Hallucination in Large Language Models: Principles, Taxonomy, Challenges, and Open Questions. https://doi.org/10.1145/3703155","Dos bloques: factualidad (contradicción y fabricación factual) y fidelidad (inconsistencia con la instrucción, con el contexto y lógica)"
+c1C2,1,C,2,"Yue Zhang, Yafu Li, Leyang Cui, Deng Cai, Lemao Liu, Tingchen Fu, Xinting Huang, Enbo Zhao, Yu Zhang, Yulong Chen, Longyue Wang, Anh Tuan Luu, Wei Bi, Freda Shi y Shuming Shi (2023). Siren's Song in the AI Ocean: A Survey on Hallucination in Large Language Models. https://arxiv.org/abs/2309.01219","Divide las alucinaciones en input-conflicting, context-conflicting y fact-conflicting"
+c1C3,1,C,3,"Ziwei Ji, Nayeon Lee, Rita Frieske, Tiezheng Yu, Dan Su, Yan Xu, Etsuko Ishii, Ye Jin Bang, Andrea Madotto y Pascale Fung (2023). Survey of Hallucination in Natural Language Generation. https://doi.org/10.1145/3571730","Marco clásico en NLG: alucinaciones intrínsecas (contradicen la fuente) y extrínsecas (no verificables con la fuente)"
+c1C4,1,C,4,"Vipula Rawte, Amit P. Sheth y Amitava Das (2023). A Survey of Hallucination in Large Foundation Models. https://arxiv.org/abs/2309.05922","Examina la manifestación y clasificación de alucinaciones en modelos fundacionales, en generación multimodal y de texto"
+c1C5,1,C,5,"S. M. Towhidul Islam Tonmoy, S. M. Mehedi Zaman, Vinija Jain, Anku Rani, Vipula Rawte, Aman Chadha y Amitava Das (2024). A Comprehensive Survey of Hallucination Mitigation Techniques in Large Language Models. Enlace: no disponible ([suspicious link removed] en la respuesta copiada)","Agrupa tipos y causas de alucinación según las etapas del ciclo de vida del modelo: datos, entrenamiento e inferencia"
 c2A1,2,A,1,"Nelson F. Liu, Kevin Lin, John Hewitt, Ashwin Paranjape, Michele Bevilacqua, Fabio Petroni y Percy Liang (2024). Lost in the Middle: How Language Models Use Long Contexts. https://arxiv.org/abs/2307.03172","Dificultad para usar información relevante en el medio de un contexto largo; el rendimiento suele ser mejor al principio o al final"
 c2A2,2,A,2,"Yuhui Zhang y colaboradores (2025). NoLiMa: Long-Context Evaluation Beyond Literal Matching. https://arxiv.org/abs/2502.05167","Limitaciones de los LLM para recuperar información en contextos largos cuando la respuesta no se obtiene por coincidencias literales"
 c2A3,2,A,3,"Cheng-Ping Hsieh y colaboradores (2024). RULER: What's the Real Context Size of Your Long-Context Language Models? https://arxiv.org/abs/2404.06654","Admitir una ventana de contexto extensa no significa poder usar toda la información de forma fiable"

@@ -447,15 +447,18 @@ def verificar_acierto(respuesta_final, verificacion):
 # ============================================================
 # 7. NUCLEO DEL EXPERIMENTO Y GUARDADO (sin CrewAI de por medio)
 # ============================================================
-def ejecutar_evaluacion(modelo, posicion, nivel_tokens, verbose=False):
+def ejecutar_evaluacion(modelo, posicion, nivel_tokens, verbose=False,
+                        indice_dato=None, indice_tema=None):
     """Núcleo del experimento. Es lo que llama el runner en las corridas
     masivas (sin pasar por el LLM orquestador). Devuelve un dict completo."""
     inicio_tiempo = time.time()
     modelo, pos, nivel = validar_parametros(modelo, posicion, nivel_tokens)
 
-    seleccion = seleccionar_dato_clave()
+    seleccion = (DATOS_CLAVE[indice_dato] if indice_dato is not None
+                 else seleccionar_dato_clave())
     pregunta_final = f"Por cierto, hace rato te mencione algo. {seleccion['pregunta']}"
-    tema = seleccionar_tema()
+    tema = (TEMAS_CONVERSACION[indice_tema] if indice_tema is not None
+            else seleccionar_tema())
 
     detalle_error = None
     try:

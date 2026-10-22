@@ -3,7 +3,9 @@ import os
 import sys
 import zlib
 import random
-from agente import ejecutar_evaluacion, guardar_resultado, validar_parametros
+import itertools
+from agente import (ejecutar_evaluacion, guardar_resultado, validar_parametros,
+                    TEMAS_CONVERSACION)
 
 SEMILLA_EXPERIMENTO = 42
 
@@ -20,11 +22,18 @@ CONFIGS = {
         "niveles": [4000, 8000, 12000],
         "replicas": 1,
     },
+    "final_D14": {
+        "modelos": ["phi4-mini", "llama3.2:3b", "gemma3:4b"],
+        "posiciones": ["inicio", "mitad", "final"],
+        "niveles": [4000, 8000, 12000],
+        "replicas": 5,
+    },
 }
 
 COLUMNAS = ["modelo", "posicion", "nivel_tokens", "replica", "estado_final", "acierto",
             "turnos_reales", "contexto_al_dato", "contexto_final", "contexto_decreciente",
-            "tokens_totales", "tiempo_segundos", "errores", "tema", "dato_clave"]
+            "tokens_totales", "tiempo_segundos", "errores", "tema", "dato_clave",
+            "bloque", "orden_en_bloque", "indice_dato", "indice_tema"]
 
 
 def orden_del_bloque(bloque, tratamientos):
@@ -62,24 +71,29 @@ def main(nombre):
         with open(ruta, "w", newline="", encoding="utf-8") as f:
             csv.writer(f).writerow(COLUMNAS)
 
-    for modelo in cfg["modelos"]:
-        for pos in cfg["posiciones"]:
-            for nivel in cfg["niveles"]:
-                for rep in range(1, cfg["replicas"] + 1):
-                    if (modelo, pos, nivel, rep) in hechas:
-                        continue
-                    print(f">>> {modelo} | {pos} | {nivel} tokens | réplica {rep}", flush=True)
-                    r = ejecutar_evaluacion(modelo, pos, nivel)
-                    guardar_resultado(r)
-                    fila = [modelo, pos, nivel, rep, r["estado_final"], r["acierto"],
-                            r["turnos_reales"], r["contexto_al_dato"], r["contexto_final"],
-                            r["contexto_decreciente"], r["tokens_totales"],
-                            r["tiempo_segundos"], r["errores_por_tipo"],
-                            r["tema"], r["dato_clave"]]
-                    with open(ruta, "a", newline="", encoding="utf-8") as f:
-                        csv.writer(f).writerow(fila)
-                    print("   ", r["estado_final"], r["acierto"], r["contexto_final"],
-                          r["tiempo_segundos"], "s", flush=True)
+    for bloque in range(1, cfg["replicas"] + 1):
+        tratamientos = list(itertools.product(cfg["modelos"], cfg["posiciones"],
+                                              cfg["niveles"]))
+        for i, (modelo, pos, nivel) in enumerate(orden_del_bloque(bloque, tratamientos)):
+            rep = bloque
+            if (modelo, pos, nivel, rep) in hechas:
+                continue
+            indice_dato = bloque - 1
+            indice_tema = (i + bloque) % len(TEMAS_CONVERSACION)
+            print(f">>> bloque {bloque} | {modelo} | {pos} | {nivel} tokens", flush=True)
+            r = ejecutar_evaluacion(modelo, pos, nivel,
+                                    indice_dato=indice_dato, indice_tema=indice_tema)
+            guardar_resultado(r)
+            fila = [modelo, pos, nivel, rep, r["estado_final"], r["acierto"],
+                    r["turnos_reales"], r["contexto_al_dato"], r["contexto_final"],
+                    r["contexto_decreciente"], r["tokens_totales"],
+                    r["tiempo_segundos"], r["errores_por_tipo"],
+                    r["tema"], r["dato_clave"],
+                    bloque, i + 1, indice_dato, indice_tema]
+            with open(ruta, "a", newline="", encoding="utf-8") as f:
+                csv.writer(f).writerow(fila)
+            print("   ", r["estado_final"], r["acierto"], r["contexto_final"],
+                  r["tiempo_segundos"], "s", flush=True)
 
 
 if __name__ == "__main__":

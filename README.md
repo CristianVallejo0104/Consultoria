@@ -364,9 +364,14 @@ Después:
 - El evaluador de calidad de texto es exploratorio y no está validado contra criterio humano.
 - Resultados del primer corte: una réplica y solo posición *inicio*; los de `phi3:mini` y `gemma2:2b` no entran al análisis final.
 
-## Fuentes verificadas
 
-La procedencia de las fuentes está en nada_sin_fuente/03_sistema/procedencia.md.
+## Fuentes y trazabilidad
+
+El corpus son 11 artículos públicos guardados en `docs/fuentes/`. Su origen, versión, fecha de ingreso al repositorio y licencia están en `nada_sin_fuente/03_sistema/procedencia.md` (la columna «Verificó» se completa a medida que cada integrante abre el PDF).
+
+Las afirmaciones del estado del arte se comprueban una por una en `nada_sin_fuente/03_sistema/trazabilidad.md`, con página y cita corta. Las que no se sostienen como estaban escritas se registran en la tabla «Afirmaciones corregidas» de ese archivo.
+
+Los PDF son copias para uso académico. Varios están bajo la licencia no exclusiva de arXiv, que no autoriza expresamente la redistribución, así que se enlaza la fuente original y se retiran si un autor lo pide.
 
 ## Autores
 

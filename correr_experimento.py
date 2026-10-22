@@ -4,6 +4,7 @@ import sys
 import zlib
 import random
 import itertools
+import traceback
 from agente import (ejecutar_evaluacion, guardar_resultado, validar_parametros,
                     TEMAS_CONVERSACION)
 
@@ -33,7 +34,10 @@ CONFIGS = {
 COLUMNAS = ["modelo", "posicion", "nivel_tokens", "replica", "estado_final", "acierto",
             "turnos_reales", "contexto_al_dato", "contexto_final", "contexto_decreciente",
             "tokens_totales", "tiempo_segundos", "errores", "tema", "dato_clave",
-            "bloque", "orden_en_bloque", "indice_dato", "indice_tema"]
+            "bloque", "orden_en_bloque", "indice_dato", "indice_tema",
+            "done_reason_final", "respuesta_final_vacia", "contexto_tras_dato",
+            "contexto_antes_pregunta", "turnos_dato_a_pregunta", "dato_sobre_nivel",
+            "turnos_relleno_cortados"]
 
 
 def orden_del_bloque(bloque, tratamientos):
@@ -83,18 +87,34 @@ def main(nombre):
             print(f">>> bloque {bloque} | {modelo} | {pos} | {nivel} tokens", flush=True)
             r = ejecutar_evaluacion(modelo, pos, nivel,
                                     indice_dato=indice_dato, indice_tema=indice_tema)
-            guardar_resultado(r)
-            fila = [modelo, pos, nivel, rep, r["estado_final"], r["acierto"],
-                    r["turnos_reales"], r["contexto_al_dato"], r["contexto_final"],
-                    r["contexto_decreciente"], r["tokens_totales"],
-                    r["tiempo_segundos"], r["errores_por_tipo"],
-                    r["tema"], r["dato_clave"],
-                    bloque, i + 1, indice_dato, indice_tema]
-            with open(ruta, "a", newline="", encoding="utf-8") as f:
-                csv.writer(f).writerow(fila)
+            try:
+                guardar_resultado(r, carpeta_salida=f"resultados/{nombre}", replica=rep)
+                fila = [modelo, pos, nivel, rep, r["estado_final"], r["acierto"],
+                        r["turnos_reales"], r["contexto_al_dato"], r["contexto_final"],
+                        r["contexto_decreciente"], r["tokens_totales"],
+                        r["tiempo_segundos"], r["errores_por_tipo"],
+                        r["tema"], r["dato_clave"],
+                        bloque, i + 1, indice_dato, indice_tema,
+                        r["done_reason_final"], r["respuesta_final_vacia"],
+                        r["contexto_tras_dato"], r["contexto_antes_pregunta"],
+                        r["turnos_dato_a_pregunta"], r["dato_sobre_nivel"],
+                        r["turnos_relleno_cortados"]]
+                with open(ruta, "a", newline="", encoding="utf-8") as f:
+                    csv.writer(f).writerow(fila)
+            except Exception:
+                detalle = traceback.format_exc()
+                print(f"[ERROR AL GUARDAR] {modelo} | {pos} | {nivel} | bloque {bloque}\n{detalle}",
+                      flush=True)
+                with open(f"resultados/{nombre}_errores.log", "a", encoding="utf-8") as f:
+                    f.write(f"--- {modelo} | {pos} | {nivel} | bloque {bloque}\n{detalle}\n")
+                continue
             print("   ", r["estado_final"], r["acierto"], r["contexto_final"],
                   r["tiempo_segundos"], "s", flush=True)
 
 
 if __name__ == "__main__":
-    main(sys.argv[1] if len(sys.argv) > 1 else "preliminares_tokens")
+    if len(sys.argv) < 2 or sys.argv[1] not in CONFIGS:
+        print("Uso: python correr_experimento.py <config>")
+        print("Configs disponibles:", ", ".join(CONFIGS))
+        sys.exit(1)
+    main(sys.argv[1])

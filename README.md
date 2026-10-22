@@ -366,20 +366,7 @@ Después:
 
 ## Fuentes verificadas
 
-| Archivo | Origen | Versión | Citada en |
-|---|---|---|---|
-| RAG.pdf (renombrar: lewis2020_rag.pdf) | arxiv.org/abs/2005.11401 | v4 (12 abr. 2021) | D-09 |
-| liu2023_GEVAL.pdf | arxiv.org/abs/2303.16634 | v3 (23 may. 2023) | D-09 |
-| RAGAS.pdf (es2023_ragas.pdf) | arxiv.org/abs/2309.15217 | v2 (28 abr. 2025) | D-09 |
-| huang2023_hallucination_survey.pdf | arxiv.org/abs/2311.05232 | v2 (19 nov. 2024) | D-03 |
-| zhang2023_sirens_song.pdf | arxiv.org/abs/2309.01219 | v3 (14 sep. 2025) | D-03 |
-| KnowYourLimits...pdf (wen2024_know_your_limits.pdf) | arxiv.org/abs/2407.18418 | v3 (12 feb. 2025) | D-03 |
-| mehri2020_user.pdf | arxiv.org/abs/2005.00456 | v1 (1 may. 2020) | D-04 |
-| zheng2023_llm_as_judge.pdf | arxiv.org/abs/2306.05685 | v4 (24 dic. 2023) | D-04, D-10 |
-| zhang2024_found_in_the_middle.pdf | arxiv.org/abs/2403.04797 | v1 (5 mar. 2024) | D-05 |
-| liu2023_lost_in_the_middle.pdf | arxiv.org/abs/2307.03172 | no registrada | D-05, D-14 |
-
-Las URLs y versiones son las que ya tenía el README; no las verifiqué contra arXiv. Las citas con página están en las entradas indicadas de `docs/decisiones.md`.
+La procedencia de las fuentes está en nada_sin_fuente/03_sistema/procedencia.md.
 
 ## Autores
 

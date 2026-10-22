@@ -8,10 +8,6 @@ pegado al año de arXiv, y una o dos palabras clave: `huang2023_hallucination_su
 Tres conservan el nombre con que se descargaron: `RAG.pdf`, `RAGAS.pdf` y
 `KnowYourLimitsASurveyofAbstentioninLargeLanguageModels.pdf`. Los archivos no se renombran.
 
-> Partir de la tabla que ya está al final del `README.md` principal (10 filas), agregar la fila de ReAct
-> y llenar las columnas que quedaron en [fecha], [por confirmar] y [nombre].
-> «Verificó» = quien abrió el PDF y confirmó que es el artículo correcto y está completo.
-
 | # | Archivo | Origen (URL o DOI) | Versión | Fecha de obtención | Licencia o permiso | Verificó |
 |---|---|---|---|---|---|---|
 | 1 | RAG.pdf | arxiv.org/abs/2005.11401 | v4 (12 abr. 2021) | | | |
@@ -23,7 +19,7 @@ Tres conservan el nombre con que se descargaron: `RAG.pdf`, `RAGAS.pdf` y
 | 7 | mehri2020_user.pdf | arxiv.org/abs/2005.00456 | v1 (1 may. 2020) | | | |
 | 8 | zheng2023_llm_as_judge.pdf | arxiv.org/abs/2306.05685 | v4 (24 dic. 2023) | | | |
 | 9 | zhang2024_found_in_the_middle.pdf | arxiv.org/abs/2403.04797 | v1 (5 mar. 2024) | | | |
-| 10 | liu2023_lost_in_the_middle.pdf | doi.org/10.1162/tacl_a_00638 | TACL 2024, vol. 12, pp. 157–173 (versión publicada; sin sello de arXiv) | | | |
+| 10 | liu2023_lost_in_the_middle.pdf | arxiv.org/abs/2307.03172 | v3 (20 nov. 2023), versión aceptada en TACL; el PDF no trae sello de arXiv | | | |
 | 11 | yao2022_react.pdf | arxiv.org/abs/2210.03629 | v3 (10 mar. 2023) | | | |
 
 **Licencia:** en la página de arXiv de cada artículo aparece, a la derecha, el enlace de licencia

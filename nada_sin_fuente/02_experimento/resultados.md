@@ -25,8 +25,9 @@ distribución binomial. Comprobación en R: `binom.test(8, 10)$conf.int`, `binom
 
 ## Interpretación
 
-- **Ninguna referencia fue inexistente (0 N).** Los errores fueron de tipo E: autor equivocado, o un identificador
-  de arXiv que lleva a otro artículo (las notas de `clasificacion_consenso.csv` dicen cuál).
+- **Ninguna referencia fue inexistente (0 N).** Las 7 E fueron: 2 de autor equivocado (A), 4 de identificador de
+  arXiv que lleva a otro artículo (B) y 1 de contenido mal atribuido (C, c1C5). Las notas de
+  `clasificacion_consenso.csv` dicen cuál es cuál.
 - **Los tres intervalos se solapan ampliamente** (A [0,44; 0,97], B [0,26; 0,88], C [0,55; 1,00]). Con n = 10 por
   tratamiento no se puede afirmar que un tratamiento sea mejor que otro; las diferencias observadas son compatibles
   con el azar.
@@ -36,6 +37,7 @@ distribución binomial. Comprobación en R: `binom.test(8, 10)$conf.int`, `binom
 - **C (anclaje) no se limitó a los 11 PDF.** Varias referencias de C no son documentos del cuaderno, sino trabajos
   citados en la bibliografía de esos PDF (ver las notas de c1C3, c1C4, c1C5 y c2C5). Es lo que advierte la lámina 5:
   el contexto cerrado no impide que la herramienta traiga referencias que no le dimos.
-- **A (control) salió alto** porque las consultas pedían artículos muy conocidos del tema. No se debe generalizar a
-  temas menos citados. Además, el control no quedó del todo limpio (ver `consultas.md`: memoria activa en la
-  consulta 2 y miniaturas de sitios web en la consulta 1).
+- **A (control) salió alto**, posiblemente porque las consultas pedían artículos muy conocidos del tema
+  (hipótesis, no medida). No se debe generalizar a temas menos citados. Además, el control no quedó del todo
+  limpio: en la consulta 2 ChatGPT no tenía interruptor para apagar la búsqueda web (un primer intento la usó y
+  se descartó; el segundo se hizo pidiéndole por mensaje que no la usara). Ver `consultas.md`.

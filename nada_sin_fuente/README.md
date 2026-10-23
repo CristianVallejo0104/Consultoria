@@ -11,8 +11,8 @@ solo apunta a ellas.
 
 | # | Entregable | Criterio | Archivo | Estado |
 |---|---|---|---|---|
-| 1 | Inventario de fallos, uno por integrante | C1 | `01_inventarios/` | Hecho: 3 fallos por integrante |
-| 2 | Experimento con control: conteos, proporciones e intervalos | C1 | `02_experimento/resultados.md` | Hecho: conteos, IC exactos, acuerdo e interpretación |
+| 1 | Inventario de fallos, uno por integrante | C1 | `01_inventarios/` | Cristian: hecho. Juan Pablo: pendiente |
+| 2 | Experimento con control: conteos, proporciones e intervalos | C1 | `02_experimento/resultados.md` | Hecho: clasificación de consenso, proporciones e intervalos exactos; sin kappa (ver «Clasificación») |
 | 3 | Tabla de decisión (6 criterios) | C1 | `02_experimento/decision.md` | [pendiente] |
 | 4 | Biblioteca en el gestor (Zotero) | C2 | `03_sistema/biblioteca.bib` | [pendiente] |
 | 5 | README de procedencia | C2 | `03_sistema/procedencia.md` | En curso: fechas y licencias puestas; faltan 2 licencias por confirmar y la columna «Verificó» |
@@ -26,11 +26,8 @@ solo apunta a ellas.
 | 13 | Memoria (2 a 4 páginas) | C1–C4 | `memoria.md` | [pendiente] |
 | 14 | Declaración de uso de IA | C1 | `memoria.md`, apartado 6 | [pendiente] |
 
+## Clasificación
 
-## Independencia de la clasificación
-
-Cada integrante subió su archivo de clasificación (`02_experimento/clasificacion_*.csv`) en su propio
-commit. Las fechas de los commits muestran el orden real: Cristian subió las 30 (c2 el 21 oct, entre las 17:39
-y las 18:03; c1 el 22 oct, entre las 18:24 y las 18:37) y Juan Pablo subió las suyas el 22 oct a las 18:41,
-después. Las notas de los dos archivos tienen casi la misma redacción, así que el acuerdo de 30/30 (kappa = 1,00)
-no prueba una clasificación independiente. Se reporta así en `02_experimento/resultados.md`.
+Las referencias se clasificaron en **consenso**, no de forma independiente: Cristian clasificó las 30 y Juan Pablo
+declara estar de acuerdo. La clasificación de Juan Pablo se hizo después de que la de Cristian estuviera publicada en
+el repositorio, así que no se usa para medir acuerdo y no se reporta kappa. Detalle en `02_experimento/resultados.md`.

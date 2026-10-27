@@ -288,3 +288,45 @@ lenguaje (verificador de checkpoints, clasificador de fallos, analista), aún si
 - Claude Code: escribió el cambio mecánico en `agente.py` (`indice_dato`, `indice_tema`, `done_reason`, campos nuevos, guardado determinista) y en `correr_experimento.py` (configuración `final_D14`, bucle por bloques, columnas, manejo de errores), con permiso por edición y sin commit.
 **Alternativas descartadas.** Que Claude Code implemente también la lógica de diseño (`orden_del_bloque`): es lo que se sustenta línea por línea. Aceptar los resúmenes de los agentes sin revisar el `git diff`: sus resúmenes llegaron incompletos.
 **Límites.** Los dos agentes son de la misma familia que el asistente del chat: que coincidan no equivale a verificación independiente (ver D-12). Solo se contrastaron los números de línea citados que coincidían con el código mostrado; el resto no se verificó.
+
+---
+
+## D-18 · Corridas inválidas: reintento manual acotado y parada del runner
+**Fecha:** 2026-10-26
+**Contexto.** D-11 define que una llamada que falla aborta la corrida y la deja como inválida. Hasta D-17 el runner contaba cualquier fila del CSV como hecha, incluidas las inválidas: una falla externa no se repetía al retomar, y si Ollama se caía quedaban filas inválidas en cadena (hallazgo de la revisión previa, D-17). Además `no_alcanzo_nivel` se marcaba `invalida_tecnica`, igual que un error de red, pero depende de cuán verboso es el modelo.
+**Decisión.**
+- Reintentable: `estado_final` = `invalida_tecnica` y `no_alcanzo_nivel` ausente de los errores.
+- No se reintentan: `valida`, `rechazo_seguridad` ni `no_alcanzo_nivel` (resultado del tratamiento).
+- Reintento manual: al relanzar el mismo comando, `ya_hechas` omite las claves (modelo, posición, nivel, réplica) con alguna fila no reintentable y repite las demás. No hay bucle de reintentos automático.
+- Cada intento queda como fila nueva con la columna `intento` (27 columnas). En el análisis, cada clave se toma de la fila que la cierra. El reintento usa el mismo dato y tema del plan, con muestreo nuevo (la semilla no siembra a Ollama, D-15).
+- Parada: tras `MAX_INVALIDAS_SEGUIDAS` = 3 corridas reintentables seguidas, el runner imprime el último estado y error y sale con código 1. La fila de esa corrida ya está escrita.
+**Alternativas descartadas.**
+- Reintentar hasta obtener una corrida válida: sesga la selección y no tiene tope de tiempo.
+- No reintentar nada: deja bloques incompletos por fallas operativas ajenas al modelo.
+- Reintentar `no_alcanzo_nivel`: selecciona por azar conversaciones más cortas.
+- Reintento automático dentro del runner: más código por probar, y repetiría la falla si la causa persiste.
+- No parar nunca: 135 filas inválidas si Ollama se cae.
+**Verificación (2026-10-26, sin Ollama).** Con un CSV temporal de ejemplo, `ya_hechas` dejó como hechas las réplicas válida, con rechazo de seguridad, con `no_alcanzo_nivel` y la que tenía un intento válido tras uno fallido, y dejó para repetir la que tenía `timeout`; `intentos_previos` dio 1 y 2 donde correspondía; `es_reintentable` dio `True` y `False`. No se probó la parada tras 3 seguidas ni un reintento real con Ollama.
+**Límites.** Un reintento sobrescribe el JSON y el TXT del intento anterior (nombre determinista, D-16); el CSV conserva todos los intentos. Si una falla es del tratamiento y no externa (por ejemplo, un `timeout` sistemático a 12K), reintentar no la arregla: el runner se detiene tras 3 y hay que decidir a mano. `no_alcanzo_nivel` sigue figurando como `invalida_tecnica` y se distingue por la columna `errores`. Los CSV de `preliminares_tokens` y `piloto_phi4` (15 columnas) no se vuelven a correr.
+**Implementación.** Claude Code, en la rama `implementar-d18` (commit `b2ed1a2`, unión `d8d4239`), sin commit hasta que el equipo revisó el diff; la prueba con el CSV temporal la ejecutó Cristian.
+
+
+---
+
+## D-19 · Medida de respuesta y plan de análisis
+**Fecha:** 2026-10-26 (registrada antes de ver los resultados completos)
+**Contexto.** D-14 fijó el diseño (factorial 3×3×3 en 5 bloques, 135 corridas) y dejó para una entrada posterior cómo se mide la respuesta y qué análisis le corresponde.
+**Decisión.**
+- **Respuesta:** acierto binario por cadena exacta (D-11). Se analizan solo las corridas `valida`.
+- **Descriptivo:** acierto por celda (k de 5) con intervalo exacto de Clopper-Pearson al 95 %. Con 5 de 5 el intervalo va de 0.48 a 1.00 (D-14).
+- **Modelo:** regresión logística con efecto principal de modelo, posición y nivel, la interacción posición × nivel (hipótesis central, D-14) y el bloque (dato). Con 5 réplicas por celda es probable que haya separación (celdas con 5 de 5 o 0 de 5), así que se ajusta con un enfoque bayesiano con previas débilmente informativas, que la maneja de forma natural y da intervalos. Alternativa dentro del mismo plan: regresión logística penalizada de Firth.
+- **Tablas marginales:** prueba exacta de Fisher en lugar de chi-cuadrado, porque las frecuencias esperadas por celda serán bajas.
+- **Cobertura:** se reporta por celda cuántas corridas son válidas, cuántas son `no_alcanzo_nivel` y cuántas son `rechazo_seguridad`. `no_alcanzo_nivel` es un resultado del tratamiento (D-18) y no se descarta en silencio.
+- **Sensibilidad:** (a) con y sin las respuestas vacías o cortadas por `length` (D-16); (b) con la posición lograda del dato (`contexto_al_dato`, `contexto_tras_dato`) como covariable; (c) con el tema como covariable; (d) con `contexto_final` como covariable, solo aquí, porque es posterior al tratamiento y depende de la verbosidad del modelo.
+**Alternativas descartadas.**
+- ANOVA sobre el acierto 0/1: la respuesta es binaria y los supuestos de normalidad y varianza constante no se cumplen.
+- Chi-cuadrado como prueba principal: frecuencias esperadas bajas.
+- Modelo sin bloque: deja la dificultad del dato como ruido (D-14).
+- Interacción triple modelo × posición × nivel: con 135 corridas probablemente no es estimable (D-14).
+- Imputar o reponderar las corridas inválidas: inventa datos que no existen.
+**Límites.** Cinco réplicas por celda dan poca potencia: solo se detectarán diferencias grandes. El tema no quedó parejo entre posiciones (D-14). Los resultados valen para estos tres modelos y hasta 12K tokens. No está verificado qué paquete de Firth se usará en tu entorno (en R existe `logistf`; en Python habría que instalarlo) ni se ha probado nada de este plan con los datos reales: es un plan previo, y cualquier cambio posterior se registra como entrada nueva.

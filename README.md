@@ -2,7 +2,7 @@
 
 Sistema que evalúa en qué punto los modelos de lenguaje locales dejan de retener un dato inventado, según la posición del dato, el nivel de longitud en tokens y el modelo (fenómeno "lost in the middle"). Proyecto de Consultoría e Investigación, Universidad Santo Tomás.
 
-> **Estado (octubre 2026):** el diseño experimental (D-14) está implementado en `main`: bloques aleatorizados, dato por bloque, tema por rotación, guardado por corrida y campos de registro de validez. Las 135 corridas finales aún no se han lanzado (no existe `resultados/final_D14.csv`), y falta decidir la política de reintentos. Los resultados de este documento son del primer corte y de un piloto (exploratorios, sin inferencia). El análisis estadístico, el etiquetado de fallos y el diseño con modelos en la nube siguen pendientes. Detalle en `docs/DISENO.md` y `docs/decisiones.md`.
+> **Estado (28 de octubre de 2026):** el diseño experimental (D-14) está implementado y las 135 corridas finales están completas: `resultados/final_D14.csv` tiene 139 filas (135 celdas con resultado más 4 filas `invalida_tecnica` conservadas como historial, ver D-18). Hay un resumen descriptivo en "Resultados finales", sin inferencia. **Pendiente:** el etiquetado por segundo evaluador y el kappa, el análisis estadístico planeado en D-19 y D-20, y la decisión de alcance sobre Laya y los agentes de D-08. Los resultados del primer corte y del piloto son exploratorios. Detalle en `docs/DISENO.md` y `docs/decisiones.md`.
 
 ## Problema y contraparte
 
@@ -91,11 +91,13 @@ Constantes al inicio de `agente.py`:
 
 Las corridas inválidas **no** cuentan como "el modelo olvidó el dato". Si cualquier turno falla, la corrida se aborta, porque una conversación con huecos es otro tratamiento (D-11).
 
-**Pendiente de decisión:** `no_alcanzo_nivel` hoy se marca `invalida_tecnica`, igual que un error de red, pero depende de cuán verboso es el modelo y no es un fallo aleatorio; su tratamiento y la política de reintentos no están decididos. Mientras tanto, `ya_hechas` cuenta cualquier fila del CSV como hecha, incluidas las inválidas.
+**Política de reintentos (D-18).** Una falla técnica externa es reintentable: se repite al relanzar el mismo comando y cada intento queda como fila nueva con la columna `intento`. `no_alcanzo_nivel` no es reintentable, porque depende del tratamiento y no es una falla externa. El runner se detiene tras 3 fallas reintentables seguidas. En el análisis, cada celda se toma de la fila que la cierra.
+
+En `final_D14` hubo 4 filas `invalida_tecnica`, todas con `generador_relleno` y todas de `gemma3:4b`. Al relanzar, las 2 celdas que seguían sin resultado salieron válidas. La causa de las fallas no está determinada: el código descarta el mensaje de la excepción (`detalle_error` queda en `None`). Una hipótesis, sin probar, es el tope de 600 s de la llamada al generador.
 
 Límite conocido: los rechazos de seguridad escritos en texto ("no puedo ayudar con eso") no se detectan automáticamente, y la detección de `rechazo_seguridad` solo existe en las API en la nube.
 
-Campos del CSV (26 columnas): `modelo, posicion, nivel_tokens, replica, estado_final, acierto, turnos_reales, contexto_al_dato, contexto_final, contexto_decreciente, tokens_totales, tiempo_segundos, errores, tema, dato_clave` y, desde D-14 y D-16, `bloque, orden_en_bloque, indice_dato, indice_tema, done_reason_final, respuesta_final_vacia, contexto_tras_dato, contexto_antes_pregunta, turnos_dato_a_pregunta, dato_sobre_nivel, turnos_relleno_cortados`.
+Campos del CSV (27 columnas): `modelo, posicion, nivel_tokens, replica, estado_final, acierto, turnos_reales, contexto_al_dato, contexto_final, contexto_decreciente, tokens_totales, tiempo_segundos, errores, tema, dato_clave` y, desde D-14, D-16 y D-18, `bloque, orden_en_bloque, indice_dato, indice_tema, done_reason_final, respuesta_final_vacia, contexto_tras_dato, contexto_antes_pregunta, turnos_dato_a_pregunta, dato_sobre_nivel, turnos_relleno_cortados, intento`.
 
 Notas sobre los campos:
 - `tokens_prompt` (en el JSON) es la **suma** de los prompts de todas las llamadas (cada turno reenvía el historial); no es la longitud de la conversación.
@@ -110,11 +112,48 @@ Factorial completo en bloques completos aleatorizados (D-14, D-15). Detalle y ju
 - **Factores fijos:** modelo (`phi4-mini`, `llama3.2:3b`, `gemma3:4b`) × posición del dato (inicio, mitad, final) × nivel de tokens (4,000, 8,000, 12,000) = 27 tratamientos.
 - **Réplicas y bloques:** 5 réplicas organizadas en 5 bloques completos; el bloque es el dato inventado. Son 135 corridas. Dentro de cada bloque se baraja el orden de los 27 tratamientos con una semilla derivada del bloque (`crc32`, porque el `hash()` de Python cambia entre ejecuciones).
 - **Tema:** 6 temas asignados por rotación, `(posición en el bloque + bloque) mod 6`. No es un bloque completo, y las corridas por tema no quedan parejas dentro de cada posición del dato (medido sobre el plan: inicio [10, 8, 5, 9, 7, 6], mitad [2, 6, 7, 8, 12, 10], final [10, 8, 10, 6, 4, 7]); se documenta como límite.
-- **Respuesta:** acierto binario por cadena exacta, sin negación; sin LLM juez.
+- **Respuesta:** acierto binario por cadena exacta, sin negación; sin LLM juez (D-11, D-19).
 - **Nivel de tokens:** "5 turnos" no es comparable entre modelos (`phi3:mini` procesó 10,259 tokens en 5 turnos y `gemma2:2b`, 1,903). El nivel es el contexto en la pregunta final (D-06).
 - **Justificación:** sigue la estructura de Liu et al. (2023: posición × longitud del contexto × modelo) y de Zhang et al. (2024), formalizada con principios de diseño de experimentos. Nuestra variante inserta el dato dentro de la conversación y no en un documento recuperado. **[Texto de diseño de experimentos por citar.]**
-- **Análisis previsto (no decidido):** modelo para respuesta binaria con efecto de bloque, manejo de la separación (Firth o enfoque bayesiano), prueba exacta de Fisher en lugar de chi-cuadrado, intervalos exactos por celda y verificación de supuestos.
+- **Plan de análisis (D-19 y D-20, aún no ejecutado):**
+  - Descriptivo: acierto por celda con intervalo exacto de Clopper-Pearson al 95 %.
+  - Modelo: regresión logística con modelo, posición, nivel, interacción posición × nivel y bloque. Con separación probable se ajusta con enfoque bayesiano o con regresión penalizada de Firth.
+  - Tablas marginales: prueba exacta de Fisher en lugar de chi-cuadrado.
+  - Sensibilidad: respuestas vacías o cortadas, posición lograda del dato, tema, `contexto_final` (solo aquí) y criterio ampliado a variantes de formato numérico (D-20). El criterio principal (`verificar_acierto`) no se modifica.
 - **Alcance:** el estudio solo dice algo sobre estos tres modelos y los niveles medidos (hasta 12K), no sobre contextos mayores aunque el modelo los soporte.
+
+## Resultados finales (`final_D14`)
+
+**Solo descriptivos, sin inferencia.** Las 135 celdas tienen resultado válido y hay 19 fallos. Conteos de acierto sobre las corridas válidas (45 por grupo):
+
+| Factor | Nivel | Aciertos |
+|---|---|---|
+| Modelo | `gemma3:4b` | 45 de 45 (1.000) |
+| Modelo | `llama3.2:3b` | 38 de 45 (0.844) |
+| Modelo | `phi4-mini` | 33 de 45 (0.733) |
+| Posición | inicio | 39 de 45 (0.867) |
+| Posición | mitad | 41 de 45 (0.911) |
+| Posición | final | 36 de 45 (0.800) |
+| Nivel | 4,000 | 40 de 45 (0.889) |
+| Nivel | 8,000 | 37 de 45 (0.822) |
+| Nivel | 12,000 | 39 de 45 (0.867) |
+
+Observaciones, con cautela:
+- Los fallos son de `llama3.2:3b` (7) y `phi4-mini` (12). `gemma3:4b` acertó sus 45 corridas, sus 9 celdas con 5 de 5, lo que genera separación en el modelo logístico (por eso D-19 prevé Firth o enfoque bayesiano).
+- Por bloque (dato inventado) hay 1, 1, 1, 11 y 5 fallos. Más de la mitad está en un solo dato, y por eso el bloque entra como efecto en el modelo.
+- Solo 13 de las 27 celdas tienen algún fallo.
+- En estos conteos no se ve el patrón clásico de "lost in the middle": la posición mitad tiene el mayor acierto y el nivel no baja de forma ordenada. Con 45 corridas por grupo, diferencias de pocos fallos pueden ser azar; la inferencia queda para D-19.
+- Dos de los 19 fallos (F003 y F004 en la hoja de etiquetado) contienen el número correcto con coma ("44,295") y el criterio exacto los cuenta como fallo. El análisis de sensibilidad de D-20 los trata aparte.
+
+## Etiquetado de fallos y kappa
+
+Los 19 fallos se clasifican a mano con `docs/guia_etiquetado.md` (6 categorías: alucinación, admisión, negación de capacidad, alucinación narrativa, desvío y otra/duda). `preparar_etiquetado.py` carga los fallos de `resultados/final_D14`, los baraja con semilla 42 y escribe una hoja sin modelo, posición ni nivel (`etiquetado/hoja_ciega.csv`) y una clave aparte (`etiquetado/clave.csv`). Cada integrante etiqueta su propia copia y el acuerdo se mide con `kappa_cohen`.
+
+- **Estado:** Cristian terminó sus 19 etiquetas; las de Juan Pablo están pendientes y el kappa no se ha calculado.
+- **Reglas de borde, acordadas por el equipo:** F003 y F004 (número correcto con otro formato) van en "otra/duda" con la nota "variante de formato". **[POR COMPLETAR: regla para "no recuerdo haber mencionado ese número" (admisión o categoría propia); confirmar con Juan Pablo.]**
+- **Cegamiento:** la hoja es ciega respecto a modelo, posición y nivel, pero algunas respuestas nombran al modelo ("como Phi, de Microsoft"). Además, `hoja_cristian.csv` y `clave.csv` están en el repositorio, así que la independencia entre etiquetadores se protegió por acuerdo y no técnicamente.
+- **Verificación de `kappa_cohen`:** con un caso calculado a mano (50 casos, 35 coincidencias, acuerdo esperado por azar 0.5) dio 0.4, y con la misma lista contra sí misma dio 1.0.
+- **Límite:** con 19 casos, un solo desacuerdo mueve mucho el kappa.
 
 ## Calidad del texto de relleno
 
@@ -125,14 +164,14 @@ Factorial completo en bloques completos aleatorizados (D-14, D-15). Detalle y ju
 Cada decisión se documenta con su alternativa descartada. Registro completo en `docs/decisiones.md`.
 
 - **Agente CrewAI con una herramienta.** El agente es una capa delgada para uso interactivo. La lógica del experimento es código determinista. Alternativa descartada: tres herramientas separadas, porque pasar el texto de la conversación por el agente entre cada una saturaba su contexto.
-- **Agentes solo donde hay juicio de lenguaje (D-08).** No hay agente selector local/nube (un diccionario lo resuelve) ni agente para verificar supuestos estadísticos (código plano). Están planeados un verificador de checkpoints intermedios, un clasificador de tipo de fallo y un analista de hallazgos.
+- **Agentes solo donde hay juicio de lenguaje (D-08).** No hay agente selector local/nube (un diccionario lo resuelve) ni agente para verificar supuestos estadísticos (código plano). Están planeados un verificador de checkpoints intermedios, un clasificador de tipo de fallo y un analista de hallazgos; su alcance final está sin decidir.
 - **CrewAI.** Alternativas descartadas: LangChain (más componentes para el mismo formato ReAct), LangGraph (sobrediseño para un flujo lineal) y AutoGen (complejidad sin beneficio).
 - **Datos inventados, no conocimiento general (D-11).** La primera versión usaba "la capital de Australia es Canberra" y todos acertaban por conocimiento de entrenamiento.
 - **Evaluación determinista, no LLM juez, para retención (D-09, D-11).** Alternativa descartada: otro modelo como evaluador (ruido y circularidad).
 - **Manejo de errores unificado (D-11).** Un solo punto (`consultar_modelo`) convierte errores de red en corridas inválidas tipadas. Alternativa descartada: copiar el parche en cada rama.
 - **D-01:** `gemma2:2b` → `gemma3:4b`, por la ventana de contexto.
 - **D-02:** pagar créditos de OpenRouter (~US$20) en lugar de depender de planes gratuitos, que producían corridas inválidas (Groq: límites de 8,000 y 1,000 tokens por minuto según el modelo; NVIDIA: ~7 min por corrida de 5 turnos y un endpoint anunciado como deprecado; Gemini: 503 intermitentes; OpenRouter `:free`: límites propios).
-- **D-03:** Laya explorado y pospuesto como clasificador de tipo de fallo: zero-shot rinde 38 % en 5 categorías (frente a 20 % de azar uniforme, con n = 13) y falta un conjunto de fallos reales etiquetados.
+- **D-03:** Laya explorado y pospuesto como clasificador de tipo de fallo: zero-shot rinde 38 % en 5 categorías (frente a 20 % de azar uniforme, con n = 13) y falta un conjunto de fallos reales etiquetados. Con 19 fallos, el alcance final de Laya está sin decidir.
 - **D-04:** evaluador de calidad de texto con LLM juez (exploratorio).
 - **D-05:** el diseño factorial se justifica con la literatura del propio campo (Liu et al.; Zhang et al.).
 - **D-06:** migración de turnos a niveles de tokens (4K, 8K, 12K).
@@ -144,17 +183,21 @@ Cada decisión se documenta con su alternativa descartada. Registro completo en 
 - **D-14 y D-15:** factorial en bloques, orden aleatorio, dato por bloque y tema por rotación; la semilla solo fija el diseño, no la generación de Ollama.
 - **D-16:** guardado determinista por corrida y campos de registro de validez.
 - **D-17:** revisión con agentes de Claude Code y reparto de trabajo (ver "Uso de IA en el desarrollo").
+- **D-18:** corridas inválidas: reintento manual acotado a fallas técnicas externas y parada del runner tras 3 seguidas. Alternativas descartadas: no reintentar nunca y reintentar sin límite.
+- **D-19:** medida de respuesta y plan de análisis (ver "Diseño experimental"). Alternativas descartadas: ANOVA sobre el acierto 0/1, chi-cuadrado como prueba principal, modelo sin bloque, interacción triple e imputación de corridas inválidas.
+- **D-20:** análisis de sensibilidad por variantes de formato numérico. Alternativas descartadas: modificar `verificar_acierto` y decidir caso por caso a mano.
 
 ## Uso de IA en el desarrollo
 
 Declarado según la rúbrica y registrado en D-17:
 
-- **Decisiones de diseño:** del equipo (semilla que solo fija el diseño; tema por posición en el orden; reemplazos de modelos; contraparte metodológica).
+- **Decisiones de diseño:** del equipo (semilla que solo fija el diseño; tema por posición en el orden; reemplazos de modelos; contraparte metodológica; categorías del etiquetado y sus reglas de borde).
 - **Asistente de IA en chat (Claude):** explicó el porqué de cada paso antes del código, redactó la función `orden_del_bloque` (que Cristian tecleó, probó y puede explicar línea por línea), las especificaciones de cada tarea y las pruebas de verificación.
-- **Claude Code, con permiso por edición y sin commits:** escribió el cambio mecánico en `agente.py` y `correr_experimento.py` (parámetros `indice_dato` e `indice_tema`, configuración `final_D14`, bucle por bloques, columnas nuevas, guardado determinista, manejo de errores del runner, campos de registro).
+- **Claude Code, con permiso por edición y sin commits:** escribió el cambio mecánico en `agente.py` y `correr_experimento.py` (parámetros `indice_dato` e `indice_tema`, configuración `final_D14`, bucle por bloques, columnas nuevas, guardado determinista, manejo de errores del runner, campos de registro, reintentos de D-18).
+- **Asistente de IA en chat, fase de análisis y etiquetado:** redactó la función `kappa_cohen` (probada con un caso calculado a mano), el borrador de la entrada D-20, el script que escribió las etiquetas de Cristian en su hoja (las categorías las decidió Cristian; el asistente solo mostró los textos y pasó los números a CSV sin sugerir categorías) y los comandos de conteo por terminal usados en "Resultados finales".
 - **Subagentes de revisión de solo lectura** (`revisor-codigo-python` y `consultor-estadistico`): auditaron el código antes de las corridas. Sus resúmenes se contrastaron con el código y con las pruebas ejecutadas.
 - **Verificación humana:** cada diff se revisó antes del commit y se ejecutaron pruebas con Ollama.
-- **Distribución del trabajo entre integrantes:** por documentar.
+- **Distribución del trabajo entre integrantes:** **[POR COMPLETAR: quién hizo qué, Cristian y Juan Pablo.]**
 
 ## Guardarraíles
 
@@ -172,6 +215,7 @@ Declarado según la rúbrica y registrado en D-17:
 - **v5, orquestador liviano y temporizador:** `qwen2.5:1.5b` (986 MB) en lugar de `qwen2.5` (4.7 GB), para correr con 8 GB de RAM.
 - **v6, control de variables y errores tipados:** temperatura fija, timeout, clasificación de corridas inválidas, detección de rechazos de seguridad, banco reescrito con frases neutras ("número de expediente") porque "código secreto" activaba filtros de seguridad.
 - **v7, niveles de tokens y diseño en bloques:** longitud medida en tokens (D-06), factorial en bloques con orden aleatorio, dato por bloque y tema por rotación (D-14, D-15), y registro de validez por corrida (D-16).
+- **v8, reintentos y análisis planeado:** reintento acotado de fallas técnicas (D-18), plan de análisis (D-19) y sensibilidad por formato (D-20).
 
 ## Herramientas exploratorias (fuera del núcleo de `agente.py`)
 
@@ -257,7 +301,7 @@ El núcleo local no necesita claves. Para evaluar modelos en la nube, copia `.en
 cp .env.example .env
 ```
 
-Variable usada por el código actual: `OPENROUTER_API_KEY` (`agente.py` solo lee esa; `.env.example` aún lista además `NVIDIA_API_KEY`, `GROQ_API_KEY` y `GEMINI_API_KEY`, de las ramas retiradas en D-07). **Nunca subas `.env` al repositorio** (está en `.gitignore`). Los modelos en la nube cuestan dinero o tienen límites de tasa: revisa las condiciones de tu proveedor antes de lanzar corridas masivas.
+Variable usada por el código actual: `OPENROUTER_API_KEY`. **Nunca subas `.env` al repositorio** (está en `.gitignore`). Los modelos en la nube cuestan dinero o tienen límites de tasa: revisa las condiciones de tu proveedor antes de lanzar corridas masivas.
 
 ## Uso
 
@@ -268,10 +312,11 @@ python correr_experimento.py              # sin argumento: lista las configuraci
 python correr_experimento.py final_D14    # las 135 corridas del diseño
 ```
 
-- Configuraciones: `final_D14` (diseño final), y `preliminares_tokens` y `piloto_phi4` (primer corte y piloto, ya hechas: **no volver a correrlas**, sus CSV tienen 15 columnas y quedarían desalineados).
+- Configuraciones: `final_D14` (diseño final, ya completo), y `preliminares_tokens` y `piloto_phi4` (primer corte y piloto, ya hechas: **no volver a correrlas**, sus CSV tienen 15 columnas y quedarían desalineados).
 - Salidas: `resultados/<config>.csv` (una fila por corrida), `resultados/<config>/` (JSON y TXT por corrida, con nombre determinista como `llama3_2_3b_mitad_4000tok_01`) y `resultados/<config>_errores.log` (errores de guardado).
-- Para retomar una corrida cortada, vuelve a ejecutar el mismo comando: `ya_hechas` omite lo que ya está en el CSV. No cambies `SEMILLA_EXPERIMENTO` ni las listas de modelos, posiciones o niveles entre retomas.
-- Hoy el runner cuenta como hecha cualquier fila, también las inválidas (ver "Clasificación de las corridas").
+- Para retomar una corrida cortada, vuelve a ejecutar el mismo comando: `ya_hechas` omite las celdas con resultado y repite las que solo tienen fallas técnicas externas (D-18). No cambies `SEMILLA_EXPERIMENTO` ni las listas de modelos, posiciones o niveles entre retomas.
+- Un reintento sobrescribe el JSON y el TXT del intento anterior (nombre determinista); el CSV conserva todos los intentos.
+- Si lo lanzas en segundo plano con `nohup`, la salida va al archivo de log y no a la pantalla. Para verla en vivo usa `python -u` con `| tee -a`.
 
 **2. Una sola corrida, sin CrewAI:**
 
@@ -287,9 +332,17 @@ python -c "from agente import ejecutar_evaluacion as e, guardar_resultado as g; 
 python3 agente.py
 ```
 
-El modo interactivo imprime los modelos, posiciones y niveles de tokens permitidos y pide tres datos: modelo, posición del dato y nivel de tokens (ya no número de turnos); el agente orquestador llama a la herramienta con esos valores. Guarda el resultado en `resultados/txt/` y `resultados/json/`.
+El modo interactivo imprime los modelos, posiciones y niveles de tokens permitidos y pide tres datos: modelo, posición del dato y nivel de tokens; el agente orquestador llama a la herramienta con esos valores. Guarda el resultado en `resultados/txt/` y `resultados/json/`.
 
-**4. Evaluar la calidad del texto del generador de relleno** (exploratorio, no forma parte del análisis final aún):
+**4. Hojas de etiquetado y kappa:**
+
+```bash
+python -c "from preparar_etiquetado import cargar_fallos, escribir_hojas; escribir_hojas(cargar_fallos('resultados/final_D14'), 'etiquetado')"
+```
+
+Genera `hoja_ciega.csv` y `clave.csv` en `etiquetado/`. `kappa_cohen(etiquetas_a, etiquetas_b)` en el mismo archivo calcula el acuerdo entre dos listas de etiquetas.
+
+**5. Evaluar la calidad del texto del generador de relleno** (exploratorio, no forma parte del análisis final aún):
 
 ```bash
 python3 evaluar_calidad_texto.py
@@ -297,7 +350,7 @@ python3 evaluar_calidad_texto.py
 
 Evalúa una muestra de `resultados/txt/` con `qwen2.5:1.5b` como LLM juez y guarda en `resultados/calidad_texto/` (no versionado). Ver limitaciones en `docs/decisiones.md`.
 
-**5. Con un agente de terminal (Claude Code u opencode):** ver la sección siguiente.
+**6. Con un agente de terminal (Claude Code u opencode):** ver la sección siguiente.
 
 ## Usar el proyecto con Claude Code u opencode
 
@@ -324,22 +377,25 @@ Después:
 
 ```
 ├── agente.py                    # Núcleo (ejecutar_evaluacion) y agente evaluador
-├── correr_experimento.py        # Runner: configuraciones, bloques, orden aleatorio y CSV
+├── correr_experimento.py        # Runner: configuraciones, bloques, orden aleatorio, reintentos y CSV
+├── preparar_etiquetado.py       # Hojas de etiquetado ciegas y kappa de Cohen
 ├── evaluar_calidad_texto.py     # Naturalidad/coherencia/interés del generador de relleno
 ├── agente_eval_claude.md        # Plantilla de agente operador para Claude Code
 ├── agente_eval_open.md          # Plantilla de agente operador para opencode
 ├── CLAUDE.md                    # Contexto del proyecto para agentes de IA
 ├── requirements.txt             # Dependencias con versiones fijadas (pip freeze)
-├── .env.example                 # Nombres de las variables (sin valores)
+├── .env.example                 # Nombre de la variable de entorno (sin valores)
 ├── docs/
 │   ├── DISENO.md                # Diseño experimental completo
-│   ├── decisiones.md            # Registro de decisiones D-01 a D-17
+│   ├── decisiones.md            # Registro de decisiones D-01 a D-20
+│   ├── guia_etiquetado.md       # Categorías y reglas del etiquetado de fallos
 │   ├── contraparte/             # Registro de la contraparte metodológica (D-12)
 │   ├── fuentes/                 # Papers descargados y verificados
 │   └── informes/                # PDF del primer corte
+├── etiquetado/                  # Hoja ciega, clave y hojas de cada evaluador
 ├── resultados/
-│   ├── <config>.csv             # Una fila por corrida
-│   ├── <config>/                # JSON y TXT por corrida
+│   ├── final_D14.csv             # Una fila por corrida
+│   ├── final_D14/                # JSON y TXT por corrida
 │   ├── txt/ y json/             # Corridas del primer corte y de modos interactivos
 │   ├── pruebas/                 # Pruebas con proveedores gratuitos y registros del piloto
 │   └── calidad_texto/           # Notas de calidad conversacional (exploratorio, no versionado)
@@ -352,22 +408,25 @@ Después:
 - Métrica binaria (acierto/fallo): no captura degradación parcial.
 - Los rechazos de seguridad escritos en texto no se detectan automáticamente.
 - Cinco réplicas por celda dan poca potencia; con 5 de 5 aciertos, el intervalo exacto al 95 % va de 0.48 a 1.00. La interacción triple probablemente no es estimable (D-14).
-- Las corridas inválidas rompen el balance de los bloques, y su tratamiento (junto con `no_alcanzo_nivel`) está pendiente de decisión.
+- Con 19 fallos en total y ninguno de `gemma3:4b`, el modelo completo de D-19 tiene muchos más parámetros de los que los fallos permiten estimar con holgura; puede requerir simplificarse, y eso se registraría como decisión nueva.
+- El criterio exacto cuenta como fallo el número correcto escrito con otro formato (2 casos); D-20 lo trata como sensibilidad.
+- 4 corridas técnicas inválidas por `generador_relleno` (todas de `gemma3:4b`) tienen causa no determinada porque el error no se guarda (`detalle_error` en `None`).
 - El tema no queda perfectamente balanceado entre posiciones (ver "Diseño experimental").
 - La posición lograda del dato se aparta de la nominal; se reporta y se analizará como sensibilidad (en una corrida de prueba de `llama3.2:3b` a 4K, "mitad" quedó en el 56 % del nivel antes del dato y en el 65 % al cierre de su turno).
-- El tope de 300 tokens por respuesta puede truncar muchas respuestas en algunos modelos (en pruebas con `llama3.2:3b` hubo 3 y 10 respuestas cortadas en conversaciones de 11 turnos); se registra `done_reason`.
+- El tope de 300 tokens por respuesta puede truncar muchas respuestas en algunos modelos; se registra `done_reason`.
 - Hay 5 datos para 5 bloques: con más réplicas el código daría `IndexError`.
 - Cada modelo usa su propio tokenizador; las cifras de ambos cortes no son comparables.
 - `top_k` y `top_p` no están fijados.
 - Los modelos que razonan pueden consumir el límite de tokens en pensamiento interno y devolver texto vacío (relevante en la nube).
 - El orquestador pequeño puede confundir nombres de modelos.
 - El evaluador de calidad de texto es exploratorio y no está validado contra criterio humano.
+- El etiquetado tiene 19 casos y dos evaluadores; la independencia se protegió por acuerdo.
+- Los resultados valen para estos tres modelos y hasta 12K tokens.
 - Resultados del primer corte: una réplica y solo posición *inicio*; los de `phi3:mini` y `gemma2:2b` no entran al análisis final.
-
 
 ## Fuentes y trazabilidad
 
-El corpus son 11 artículos públicos guardados en `docs/fuentes/`. Su origen, versión, fecha de ingreso al repositorio y licencia están en `nada_sin_fuente/03_sistema/procedencia.md` (la columna «Verificó» se completa a medida que cada integrante abre el PDF).
+El corpus son 11 artículos públicos guardados en `docs/fuentes/`. Su origen, versión, fecha de ingreso al repositorio y licencia están en `nada_sin_fuente/03_sistema/procedencia.md` (la columna «Verificó» se completa a medida que cada integrante abre el PDF). **[POR COMPLETAR: confirmar el estado de esa tabla de fuentes.]**
 
 Las afirmaciones del estado del arte se comprueban una por una en `nada_sin_fuente/03_sistema/trazabilidad.md`, con página y cita corta. Las que no se sostienen como estaban escritas se registran en la tabla «Afirmaciones corregidas» de ese archivo.
 

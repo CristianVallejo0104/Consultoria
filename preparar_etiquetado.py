@@ -41,3 +41,18 @@ def escribir_hojas(fallos, carpeta_salida):
                 id_ = f"F{i:03d}"
                 hoja.writerow([id_, x["respuesta_final"], "", ""])
                 clave.writerow([id_, x["archivo"], x["modelo"], x["posicion"], x["nivel_tokens"]])
+
+
+def kappa_cohen(etiquetas_a, etiquetas_b):
+    """Kappa de Cohen entre dos etiquetadores sobre los mismos casos."""
+    a = list(etiquetas_a)
+    b = list(etiquetas_b)
+    if len(a) != len(b) or len(a) == 0:
+        raise ValueError("Las dos listas deben tener el mismo largo y no estar vacías")
+    n = len(a)
+    po = sum(x == y for x, y in zip(a, b)) / n
+    categorias = set(a) | set(b)
+    pe = sum((a.count(c) / n) * (b.count(c) / n) for c in categorias)
+    if pe == 1:
+        return 1.0
+    return (po - pe) / (1 - pe)

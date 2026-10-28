@@ -1,0 +1,308 @@
+nohup: ignoring input
+>>> bloque 1 | gemma3:4b | final | 12000 tokens
+    valida True 12095 477.6 s
+>>> bloque 1 | llama3.2:3b | inicio | 8000 tokens
+    valida True 8240 252.4 s
+>>> bloque 1 | llama3.2:3b | inicio | 4000 tokens
+    valida True 4047 93.5 s
+>>> bloque 1 | phi4-mini | mitad | 8000 tokens
+    valida True 8283 572.5 s
+>>> bloque 1 | phi4-mini | mitad | 4000 tokens
+    valida True 4216 243.6 s
+>>> bloque 1 | phi4-mini | inicio | 4000 tokens
+    valida True 4166 230.6 s
+>>> bloque 1 | llama3.2:3b | inicio | 12000 tokens
+    valida True 12320 599.2 s
+>>> bloque 1 | gemma3:4b | final | 8000 tokens
+    valida True 8163 328.1 s
+>>> bloque 1 | gemma3:4b | inicio | 4000 tokens
+    valida True 4140 169.3 s
+>>> bloque 1 | llama3.2:3b | mitad | 12000 tokens
+    valida True 12176 482.5 s
+>>> bloque 1 | gemma3:4b | mitad | 4000 tokens
+    valida True 4217 164.4 s
+>>> bloque 1 | phi4-mini | inicio | 12000 tokens
+Exception ignored in: <function BaseEventLoop.__del__ at 0x7d4b84b61760>
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 728, in __del__
+    self.close()
+  File "/usr/lib/python3.12/asyncio/unix_events.py", line 68, in close
+    super().close()
+  File "/usr/lib/python3.12/asyncio/selector_events.py", line 104, in close
+    self._close_self_pipe()
+  File "/usr/lib/python3.12/asyncio/selector_events.py", line 111, in _close_self_pipe
+    self._remove_reader(self._ssock.fileno())
+                        ^^^^^^^^^^^
+AttributeError: '_UnixSelectorEventLoop' object has no attribute '_ssock'
+nohup: ignoring input
+>>> bloque 1 | phi4-mini | inicio | 12000 tokens
+    valida True 12148 1718.4 s
+>>> bloque 1 | phi4-mini | final | 4000 tokens
+    valida True 4203 315.6 s
+>>> bloque 1 | gemma3:4b | inicio | 12000 tokens
+    valida True 12408 706.5 s
+>>> bloque 1 | phi4-mini | mitad | 12000 tokens
+    valida False 12350 1246.6 s
+>>> bloque 1 | llama3.2:3b | mitad | 8000 tokens
+    valida True 8159 883.0 s
+>>> bloque 1 | gemma3:4b | mitad | 12000 tokens
+    invalida_tecnica None None 677.3 s
+>>> bloque 1 | gemma3:4b | inicio | 8000 tokens
+    valida True 8218 354.5 s
+>>> bloque 1 | gemma3:4b | final | 4000 tokens
+    invalida_tecnica None None 690.1 s
+>>> bloque 1 | gemma3:4b | mitad | 8000 tokens
+    valida True 8307 391.8 s
+>>> bloque 1 | llama3.2:3b | final | 12000 tokens
+    valida True 12248 744.2 s
+>>> bloque 1 | phi4-mini | final | 8000 tokens
+    valida True 8278 654.8 s
+>>> bloque 1 | llama3.2:3b | final | 8000 tokens
+    valida True 8361 429.2 s
+>>> bloque 1 | phi4-mini | inicio | 8000 tokens
+    valida True 8182 634.7 s
+>>> bloque 1 | phi4-mini | final | 12000 tokens
+    valida True 12150 1633.0 s
+>>> bloque 1 | llama3.2:3b | final | 4000 tokens
+    valida True 4223 186.7 s
+>>> bloque 1 | llama3.2:3b | mitad | 4000 tokens
+    valida True 4338 185.5 s
+>>> bloque 2 | phi4-mini | final | 4000 tokens
+    valida True 4300 264.6 s
+>>> bloque 2 | gemma3:4b | mitad | 12000 tokens
+    valida True 12304 537.3 s
+>>> bloque 2 | llama3.2:3b | mitad | 4000 tokens
+    valida True 4391 198.2 s
+>>> bloque 2 | phi4-mini | final | 8000 tokens
+    valida True 8355 661.9 s
+>>> bloque 2 | gemma3:4b | inicio | 8000 tokens
+    valida True 8253 356.9 s
+>>> bloque 2 | phi4-mini | inicio | 4000 tokens
+    valida True 4229 255.4 s
+>>> bloque 2 | llama3.2:3b | mitad | 12000 tokens
+    valida True 12145 950.4 s
+>>> bloque 2 | gemma3:4b | inicio | 12000 tokens
+    valida True 12186 652.8 s
+>>> bloque 2 | gemma3:4b | mitad | 4000 tokens
+    valida True 4284 205.5 s
+>>> bloque 2 | gemma3:4b | mitad | 8000 tokens
+    valida True 8152 409.3 s
+>>> bloque 2 | phi4-mini | final | 12000 tokens
+    valida True 12144 1156.5 s
+>>> bloque 2 | phi4-mini | inicio | 8000 tokens
+    valida True 8103 611.6 s
+>>> bloque 2 | llama3.2:3b | final | 8000 tokens
+    valida True 8295 419.1 s
+>>> bloque 2 | phi4-mini | mitad | 12000 tokens
+    valida True 12303 1030.6 s
+>>> bloque 2 | phi4-mini | mitad | 8000 tokens
+    valida True 8161 574.7 s
+>>> bloque 2 | llama3.2:3b | inicio | 4000 tokens
+    valida True 4299 152.9 s
+>>> bloque 2 | phi4-mini | inicio | 12000 tokens
+    valida True 12218 1011.8 s
+>>> bloque 2 | gemma3:4b | final | 4000 tokens
+    valida True 4210 160.5 s
+>>> bloque 2 | llama3.2:3b | mitad | 8000 tokens
+    valida True 8108 363.4 s
+>>> bloque 2 | phi4-mini | mitad | 4000 tokens
+    valida True 4313 254.2 s
+>>> bloque 2 | llama3.2:3b | inicio | 12000 tokens
+    valida True 12159 542.5 s
+>>> bloque 2 | gemma3:4b | final | 8000 tokens
+    valida True 8401 386.8 s
+>>> bloque 2 | llama3.2:3b | final | 12000 tokens
+    valida True 12141 578.7 s
+>>> bloque 2 | llama3.2:3b | final | 4000 tokens
+    valida False 4120 149.3 s
+>>> bloque 2 | gemma3:4b | final | 12000 tokens
+    valida True 12038 456.6 s
+>>> bloque 2 | llama3.2:3b | inicio | 8000 tokens
+    valida True 8070 335.6 s
+>>> bloque 2 | gemma3:4b | inicio | 4000 tokens
+    valida True 4053 162.1 s
+>>> bloque 3 | llama3.2:3b | final | 4000 tokens
+    valida True 4372 154.2 s
+>>> bloque 3 | phi4-mini | inicio | 4000 tokens
+    valida True 4364 268.9 s
+>>> bloque 3 | phi4-mini | final | 8000 tokens
+    valida True 8026 536.2 s
+>>> bloque 3 | llama3.2:3b | inicio | 4000 tokens
+    valida True 4133 140.4 s
+>>> bloque 3 | phi4-mini | inicio | 8000 tokens
+    valida True 8164 581.9 s
+>>> bloque 3 | gemma3:4b | inicio | 12000 tokens
+    valida True 12112 531.8 s
+>>> bloque 3 | gemma3:4b | final | 8000 tokens
+    valida True 8086 308.8 s
+>>> bloque 3 | llama3.2:3b | mitad | 12000 tokens
+    valida True 12105 561.8 s
+>>> bloque 3 | phi4-mini | mitad | 8000 tokens
+    valida True 8200 549.9 s
+>>> bloque 3 | gemma3:4b | mitad | 4000 tokens
+    valida True 4064 135.0 s
+>>> bloque 3 | gemma3:4b | inicio | 4000 tokens
+    valida True 4421 143.0 s
+>>> bloque 3 | gemma3:4b | final | 12000 tokens
+    valida True 12283 470.7 s
+>>> bloque 3 | llama3.2:3b | mitad | 4000 tokens
+    valida True 4099 152.1 s
+>>> bloque 3 | gemma3:4b | final | 4000 tokens
+    valida True 4104 173.9 s
+>>> bloque 3 | llama3.2:3b | inicio | 8000 tokens
+    valida True 8215 334.8 s
+>>> bloque 3 | phi4-mini | final | 12000 tokens
+    valida False 12363 1027.2 s
+>>> bloque 3 | phi4-mini | mitad | 4000 tokens
+    valida True 4083 218.8 s
+>>> bloque 3 | llama3.2:3b | final | 12000 tokens
+    valida True 12108 547.1 s
+>>> bloque 3 | gemma3:4b | inicio | 8000 tokens
+    valida True 8064 307.8 s
+>>> bloque 3 | llama3.2:3b | inicio | 12000 tokens
+    valida True 12172 588.9 s
+>>> bloque 3 | phi4-mini | inicio | 12000 tokens
+    valida True 12266 1002.9 s
+>>> bloque 3 | llama3.2:3b | final | 8000 tokens
+    valida True 8253 354.9 s
+>>> bloque 3 | gemma3:4b | mitad | 12000 tokens
+    valida True 12208 460.6 s
+>>> bloque 3 | llama3.2:3b | mitad | 8000 tokens
+    valida True 8198 338.8 s
+>>> bloque 3 | phi4-mini | final | 4000 tokens
+    valida True 4292 249.4 s
+>>> bloque 3 | phi4-mini | mitad | 12000 tokens
+    valida True 12307 1066.6 s
+>>> bloque 3 | gemma3:4b | mitad | 8000 tokens
+    valida True 8132 278.1 s
+>>> bloque 4 | phi4-mini | mitad | 8000 tokens
+    valida False 8279 591.6 s
+>>> bloque 4 | phi4-mini | mitad | 12000 tokens
+    valida True 12305 980.6 s
+>>> bloque 4 | phi4-mini | inicio | 4000 tokens
+    valida False 4151 244.6 s
+>>> bloque 4 | phi4-mini | inicio | 12000 tokens
+    valida False 12290 1039.1 s
+>>> bloque 4 | llama3.2:3b | mitad | 8000 tokens
+    valida False 8276 323.0 s
+>>> bloque 4 | gemma3:4b | final | 4000 tokens
+    valida True 4350 181.7 s
+>>> bloque 4 | llama3.2:3b | mitad | 4000 tokens
+    valida True 4125 154.1 s
+>>> bloque 4 | gemma3:4b | mitad | 4000 tokens
+    valida True 4050 149.5 s
+>>> bloque 4 | gemma3:4b | final | 8000 tokens
+    valida True 8251 277.4 s
+>>> bloque 4 | gemma3:4b | final | 12000 tokens
+    valida True 12144 419.3 s
+>>> bloque 4 | phi4-mini | mitad | 4000 tokens
+    valida True 4205 246.1 s
+>>> bloque 4 | gemma3:4b | mitad | 8000 tokens
+    valida True 8049 351.0 s
+>>> bloque 4 | gemma3:4b | inicio | 12000 tokens
+    valida True 12137 469.6 s
+>>> bloque 4 | gemma3:4b | inicio | 4000 tokens
+    valida True 4332 150.8 s
+>>> bloque 4 | llama3.2:3b | final | 4000 tokens
+    valida False 4326 156.8 s
+>>> bloque 4 | llama3.2:3b | inicio | 4000 tokens
+    valida True 4184 138.5 s
+>>> bloque 4 | phi4-mini | final | 12000 tokens
+    valida True 12059 1422.6 s
+>>> bloque 4 | gemma3:4b | inicio | 8000 tokens
+    valida True 8260 308.6 s
+>>> bloque 4 | phi4-mini | final | 8000 tokens
+    valida False 8169 573.7 s
+>>> bloque 4 | llama3.2:3b | final | 8000 tokens
+    valida False 8344 327.6 s
+>>> bloque 4 | llama3.2:3b | final | 12000 tokens
+    valida True 12067 557.2 s
+>>> bloque 4 | gemma3:4b | mitad | 12000 tokens
+    valida True 12115 458.4 s
+>>> bloque 4 | phi4-mini | inicio | 8000 tokens
+    valida False 8291 556.2 s
+>>> bloque 4 | llama3.2:3b | inicio | 12000 tokens
+    valida False 12212 542.5 s
+>>> bloque 4 | llama3.2:3b | inicio | 8000 tokens
+    valida False 8178 777.4 s
+>>> bloque 4 | llama3.2:3b | mitad | 12000 tokens
+    valida True 12199 542.1 s
+>>> bloque 4 | phi4-mini | final | 4000 tokens
+    valida False 4245 239.4 s
+>>> bloque 5 | phi4-mini | final | 8000 tokens
+    valida True 8150 532.8 s
+>>> bloque 5 | phi4-mini | inicio | 12000 tokens
+    valida False 12196 1009.5 s
+>>> bloque 5 | llama3.2:3b | mitad | 4000 tokens
+    valida True 4156 141.6 s
+>>> bloque 5 | gemma3:4b | mitad | 4000 tokens
+    valida True 4058 166.5 s
+>>> bloque 5 | gemma3:4b | inicio | 4000 tokens
+    valida True 4049 153.0 s
+>>> bloque 5 | llama3.2:3b | inicio | 4000 tokens
+    valida True 4157 150.5 s
+>>> bloque 5 | gemma3:4b | final | 8000 tokens
+    valida True 8079 333.0 s
+>>> bloque 5 | phi4-mini | inicio | 4000 tokens
+    valida True 4053 227.2 s
+>>> bloque 5 | llama3.2:3b | final | 4000 tokens
+    valida True 4203 144.4 s
+>>> bloque 5 | gemma3:4b | final | 12000 tokens
+    valida True 12206 473.8 s
+>>> bloque 5 | llama3.2:3b | final | 8000 tokens
+    valida False 8367 375.6 s
+>>> bloque 5 | gemma3:4b | mitad | 8000 tokens
+    valida True 8310 516.8 s
+>>> bloque 5 | phi4-mini | inicio | 8000 tokens
+    valida True 8244 712.3 s
+>>> bloque 5 | phi4-mini | final | 4000 tokens
+    valida False 4351 288.0 s
+>>> bloque 5 | phi4-mini | mitad | 4000 tokens
+    valida True 4234 273.1 s
+>>> bloque 5 | phi4-mini | final | 12000 tokens
+    valida False 12235 1174.9 s
+>>> bloque 5 | llama3.2:3b | inicio | 8000 tokens
+    valida True 8346 473.8 s
+>>> bloque 5 | llama3.2:3b | mitad | 12000 tokens
+nohup: ignoring input
+>>> bloque 1 | gemma3:4b | mitad | 12000 tokens
+Exception ignored in: <function BaseEventLoop.__del__ at 0x7f4c46d75760>
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 728, in __del__
+    self.close()
+  File "/usr/lib/python3.12/asyncio/unix_events.py", line 68, in close
+    super().close()
+  File "/usr/lib/python3.12/asyncio/selector_events.py", line 104, in close
+    self._close_self_pipe()
+  File "/usr/lib/python3.12/asyncio/selector_events.py", line 111, in _close_self_pipe
+    self._remove_reader(self._ssock.fileno())
+                        ^^^^^^^^^^^
+AttributeError: '_UnixSelectorEventLoop' object has no attribute '_ssock'
+>>> bloque 1 | gemma3:4b | mitad | 12000 tokens
+    valida True 12031 463.4 s
+>>> bloque 1 | gemma3:4b | final | 4000 tokens
+    invalida_tecnica None None 710.8 s
+>>> bloque 5 | llama3.2:3b | mitad | 12000 tokens
+    valida True 12200 503.0 s
+>>> bloque 5 | llama3.2:3b | inicio | 12000 tokens
+    valida True 12197 384.5 s
+>>> bloque 5 | gemma3:4b | mitad | 12000 tokens
+    valida True 12243 437.8 s
+>>> bloque 5 | phi4-mini | mitad | 8000 tokens
+    valida False 8031 558.2 s
+>>> bloque 5 | gemma3:4b | inicio | 12000 tokens
+    valida True 12306 489.4 s
+>>> bloque 5 | llama3.2:3b | mitad | 8000 tokens
+    valida True 8365 260.1 s
+>>> bloque 5 | gemma3:4b | final | 4000 tokens
+    valida True 4143 172.7 s
+>>> bloque 5 | phi4-mini | mitad | 12000 tokens
+    valida True 12070 908.2 s
+>>> bloque 5 | llama3.2:3b | final | 12000 tokens
+    valida True 12329 385.7 s
+>>> bloque 5 | gemma3:4b | inicio | 8000 tokens
+    invalida_tecnica None None 835.4 s
+>>> bloque 1 | gemma3:4b | final | 4000 tokens
+    valida True 4153 148.1 s
+>>> bloque 5 | gemma3:4b | inicio | 8000 tokens
+    valida True 8126 273.7 s

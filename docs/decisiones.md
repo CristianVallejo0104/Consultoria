@@ -330,3 +330,15 @@ lenguaje (verificador de checkpoints, clasificador de fallos, analista), aún si
 - Interacción triple modelo × posición × nivel: con 135 corridas probablemente no es estimable (D-14).
 - Imputar o reponderar las corridas inválidas: inventa datos que no existen.
 **Límites.** Cinco réplicas por celda dan poca potencia: solo se detectarán diferencias grandes. El tema no quedó parejo entre posiciones (D-14). Los resultados valen para estos tres modelos y hasta 12K tokens. No está verificado qué paquete de Firth se usará en tu entorno (en R existe `logistf`; en Python habría que instalarlo) ni se ha probado nada de este plan con los datos reales: es un plan previo, y cualquier cambio posterior se registra como entrada nueva.
+
+
+---
+
+## D-20 · Análisis de sensibilidad por variantes de formato
+**Fecha:** 2026-10-27 (registrada antes de calcular cualquier medida del análisis D-19)
+**Contexto.** El criterio principal es cadena exacta (D-11). Al revisar fallos de corridas parciales se observó que algunas respuestas contienen el número correcto con otro formato (por ejemplo, 44.295 en vez de 44295). Esta entrada se escribe después de esa observación y antes de calcular el análisis; no se afirma que el criterio se fijó sin ver ningún resultado.
+**Decisión.** El análisis principal no cambia y `verificar_acierto` no se modifica. Se agrega un análisis de sensibilidad aparte en el que cuenta como acierto la cadena exacta o el mismo número con separador de miles (punto, coma o espacio). La regla es general: se aplica igual a todos los datos, bloques y modelos, y se calcula sobre `respuesta_final`.
+**Alternativas descartadas.**
+- Modificar `verificar_acierto`: mezclaría los dos criterios y se perdería la comparación.
+- Decidir caso por caso a mano: introduce subjetividad.
+**Límites.** Solo cubre variantes de formato numérico, no paráfrasis ni dígitos equivocados. El criterio ampliado solo se reporta como sensibilidad, no como resultado principal.

@@ -1,0 +1,140 @@
+modelo,posicion,nivel_tokens,replica,estado_final,acierto,turnos_reales,contexto_al_dato,contexto_final,contexto_decreciente,tokens_totales,tiempo_segundos,errores,tema,dato_clave,bloque,orden_en_bloque,indice_dato,indice_tema,done_reason_final,respuesta_final_vacia,contexto_tras_dato,contexto_antes_pregunta,turnos_dato_a_pregunta,dato_sobre_nivel,turnos_relleno_cortados,intento
+gemma3:4b,final,12000,1,valida,True,43,10321,12095,False,282107,477.6,{},matematicas,el numero de expediente del caso Aurora es 3851,1,1,0,1,stop,False,10546,12064,5,False,9,1
+llama3.2:3b,inicio,8000,1,valida,True,22,342,8240,False,102390,252.4,{},programacion,el numero de expediente del caso Aurora es 3851,1,2,0,2,stop,False,696,8206,20,False,17,1
+llama3.2:3b,inicio,4000,1,valida,True,11,348,4047,False,28350,93.5,{},historia,el numero de expediente del caso Aurora es 3851,1,3,0,3,stop,False,702,4015,9,False,7,1
+phi4-mini,mitad,8000,1,valida,True,25,4304,8283,False,113419,572.5,{},economia,el numero de expediente del caso Aurora es 3851,1,4,0,4,stop,False,4647,8258,10,False,16,1
+phi4-mini,mitad,4000,1,valida,True,12,2211,4216,False,32085,243.6,{},ciencia,el numero de expediente del caso Aurora es 3851,1,5,0,5,stop,False,2554,4191,5,False,10,1
+phi4-mini,inicio,4000,1,valida,True,12,324,4166,False,31030,230.6,{},geografia,el numero de expediente del caso Aurora es 3851,1,6,0,0,stop,False,666,4142,10,False,5,1
+llama3.2:3b,inicio,12000,1,valida,True,33,348,12320,False,223147,599.2,{},matematicas,el numero de expediente del caso Aurora es 3851,1,7,0,1,stop,False,702,12286,31,False,26,1
+gemma3:4b,final,8000,1,valida,True,24,7151,8163,False,114912,328.1,{},programacion,el numero de expediente del caso Aurora es 3851,1,8,0,2,stop,False,7504,8132,3,False,14,1
+gemma3:4b,inicio,4000,1,valida,True,15,328,4140,False,37505,169.3,{},historia,el numero de expediente del caso Aurora es 3851,1,9,0,3,stop,False,681,4109,13,False,3,1
+llama3.2:3b,mitad,12000,1,valida,True,32,6084,12176,False,212435,482.5,{},economia,el numero de expediente del caso Aurora es 3851,1,10,0,4,stop,False,6438,12142,15,False,31,1
+gemma3:4b,mitad,4000,1,valida,True,13,2358,4217,False,34616,164.4,{},ciencia,el numero de expediente del caso Aurora es 3851,1,11,0,5,stop,False,2711,4186,5,False,4,1
+phi4-mini,inicio,12000,1,valida,True,42,324,12148,False,276686,1718.4,{},geografia,el numero de expediente del caso Aurora es 3851,1,12,0,0,stop,False,668,12124,40,False,21,1
+phi4-mini,final,4000,1,valida,True,13,3501,4203,False,32349,315.6,{},matematicas,el numero de expediente del caso Aurora es 3851,1,13,0,1,stop,False,3845,4178,1,False,8,1
+gemma3:4b,inicio,12000,1,valida,True,38,326,12408,False,255490,706.5,{},programacion,el numero de expediente del caso Aurora es 3851,1,14,0,2,stop,False,679,12376,36,False,16,1
+phi4-mini,mitad,12000,1,valida,False,37,6008,12350,False,240757,1246.6,{},historia,el numero de expediente del caso Aurora es 3851,1,15,0,3,stop,False,6352,12326,17,False,24,1
+llama3.2:3b,mitad,8000,1,valida,True,22,4160,8159,False,102454,883.0,{},economia,el numero de expediente del caso Aurora es 3851,1,16,0,4,stop,False,4514,8125,10,False,19,1
+gemma3:4b,mitad,12000,1,invalida_tecnica,,5,,,False,5241,677.3,{'generador_relleno': 1},ciencia,el numero de expediente del caso Aurora es 3851,1,17,0,5,,,,,,,4,1
+gemma3:4b,inicio,8000,1,valida,True,26,330,8218,False,121229,354.5,{},geografia,el numero de expediente del caso Aurora es 3851,1,18,0,0,stop,False,683,8187,24,False,16,1
+gemma3:4b,final,4000,1,invalida_tecnica,,6,,,False,7378,690.1,{'generador_relleno': 1},matematicas,el numero de expediente del caso Aurora es 3851,1,19,0,1,,,,,,,5,1
+gemma3:4b,mitad,8000,1,valida,True,26,4215,8307,False,125327,391.8,{},programacion,el numero de expediente del caso Aurora es 3851,1,20,0,2,stop,False,4568,8276,13,False,9,1
+llama3.2:3b,final,12000,1,valida,True,33,10212,12248,False,223581,744.2,{},historia,el numero de expediente del caso Aurora es 3851,1,21,0,3,stop,False,10566,12214,5,False,23,1
+phi4-mini,final,8000,1,valida,True,24,7163,8278,False,109337,654.8,{},economia,el numero de expediente del caso Aurora es 3851,1,22,0,4,stop,False,7507,8253,2,False,18,1
+llama3.2:3b,final,8000,1,valida,True,22,6816,8361,False,103949,429.2,{},ciencia,el numero de expediente del caso Aurora es 3851,1,23,0,5,stop,False,7170,8327,3,False,15,1
+phi4-mini,inicio,8000,1,valida,True,23,324,8182,False,105600,634.7,{},geografia,el numero de expediente del caso Aurora es 3851,1,24,0,0,stop,False,668,8157,21,False,17,1
+phi4-mini,final,12000,1,valida,True,39,10342,12150,False,261041,1633.0,{},matematicas,el numero de expediente del caso Aurora es 3851,1,25,0,1,stop,False,10685,12126,4,False,15,1
+llama3.2:3b,final,4000,1,valida,True,12,3459,4223,False,32947,186.7,{},programacion,el numero de expediente del caso Aurora es 3851,1,26,0,2,stop,False,3812,4189,1,False,7,1
+llama3.2:3b,mitad,4000,1,valida,True,12,2205,4338,False,32876,185.5,{},historia,el numero de expediente del caso Aurora es 3851,1,27,0,3,stop,False,2558,4304,5,False,9,1
+phi4-mini,final,4000,2,valida,True,13,3553,4300,False,33989,264.6,{},programacion,el codigo de referencia del proyecto Fenix es F-7492-X,2,1,1,2,stop,False,3899,4272,1,False,5,1
+gemma3:4b,mitad,12000,2,valida,True,47,6065,12304,False,343645,537.3,{},historia,el codigo de referencia del proyecto Fenix es F-7492-X,2,2,1,3,stop,False,6328,12270,27,False,15,1
+llama3.2:3b,mitad,4000,2,valida,True,12,2220,4391,False,32836,198.2,{},economia,el codigo de referencia del proyecto Fenix es F-7492-X,2,3,1,4,stop,False,2575,4355,5,False,7,1
+phi4-mini,final,8000,2,valida,True,24,6921,8355,False,112558,661.9,{},ciencia,el codigo de referencia del proyecto Fenix es F-7492-X,2,4,1,5,stop,False,7242,8327,3,False,15,1
+gemma3:4b,inicio,8000,2,valida,True,36,330,8253,False,155712,356.9,{},geografia,el codigo de referencia del proyecto Fenix es F-7492-X,2,5,1,0,stop,False,687,8219,34,False,5,1
+phi4-mini,inicio,4000,2,valida,True,12,324,4229,False,31555,255.4,{},matematicas,el codigo de referencia del proyecto Fenix es F-7492-X,2,6,1,1,stop,False,671,4201,10,False,9,1
+llama3.2:3b,mitad,12000,2,valida,True,38,6182,12145,False,245895,950.4,{},programacion,el codigo de referencia del proyecto Fenix es F-7492-X,2,7,1,2,stop,False,6537,12110,17,False,12,1
+gemma3:4b,inicio,12000,2,valida,True,40,328,12186,False,275875,652.8,{},historia,el codigo de referencia del proyecto Fenix es F-7492-X,2,8,1,3,stop,False,685,12152,38,False,15,1
+gemma3:4b,mitad,4000,2,valida,True,14,2103,4284,False,37457,205.5,{},economia,el codigo de referencia del proyecto Fenix es F-7492-X,2,9,1,4,stop,False,2459,4250,6,False,5,1
+gemma3:4b,mitad,8000,2,valida,True,25,4180,8152,False,119781,409.3,{},ciencia,el codigo de referencia del proyecto Fenix es F-7492-X,2,10,1,5,stop,False,4536,8118,12,False,11,1
+phi4-mini,final,12000,2,valida,True,40,10229,12144,False,281381,1156.5,{},geografia,el codigo de referencia del proyecto Fenix es F-7492-X,2,11,1,0,stop,False,10575,12117,7,False,16,1
+phi4-mini,inicio,8000,2,valida,True,25,324,8103,False,112046,611.6,{},matematicas,el codigo de referencia del proyecto Fenix es F-7492-X,2,12,1,1,stop,False,671,8076,23,False,14,1
+llama3.2:3b,final,8000,2,valida,True,23,7119,8295,False,107609,419.1,{},programacion,el codigo de referencia del proyecto Fenix es F-7492-X,2,13,1,2,stop,False,7474,8260,2,False,14,1
+phi4-mini,mitad,12000,2,valida,True,38,6026,12303,False,264923,1030.6,{},historia,el codigo de referencia del proyecto Fenix es F-7492-X,2,14,1,3,stop,False,6373,12275,20,False,17,1
+phi4-mini,mitad,8000,2,valida,True,26,4333,8161,False,119513,574.7,{},economia,el codigo de referencia del proyecto Fenix es F-7492-X,2,15,1,4,stop,False,4680,8134,12,False,13,1
+llama3.2:3b,inicio,4000,2,valida,True,12,345,4299,False,32639,152.9,{},ciencia,el codigo de referencia del proyecto Fenix es F-7492-X,2,16,1,5,stop,False,701,4263,10,False,9,1
+phi4-mini,inicio,12000,2,valida,True,35,99,12218,False,225214,1011.8,{},geografia,el codigo de referencia del proyecto Fenix es F-7492-X,2,17,1,0,stop,False,445,12191,33,False,27,1
+gemma3:4b,final,4000,2,valida,True,13,3548,4210,False,34563,160.5,{},matematicas,el codigo de referencia del proyecto Fenix es F-7492-X,2,18,1,1,stop,False,3904,4176,1,False,4,1
+llama3.2:3b,mitad,8000,2,valida,True,28,4022,8108,False,117601,363.4,{},programacion,el codigo de referencia del proyecto Fenix es F-7492-X,2,19,1,2,stop,False,4369,8072,11,False,6,1
+phi4-mini,mitad,4000,2,valida,True,14,2177,4313,False,36525,254.2,{},historia,el codigo de referencia del proyecto Fenix es F-7492-X,2,20,1,3,stop,False,2523,4285,6,False,4,1
+llama3.2:3b,inicio,12000,2,valida,True,32,343,12159,False,211671,542.5,{},economia,el codigo de referencia del proyecto Fenix es F-7492-X,2,21,1,4,stop,False,699,12123,30,False,23,1
+gemma3:4b,final,8000,2,valida,True,23,6892,8401,False,110095,386.8,{},ciencia,el codigo de referencia del proyecto Fenix es F-7492-X,2,22,1,5,stop,False,7248,8366,3,False,20,1
+llama3.2:3b,final,12000,2,valida,True,38,10442,12141,False,261401,578.7,{},geografia,el codigo de referencia del proyecto Fenix es F-7492-X,2,23,1,0,stop,False,10798,12106,5,False,14,1
+llama3.2:3b,final,4000,2,valida,False,11,3728,4120,False,28957,149.3,{},matematicas,el codigo de referencia del proyecto Fenix es F-7492-X,2,24,1,1,stop,False,4084,4084,0,True,10,1
+gemma3:4b,final,12000,2,valida,True,37,10522,12038,False,238510,456.6,{},programacion,el codigo de referencia del proyecto Fenix es F-7492-X,2,25,1,2,stop,False,10879,12003,3,False,17,1
+llama3.2:3b,inicio,8000,2,valida,True,21,348,8070,False,95945,335.6,{},historia,el codigo de referencia del proyecto Fenix es F-7492-X,2,26,1,3,stop,False,704,8034,19,False,20,1
+gemma3:4b,inicio,4000,2,valida,True,11,327,4053,False,28156,162.1,{},economia,el codigo de referencia del proyecto Fenix es F-7492-X,2,27,1,4,stop,False,684,4019,9,False,8,1
+llama3.2:3b,final,4000,3,valida,True,12,3630,4372,False,32978,154.2,{},historia,el numero de registro del laboratorio Nexus es 6037,3,1,2,3,stop,False,3984,4339,1,False,9,1
+phi4-mini,inicio,4000,3,valida,True,15,320,4364,False,38956,268.9,{},economia,el numero de registro del laboratorio Nexus es 6037,3,2,2,4,stop,False,664,4339,13,False,6,1
+phi4-mini,final,8000,3,valida,True,23,6918,8026,False,105774,536.2,{},ciencia,el numero de registro del laboratorio Nexus es 6037,3,3,2,5,stop,False,7261,8001,2,False,18,1
+llama3.2:3b,inicio,4000,3,valida,True,11,348,4133,False,28599,140.4,{},geografia,el numero de registro del laboratorio Nexus es 6037,3,4,2,0,stop,False,702,4099,9,False,6,1
+phi4-mini,inicio,8000,3,valida,True,24,255,8164,False,109131,581.9,{},matematicas,el numero de registro del laboratorio Nexus es 6037,3,5,2,1,stop,False,598,8139,22,False,17,1
+gemma3:4b,inicio,12000,3,valida,True,55,326,12112,False,365230,531.8,{},programacion,el numero de registro del laboratorio Nexus es 6037,3,6,2,2,stop,False,679,12081,53,False,1,1
+gemma3:4b,final,8000,3,valida,True,23,7109,8086,False,107031,308.8,{},historia,el numero de registro del laboratorio Nexus es 6037,3,7,2,3,stop,False,7445,8055,2,False,16,1
+llama3.2:3b,mitad,12000,3,valida,True,34,6119,12105,False,226286,561.8,{},economia,el numero de registro del laboratorio Nexus es 6037,3,8,2,4,stop,False,6409,12071,16,False,16,1
+phi4-mini,mitad,8000,3,valida,True,23,4011,8200,False,107819,549.9,{},ciencia,el numero de registro del laboratorio Nexus es 6037,3,9,2,5,stop,False,4353,8175,11,False,19,1
+gemma3:4b,mitad,4000,3,valida,True,12,2183,4064,False,31719,135.0,{},geografia,el numero de registro del laboratorio Nexus es 6037,3,10,2,0,stop,False,2536,4033,5,False,8,1
+gemma3:4b,inicio,4000,3,valida,True,13,331,4421,False,35866,143.0,{},matematicas,el numero de registro del laboratorio Nexus es 6037,3,11,2,1,stop,False,684,4389,11,False,10,1
+gemma3:4b,final,12000,3,valida,True,45,10471,12283,False,303839,470.7,{},programacion,el numero de registro del laboratorio Nexus es 6037,3,12,2,2,stop,False,10793,12252,6,False,2,1
+llama3.2:3b,mitad,4000,3,valida,True,11,2272,4099,False,28548,152.1,{},historia,el numero de registro del laboratorio Nexus es 6037,3,13,2,3,stop,False,2625,4065,4,False,8,1
+gemma3:4b,final,4000,3,valida,True,12,3443,4104,False,31394,173.9,{},economia,el numero de registro del laboratorio Nexus es 6037,3,14,2,4,stop,False,3796,4073,1,False,6,1
+llama3.2:3b,inicio,8000,3,valida,True,23,345,8215,False,107292,334.8,{},ciencia,el numero de registro del laboratorio Nexus es 6037,3,15,2,5,stop,False,699,8181,21,False,14,1
+phi4-mini,final,12000,3,valida,False,37,10451,12363,False,251814,1027.2,{},geografia,el numero de registro del laboratorio Nexus es 6037,3,16,2,0,stop,False,10794,12338,5,False,24,1
+phi4-mini,mitad,4000,3,valida,True,12,2243,4083,False,29700,218.8,{},matematicas,el numero de registro del laboratorio Nexus es 6037,3,17,2,1,stop,False,2586,4058,4,False,6,1
+llama3.2:3b,final,12000,3,valida,True,34,10453,12108,False,222761,547.1,{},programacion,el numero de registro del laboratorio Nexus es 6037,3,18,2,2,stop,False,10783,12074,4,False,18,1
+gemma3:4b,inicio,8000,3,valida,True,29,328,8064,False,137903,307.8,{},historia,el numero de registro del laboratorio Nexus es 6037,3,19,2,3,stop,False,681,8033,27,False,5,1
+llama3.2:3b,inicio,12000,3,valida,True,38,343,12172,False,257244,588.9,{},economia,el numero de registro del laboratorio Nexus es 6037,3,20,2,4,stop,False,697,12139,36,False,9,1
+phi4-mini,inicio,12000,3,valida,True,38,321,12266,False,246171,1002.9,{},ciencia,el numero de registro del laboratorio Nexus es 6037,3,21,2,5,stop,False,665,12241,36,False,21,1
+llama3.2:3b,final,8000,3,valida,True,25,7106,8253,False,111118,354.9,{},geografia,el numero de registro del laboratorio Nexus es 6037,3,22,2,0,stop,False,7460,8219,2,False,8,1
+gemma3:4b,mitad,12000,3,valida,True,39,6157,12208,False,263598,460.6,{},matematicas,el numero de registro del laboratorio Nexus es 6037,3,23,2,1,stop,False,6509,12176,19,False,23,1
+llama3.2:3b,mitad,8000,3,valida,True,23,4169,8198,False,105598,338.8,{},programacion,el numero de registro del laboratorio Nexus es 6037,3,24,2,2,stop,False,4523,8164,10,False,15,1
+phi4-mini,final,4000,3,valida,True,14,3552,4292,False,35233,249.4,{},historia,el numero de registro del laboratorio Nexus es 6037,3,25,2,3,stop,False,3894,4267,1,False,7,1
+phi4-mini,mitad,12000,3,valida,True,41,6129,12307,False,268161,1066.6,{},economia,el numero de registro del laboratorio Nexus es 6037,3,26,2,4,stop,False,6472,12282,19,False,17,1
+gemma3:4b,mitad,8000,3,valida,True,26,4220,8132,False,122773,278.1,{},ciencia,el numero de registro del laboratorio Nexus es 6037,3,27,2,5,stop,False,4572,8101,12,False,9,1
+phi4-mini,mitad,8000,4,valida,False,25,4177,8279,False,115240,591.6,{},economia,el resultado del experimento Delta-7 fue exactamente 44295,4,1,3,4,stop,False,4523,8250,12,False,17,1
+phi4-mini,mitad,12000,4,valida,True,37,6161,12305,False,252601,980.6,{},ciencia,el resultado del experimento Delta-7 fue exactamente 44295,4,2,3,5,stop,False,6507,12276,19,False,27,1
+phi4-mini,inicio,4000,4,valida,False,14,324,4151,False,34826,244.6,{},geografia,el resultado del experimento Delta-7 fue exactamente 44295,4,3,3,0,stop,False,670,4122,12,False,8,1
+phi4-mini,inicio,12000,4,valida,False,39,324,12290,False,269776,1039.1,{},matematicas,el resultado del experimento Delta-7 fue exactamente 44295,4,4,3,1,stop,False,655,12260,37,False,21,1
+llama3.2:3b,mitad,8000,4,valida,False,22,4158,8276,False,103447,323.0,{},programacion,el resultado del experimento Delta-7 fue exactamente 44295,4,5,3,2,stop,False,4514,8238,10,False,20,1
+gemma3:4b,final,4000,4,valida,True,12,3622,4350,False,32834,181.7,{},historia,el resultado del experimento Delta-7 fue exactamente 44295,4,6,3,3,stop,False,3976,4315,1,False,8,1
+llama3.2:3b,mitad,4000,4,valida,True,11,2190,4125,False,28495,154.1,{},economia,el resultado del experimento Delta-7 fue exactamente 44295,4,7,3,4,stop,False,2545,4087,4,False,9,1
+gemma3:4b,mitad,4000,4,valida,True,12,2180,4050,False,31308,149.5,{},ciencia,el resultado del experimento Delta-7 fue exactamente 44295,4,8,3,5,stop,False,2535,4014,5,False,7,1
+gemma3:4b,final,8000,4,valida,True,33,6945,8251,False,139820,277.4,{},geografia,el resultado del experimento Delta-7 fue exactamente 44295,4,9,3,0,stop,False,7216,8216,3,False,2,1
+gemma3:4b,final,12000,4,valida,True,43,10381,12144,False,277145,419.3,{},matematicas,el resultado del experimento Delta-7 fue exactamente 44295,4,10,3,1,stop,False,10735,12109,4,False,13,1
+phi4-mini,mitad,4000,4,valida,True,12,2105,4205,False,31768,246.1,{},programacion,el resultado del experimento Delta-7 fue exactamente 44295,4,11,3,2,stop,False,2451,4176,5,False,6,1
+gemma3:4b,mitad,8000,4,valida,True,27,4164,8049,False,131749,351.0,{},historia,el resultado del experimento Delta-7 fue exactamente 44295,4,12,3,3,stop,False,4518,8014,14,False,13,1
+gemma3:4b,inicio,12000,4,valida,True,40,327,12137,False,266595,469.6,{},economia,el resultado del experimento Delta-7 fue exactamente 44295,4,13,3,4,stop,False,682,12102,38,False,10,1
+gemma3:4b,inicio,4000,4,valida,True,15,327,4332,False,39945,150.8,{},ciencia,el resultado del experimento Delta-7 fue exactamente 44295,4,14,3,5,stop,False,682,4296,13,False,4,1
+llama3.2:3b,final,4000,4,valida,False,12,3575,4326,False,31665,156.8,{},geografia,el resultado del experimento Delta-7 fue exactamente 44295,4,15,3,0,stop,False,3931,4288,1,False,7,1
+llama3.2:3b,inicio,4000,4,valida,True,11,348,4184,False,28712,138.5,{},matematicas,el resultado del experimento Delta-7 fue exactamente 44295,4,16,3,1,stop,False,704,4146,9,False,10,1
+phi4-mini,final,12000,4,valida,True,36,10278,12059,False,236294,1422.6,{},programacion,el resultado del experimento Delta-7 fue exactamente 44295,4,17,3,2,stop,False,10623,12029,4,False,24,1
+gemma3:4b,inicio,8000,4,valida,True,26,328,8260,False,114098,308.6,{},historia,el resultado del experimento Delta-7 fue exactamente 44295,4,18,3,3,stop,False,683,8224,24,False,6,1
+phi4-mini,final,8000,4,valida,False,26,7052,8169,False,120056,573.7,{},economia,el resultado del experimento Delta-7 fue exactamente 44295,4,19,3,4,stop,False,7397,8139,2,False,13,1
+llama3.2:3b,final,8000,4,valida,False,22,7175,8344,False,103090,327.6,{},ciencia,el resultado del experimento Delta-7 fue exactamente 44295,4,20,3,5,stop,False,7531,8306,2,False,19,1
+llama3.2:3b,final,12000,4,valida,True,35,10323,12067,False,236517,557.2,{},geografia,el resultado del experimento Delta-7 fue exactamente 44295,4,21,3,0,stop,False,10635,12030,4,False,18,1
+gemma3:4b,mitad,12000,4,valida,True,36,6178,12115,False,236110,458.4,{},matematicas,el resultado del experimento Delta-7 fue exactamente 44295,4,22,3,1,stop,False,6533,12079,17,False,14,1
+phi4-mini,inicio,8000,4,valida,False,24,319,8291,False,112181,556.2,{},programacion,el resultado del experimento Delta-7 fue exactamente 44295,4,23,3,2,stop,False,665,8261,22,False,17,1
+llama3.2:3b,inicio,12000,4,valida,False,33,348,12212,False,214188,542.5,{},historia,el resultado del experimento Delta-7 fue exactamente 44295,4,24,3,3,stop,False,704,12175,31,False,28,1
+llama3.2:3b,inicio,8000,4,valida,False,22,343,8178,False,102967,777.4,{},economia,el resultado del experimento Delta-7 fue exactamente 44295,4,25,3,4,stop,False,699,8141,20,False,15,1
+llama3.2:3b,mitad,12000,4,valida,True,32,6171,12199,False,214250,542.1,{},ciencia,el resultado del experimento Delta-7 fue exactamente 44295,4,26,3,5,stop,False,6527,12161,15,False,30,1
+phi4-mini,final,4000,4,valida,False,13,3497,4245,False,35012,239.4,{},geografia,el resultado del experimento Delta-7 fue exactamente 44295,4,27,3,0,stop,False,3842,4215,1,False,7,1
+phi4-mini,final,8000,5,valida,True,23,7028,8150,False,104857,532.8,{},ciencia,la version del algoritmo Centinela que se implemento fue la 9.15.6,5,1,4,5,stop,False,7380,8122,2,False,21,1
+phi4-mini,inicio,12000,5,valida,False,38,314,12196,False,258528,1009.5,{},geografia,la version del algoritmo Centinela que se implemento fue la 9.15.6,5,2,4,0,stop,False,665,12169,36,False,23,1
+llama3.2:3b,mitad,4000,5,valida,True,11,2322,4156,False,29235,141.6,{},matematicas,la version del algoritmo Centinela que se implemento fue la 9.15.6,5,3,4,1,stop,False,2684,4118,4,False,8,1
+gemma3:4b,mitad,4000,5,valida,True,11,2226,4058,False,28305,166.5,{},programacion,la version del algoritmo Centinela que se implemento fue la 9.15.6,5,4,4,2,stop,False,2586,4023,4,False,9,1
+gemma3:4b,inicio,4000,5,valida,True,13,328,4049,False,33807,153.0,{},historia,la version del algoritmo Centinela que se implemento fue la 9.15.6,5,5,4,3,stop,False,688,4015,11,False,5,1
+llama3.2:3b,inicio,4000,5,valida,True,11,343,4157,False,28462,150.5,{},economia,la version del algoritmo Centinela que se implemento fue la 9.15.6,5,6,4,4,stop,False,706,4119,9,False,9,1
+gemma3:4b,final,8000,5,valida,True,26,6847,8079,False,119311,333.0,{},ciencia,la version del algoritmo Centinela que se implemento fue la 9.15.6,5,7,4,5,stop,False,7206,8044,3,False,4,1
+phi4-mini,inicio,4000,5,valida,True,12,324,4053,False,30006,227.2,{},geografia,la version del algoritmo Centinela que se implemento fue la 9.15.6,5,8,4,0,stop,False,676,4025,10,False,6,1
+llama3.2:3b,final,4000,5,valida,True,11,3424,4203,False,29315,144.4,{},matematicas,la version del algoritmo Centinela que se implemento fue la 9.15.6,5,9,4,1,stop,False,3787,4165,1,False,9,1
+gemma3:4b,final,12000,5,valida,True,35,10231,12206,False,235753,473.8,{},programacion,la version del algoritmo Centinela que se implemento fue la 9.15.6,5,10,4,2,stop,False,10590,12171,5,False,25,1
+llama3.2:3b,final,8000,5,valida,False,28,6969,8367,False,138304,375.6,{},historia,la version del algoritmo Centinela que se implemento fue la 9.15.6,5,11,4,3,stop,False,7242,8330,6,False,13,1
+gemma3:4b,mitad,8000,5,valida,True,23,4373,8310,False,107910,516.8,{},economia,la version del algoritmo Centinela que se implemento fue la 9.15.6,5,12,4,4,stop,False,4733,8275,10,False,19,1
+phi4-mini,inicio,8000,5,valida,True,24,321,8244,False,112647,712.3,{},ciencia,la version del algoritmo Centinela que se implemento fue la 9.15.6,5,13,4,5,stop,False,673,8217,22,False,18,1
+phi4-mini,final,4000,5,valida,False,13,3611,4351,False,35307,288.0,{},geografia,la version del algoritmo Centinela que se implemento fue la 9.15.6,5,14,4,0,stop,False,3962,4323,1,False,4,1
+phi4-mini,mitad,4000,5,valida,True,12,2146,4234,False,31910,273.1,{},matematicas,la version del algoritmo Centinela que se implemento fue la 9.15.6,5,15,4,1,stop,False,2498,4206,5,False,9,1
+phi4-mini,final,12000,5,valida,False,35,10364,12235,False,227108,1174.9,{},programacion,la version del algoritmo Centinela que se implemento fue la 9.15.6,5,16,4,2,stop,False,10716,12209,4,False,28,1
+llama3.2:3b,inicio,8000,5,valida,True,22,348,8346,False,103458,473.8,{},historia,la version del algoritmo Centinela que se implemento fue la 9.15.6,5,17,4,3,stop,False,710,8308,20,False,17,1
+gemma3:4b,mitad,12000,1,valida,True,43,6113,12031,False,286797,463.4,{},ciencia,el numero de expediente del caso Aurora es 3851,1,17,0,5,stop,False,6323,12000,21,False,9,2
+gemma3:4b,final,4000,1,invalida_tecnica,,9,,,False,16095,710.8,{'generador_relleno': 1},matematicas,el numero de expediente del caso Aurora es 3851,1,19,0,1,,,,,,,6,2
+llama3.2:3b,mitad,12000,5,valida,True,33,6376,12200,False,221010,503.0,{},economia,la version del algoritmo Centinela que se implemento fue la 9.15.6,5,18,4,4,stop,False,6739,12162,15,False,27,1
+llama3.2:3b,inicio,12000,5,valida,True,35,345,12197,False,232946,384.5,{},ciencia,la version del algoritmo Centinela que se implemento fue la 9.15.6,5,19,4,5,stop,False,708,12160,33,False,20,1
+gemma3:4b,mitad,12000,5,valida,True,40,6233,12243,False,257794,437.8,{},geografia,la version del algoritmo Centinela que se implemento fue la 9.15.6,5,20,4,0,stop,False,6569,12209,18,False,9,1
+phi4-mini,mitad,8000,5,valida,False,26,4200,8031,False,118789,558.2,{},matematicas,la version del algoritmo Centinela que se implemento fue la 9.15.6,5,21,4,1,stop,False,4551,8004,11,False,16,1
+gemma3:4b,inicio,12000,5,valida,True,45,326,12306,False,315272,489.4,{},programacion,la version del algoritmo Centinela que se implemento fue la 9.15.6,5,22,4,2,stop,False,686,12272,43,False,16,1
+llama3.2:3b,mitad,8000,5,valida,True,23,4170,8365,False,110516,260.1,{},historia,la version del algoritmo Centinela que se implemento fue la 9.15.6,5,23,4,3,stop,False,4532,8327,11,False,15,1
+gemma3:4b,final,4000,5,valida,True,12,3748,4143,False,31097,172.7,{},economia,la version del algoritmo Centinela que se implemento fue la 9.15.6,5,24,4,4,stop,False,4108,4108,0,True,8,1
+phi4-mini,mitad,12000,5,valida,True,35,6292,12070,False,230505,908.2,{},ciencia,la version del algoritmo Centinela que se implemento fue la 9.15.6,5,25,4,5,stop,False,6644,12042,16,False,23,1
+llama3.2:3b,final,12000,5,valida,True,34,10411,12329,False,230162,385.7,{},geografia,la version del algoritmo Centinela que se implemento fue la 9.15.6,5,26,4,0,stop,False,10774,12291,4,False,25,1
+gemma3:4b,inicio,8000,5,invalida_tecnica,,18,331,,False,57696,835.4,{'generador_relleno': 1},matematicas,la version del algoritmo Centinela que se implemento fue la 9.15.6,5,27,4,1,,,691,,,False,8,1
+gemma3:4b,final,4000,1,valida,True,14,3556,4153,False,37549,148.1,{},matematicas,el numero de expediente del caso Aurora es 3851,1,19,0,1,stop,False,3899,4122,1,False,5,3
+gemma3:4b,inicio,8000,5,valida,True,27,331,8126,False,124322,273.7,{},matematicas,la version del algoritmo Centinela que se implemento fue la 9.15.6,5,27,4,1,stop,False,691,8092,25,False,10,2

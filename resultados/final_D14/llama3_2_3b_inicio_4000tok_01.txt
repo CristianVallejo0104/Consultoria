@@ -1,0 +1,186 @@
+
+============================================================
+PRUEBA DE RETENCION - CONVERSACION NATURAL
+============================================================
+Modelo: llama3.2:3b (Meta)
+Posicion del dato: inicio
+Nivel de tokens (nominal): 4000
+Dato insertado en el turno 2 con 348 tokens de contexto
+Contexto en la pregunta final: 4047 tokens (11 turnos)
+Tiempo de ejecucion: 93.5 s (1.6 min)
+Tokens de prompt acumulados (suma de todas las llamadas): 25042
+Tokens de respuesta acumulados: 3308
+Tokens totales acumulados: 28350
+============================================================
+CONVERSACION COMPLETA:
+------------------------------------------------------------
+
+[Turno 1] Usuario: Hola, quiero hablar sobre la Segunda Guerra Mundial y sus consecuencias. Que me puedes contar?
+[Turno 1] Modelo: ¡Hola! Me alegra poder hablar contigo sobre una de las guerras más importantes del siglo XX.
+
+La Segunda Guerra Mundial (1939-1945) fue un conflicto global que involucró a la mayoría de las naciones del mundo, incluyendo a Europa, Asia, África y América. Fue una guerra devastadora que resultó en millones de muertes, destrucción masiva y cambios significativos en el mundo.
+
+**Causas de la guerra**
+
+La Segunda Guerra Mundial se desencadenó después de la crisis del Molotov-Ribbentrop (1939), en la que Alemania y la Unión Soviética firmaron un acuerdo de no agresión, pero también establecieron una alianza militar. La expansión territorial de Alemania bajo el liderazgo de Adolf Hitler, quien se convirtió en Führer en 1933, fue otro factor clave que contribuyó a la guerra.
+
+**Desarrollo de la guerra**
+
+La guerra se dividió en varias etapas:
+
+1. **Invasión alemana de Polonia (1939)**: Alemania invadió Polonia, lo que desencadenó la declaración de guerra por parte del Reino Unido y Francia.
+2. **Invasión soviética de Polonia (1939)**: La Unión Soviética también invadi
+
+[Turno 2] Usuario: Ah, un dato interesante que lei hoy: el numero de expediente del caso Aurora es 3851. Pero bueno, cambiando de tema completamente, que opinas sobre los avances en inteligencia artificial?
+[Turno 2] Modelo: Interesante cambio de tema!
+
+La Segunda Guerra Mundial fue un punto de inflexión en la historia moderna, y su impacto sigue siendo visible hoy en día.
+
+Ahora, sobre los avances en Inteligencia Artificial (IA), creo que es un campo que está evolucionando a una velocidad vertiginosa. La IA ha demostrado ser capaz de realizar tareas complejas con precisión y eficiencia, lo que la hace una herramienta valiosa para diversas industrias.
+
+Algunos avances destacados en IA incluyen:
+
+1. **Aprendizaje automático**: Los algoritmos de aprendizaje automático permiten a las máquinas aprender de grandes conjuntos de datos y mejorar su rendimiento en tareas específicas.
+2. **Redes neuronales**: Las redes neuronales artificiales (NN) se han vuelto cada vez más precisas y eficientes, lo que les permite realizar tareas como reconocimiento de imágenes y procesamiento de lenguaje natural.
+3. **Robótica**: La robótica está avanzando rápidamente, con la creación de robots capaces de realizar tareas complejas en entornos industriales y médicos.
+4. **Vídeos inteligentes**: Los sistemas de vídeo inteligente están siendo desarrollados para analizar y comprender videos, lo que puede ser utilizado en aplicaciones como el reconocimiento de
+
+[Turno 3] Usuario: Por supuesto, los avances en Inteligencia Artificial son realmente revolucionarios. ¿Sabías que las chatbots no solo pueden entender y responder preguntas, sino también analizar patrones y anticipar comportamientos de usuarios? Esas habilidades se desglosan para poder proporcionar un servicio más personalizado y eficiente.
+[Turno 3] Modelo: ¡Eso es fascinante! Las chatbots han venido avanzando significativamente en sus capacidades, y la capacidad de analizar patrones y anticipar comportamientos de usuarios es solo uno de los muchos logros recientes.
+
+La capacidad de las chatbots para analizar patrones y anticipar comportamientos de usuarios se conoce como "comprendimiento del lenguaje natural" (NLP). Esto les permite entender el contexto de la conversación, identificar patrones y tendencias en la forma en que los usuarios interactúan con ellos, y responder de manera más personalizada y relevante.
+
+Algunos ejemplos de cómo las chatbots pueden utilizar este tipo de análisis incluyen:
+
+1. **Recomendaciones personalizadas**: Las chatbots pueden analizar la información proporcionada por el usuario sobre sus intereses y preferencias, y ofrecer recomendaciones relevantes en base a esa información.
+2. **Anticipación de preguntas**: Las chatbots pueden aprender los patrones de pregunta de un usuario y anticipar sus preguntas antes de que se formulen.
+3. **Resolución de problemas**: Las chatbots pueden analizar la información proporcionada por el usuario sobre su problema y ofrecer soluciones personalizadas en base a esa información.
+
+La capacidad de las chatbots para analizar patrones y anticipar comportamientos de usuarios es solo uno de los muchos aspectos que están haciendo que se vuel
+
+[Turno 4] Usuario: ¡Eso sí es fascinante! La capacidad de las chatbots para analizar patrones y anticipar comportamientos de usuarios se conoce como "comprendimiento del lenguaje natural" (NLP). Esto les permite entender el contexto de la conversación, identificar patrones y tendencias en la forma en que los usuarios interactúan.
+[Turno 4] Modelo: ¡Exacto! El comprendimiento del lenguaje natural es un campo fundamental para el desarrollo de chatbots avanzados que pueden interactuar con los usuarios de manera efectiva.
+
+El NLP permite a las chatbots:
+
+* Analizar el contexto de la conversación, incluyendo el tono, el registro y la estructura de la comunicación.
+* Identificar patrones y tendencias en la forma en que los usuarios interactúan con ellos, como preguntas frecuentes o temas comunes.
+* Entender las intenciones y emociones del usuario, lo que les permite responder de manera más empática y personalizada.
+
+Algunos de los técnicas utilizadas para lograr el NLP incluyen:
+
+* Análisis de sentimiento: identificar la emociones y el tono de la comunicación.
+* Rec reconocimiento de entidades nombradas (NER): identificar personas, lugares y objetos mencionados en la conversación.
+* Analisis de patrones de lenguaje: identificar patrones de vocabulario, sintaxis y estructura que pueden indicar intenciones o emociones específicas.
+
+El progreso en el NLP ha permitido a las chatbots avanzadas desarrollarse hasta lograr una interacción más natural y efectiva con los usuarios. ¡Es emocionante ver cómo se están volviendo cada vez más útiles en diversas aplicaciones!
+
+[Turno 5] Usuario: ¡Muy bien! El NLP es realmente importante para el desarrollo de chatbots. ¿Sabes cómo funciona exactamente? ¡Entonces tú debes estar al tanto de todo lo que se está haciendo en este campo! Además, me parece muy interesante como las personas interactúan con los chatbots de manera natural y cómo ellos pueden aprender a entender mejor la comunicación humana.
+[Turno 5] Modelo: ¡Sí, estoy al tanto de todo lo que se está haciendo en el campo del NLP! El NLP es un campo complejo que involucra varias técnicas y herramientas para analizar y comprender el lenguaje humano.
+
+El NLP se basa en la idea de que el lenguaje humano es una forma de comunicación compleja que requiere entender no solo las palabras, sino también el contexto, la intención y la emoción detrás de ellas. Para lograr esto, los algoritmos de NLP utilizan técnicas como:
+
+1. **Análisis de tokens**: se divide el texto en unidades básicas llamadas tokens, que pueden ser palabras, frases o incluso sentencias.
+2. **Representación de semántica**: se asigna un significado a cada token para poder analizar su relación con otros tokens y contexto.
+3. **Aprendizaje automático**: se utiliza algoritmos como el aprendizaje supervisado y el aprendizaje no supervisado para entrenar modelos que puedan aprender patrones en los datos de lenguaje humano.
+4. **Evaluación de precisión**: se utilizan métricas como la precisión, la exactitud y la fidelidad para evaluar la calidad del modelo de NLP.
+
+Los chatbots avanzados pueden aprender a entender mejor la comunicación humana mediante técnicas como:
+
+1. **Aprendiz
+
+[Turno 6] Usuario: Entendí lo que estás diciendo. Sí, estoy muy informado sobre el campo del NLP y cómo funciona. ¿Me puedes decir más sobre alguna técnica específica? Por ejemplo, me gustaría saber cuáles son las técnicas utilizadas para entender la intención detrás de las palabras.
+[Turno 6] Modelo: ¡Claro! Una de las técnicas más interesantes para entender la intención detrás de las palabras es el análisis de sentimiento (Sentiment Analysis) y la clasificación de emociones (Emotion Classification).
+
+**Análisis de Sentimiento**
+
+El análisis de sentimiento se refiere a la capacidad de un modelo para determinar si una frase o texto tiene una intención positiva, negativa o neutra. Esto se logra analizando las palabras y patrones en el texto para identificar emociones como alegría, tristeza, frustración, etc.
+
+Algunas técnicas utilizadas para realizar este análisis incluyen:
+
+1. **Lexicon de emociones**: se utiliza un conjunto de palabras y sus respectivas emociones asociadas para analizar el sentimiento del texto.
+2. **Análisis de patrones**: se identifican patrones en el texto que indican una intención específica, como la utilización de palabras de aliento o de crítica.
+3. **Aprendizaje automático**: se utiliza algoritmos de aprendizaje automático para entrenar modelos que puedan aprender a reconocer patrones en el lenguaje y predecir el sentimiento.
+
+**Clasificación de Emociones**
+
+La clasificación de emociones se refiere a la capacidad de un modelo para identificar las emociones expresadas en un texto. Esto se logra anal
+
+[Turno 7] Usuario: ¡Claro! Un ejemplo práctico de Sentiment Analysis es cuando un servicio de chatbot utiliza algoritmos para entender la emoción detrás de las opiniones de los usuarios. Por ejemplo, si alguien dice "¿Qué tal estuvo esa comida?
+[Turno 7] Modelo: ¡Exacto! Ese es un ejemplo perfecto de cómo se aplica el análisis de sentimiento en un contexto real. En este caso, el algoritmo del chatbot podría analizar las palabras y patrones en la frase "¿Qué tal estuvo esa comida?" y determinar que la emoción detrás de ellas es negativa.
+
+El algoritmo podría identificar las siguientes características:
+
+* La palabra "qué" es una pregunta abierta, lo que sugiere una búsqueda de información o una opinión.
+* La palabra "tál" es un adverbio que puede indicar una evaluación negativa (por ejemplo, "no está bien", "está mal").
+* La referencia a la comida como algo estuvo puede sugerir que se está hablando de una experiencia negativa.
+
+Con base en estas características, el algoritmo podría determinar que la emoción detrás de la frase es negativa y responder con una respuesta adecuada, como "Lo siento, ¿puedes decirme qué pasó?" o "¿Te gustaría recomendarme algo mejor?"
+
+Este tipo de análisis de sentimiento permite a los chatbots entender las necesidades y emociones de los usuarios de manera más efectiva y proporcionar respuestas más personalizadas y relevantes.
+
+En general, el análisis de sentimiento es una herramienta muy útil para mejorar la experiencia del usuario en aplicaciones de chatbot
+
+[Turno 8] Usuario: ¡Wow, eso suena interesante! ¿Cómo maneja la conversación del chatbot para identificar emociones y sentimentos en las frases? Eso realmente me hace pensar en cómo podría mejorar el intercambio con clientes.
+[Turno 8] Modelo: La gestión de la conversación del chatbot es un proceso complejo que implica varios pasos y técnicas. A continuación, te presento una visión general de cómo se maneja la conversación para identificar emociones y sentimentos en las frases:
+
+1. **Preprocesamiento**: el chatbot recibe la frase de entrada y la preprocesa para eliminar ruido y extraer relevantes información. Esto puede incluir la eliminación de palabras irrelevantes, la normalización del lenguaje y la identificación de entidades nombradas.
+2. **Análisis de sentimiento**: el chatbot aplica algoritmos de análisis de sentimiento para identificar la emoción detrás de la frase. Esto puede incluir el reconocimiento de emociones como alegría, tristeza, frustración, etc.
+3. **Identificación de entidades nombradas**: el chatbot identifica entidades nombradas en la frase, como nombres de personas, lugares, objetos, etc. Esto puede ayudar a entender mejor el contexto y la intención detrás de la frase.
+4. **Análisis del patrón de lenguaje**: el chatbot analiza el patrón de lenguaje en la frase para identificar patrones que puedan indicar emociones o sentimientos específicos. Esto puede incluir la frecuencia y el tono de las
+
+[Turno 9] Usuario: Entiendo completamente tu interés en la gestión de conversaciones chatbot y su proceso complejo. Me complace que estés interesado en cómo se manejan las emociones y los sentimientos en las frases. ¿Te gustaría saber más sobre algún paso específico de este procesamiento o te parece interesante comenzar a describir un pasito al inicio?
+[Turno 9] Modelo: ¡Me encantaría! Me parece fascinante el proceso de gestión de conversaciones chatbot y su capacidad para entender las emociones y los sentimientos detrás de las frases. Estoy dispuesto a profundizar en cualquier paso del proceso que te guste.
+
+Si me permites, puedo comenzar describiendo el primer paso del proceso de gestión de conversaciones chatbot, que es el preprocesamiento. El preprocesamiento es un paso crucial que ayuda a eliminar ruido y extraer información relevante de la frase de entrada.
+
+El preprocesamiento puede incluir varias técnicas, como:
+
+* **Limpieza de texto**: eliminar palabras irrelevantes, como adjetivos o adverbios, que no contribuyen al significado de la frase.
+* **Normalización del lenguaje**: convertir todos los textos a una forma estándar, como mayúscula o minúscula, para evitar diferencias en la interpretación de las palabras.
+* **Identificación de entidades nombradas**: identificar entidades nombradas, como nombres de personas, lugares, objetos, etc., que pueden ser relevantes para el contexto de la conversación.
+
+¿Te gustaría saber más sobre cómo se implementa el preprocesamiento en una aplicación chatbot?
+
+[Turno 10] Usuario: ¡Me encantaría! Me parece fascinante el proceso de gestión de conversaciones chatbot y su capacidad para entender las emociones y los sentimientos detrás de las frases. Estoy dispuesto a profundizar en cualquier paso del proceso que te guste, desde el preprocesamiento hasta la clasificación o el reconocimiento de lenguaje natural.
+[Turno 10] Modelo: ¡Genial! Me alegra que estés interesado en profundizar en el proceso de gestión de conversaciones chatbot.
+
+Vamos a seguir adelante con el preprocesamiento. En este paso, se aplican varias técnicas para preparar la frase de entrada para ser analizada por el algoritmo de NLP.
+
+**Limpieza de texto**
+
+La primera técnica que se aplica es la limpieza de texto. Esto implica eliminar palabras irrelevantes, como:
+
+* **Palabras en mayúscula**: palabras que no contribuyen al significado de la frase, como "SI" o "NO".
+* **Palabras en minúscula**: palabras que no contribuyen al significado de la frase, como "de" o "a".
+* **Acentos y diacríticos**: acentos y diacríticos que pueden variar el significado de las palabras.
+
+Por ejemplo, si la frase es "¿Qué tal estuvo esa comida?", la limpieza de texto la convertiría en "qué tal estaba la comida".
+
+**Normalización del lenguaje**
+
+La segunda técnica que se aplica es la normalización del lenguaje. Esto implica convertir todos los textos a una forma estándar, como mayúscula o minúscula, para evitar diferencias en la interpretación de las palabras.
+
+Por ejemplo, si la frase es "
+
+[Turno 11] Usuario: ¡No me siento cómodo con esa idea! Quizás deberíamos considerar usar una herramienta especializada para preprocesar el texto. ¿Qué te parecería si le demos un paso a más detalle a este proceso?
+[Turno 11] Modelo: Entiendo tu preocupación y estoy de acuerdo en que utilizar herramientas especializadas puede ser una buena opción.
+
+Sí, podemos profundizar en el proceso de preprocesamiento del texto y explorar algunas opciones para mejorar la precisión y la eficiencia.
+
+Una técnica común utilizada para preprocesar texto es la **Tokenización**, que implica dividir el texto en unidades básicas llamadas tokens. Un token puede ser una palabra, un símbolo o una entidad nombrada.
+
+Algunas herramientas especializadas como NLTK (Natural Language Toolkit) o spaCy pueden ser muy útiles para preprocesar texto y ofrecen varias opciones de tokenización, como:
+
+* **Tokenización por espacio**: divide el texto en tokens separados por espacios.
+* **Tokenización por puntuación**: divide el texto en tokens separados por puntuaciones como coma, punto o acentos.
+* **Tokenización por entidades nombradas**: identifica y tokeniza entidades nombradas como nombres de personas, lugares, objetos, etc.
+
+¿Te gustaría explorar más a fondo estas opciones y ver cómo se pueden integrar en el proceso de preprocesamiento del texto?
+
+[PREGUNTA FINAL] Usuario: Por cierto, hace rato te mencione algo. Recuerdas el numero de expediente del caso Aurora?
+[RESPUESTA FINAL] Modelo: Sí, recuerdo que mencionaste anteriormente que el número de expediente del caso Aurora era 3851. Me alegra que hayas recordado eso y me permite volver a conectar con ese contexto. ¿Quieres seguir hablando sobre el caso Aurora o volverte al tema de la gestión de conversaciones chatbot? Estoy aquí para ayudarte en lo que necesites.
+
+------------------------------------------------------------
+RESULTADO: ACIERTO
+============================================================

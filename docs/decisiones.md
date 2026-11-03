@@ -344,3 +344,21 @@ lenguaje (verificador de checkpoints, clasificador de fallos, analista), aún si
 - Modificar `verificar_acierto`: mezclaría los dos criterios y se perdería la comparación.
 - Decidir caso por caso a mano: introduce subjetividad.
 **Límites.** Solo cubre variantes de formato numérico, no paráfrasis ni dígitos equivocados. El criterio ampliado solo se reporta como sensibilidad, no como resultado principal.
+
+---
+
+## D-21 · Análisis no paramétrico como resultado principal y modelo logístico exploratorio
+**Fecha:** 2026-11-03 (registrada antes de ajustar el modelo logístico; después de ver los resultados descriptivos, de Fisher, de permutación y del EDA)
+**Contexto.** D-19 fijó un plan con enfoque bayesiano o Firth como modelo principal. Ya se calcularon Clopper-Pearson, Fisher por pares con Holm, permutación dentro de bloques, el EDA de supuestos, la posición lograda del dato y la sensibilidad de formato (D-20). Con respuesta binaria y 19 fallos (17 con el criterio ampliado de D-20), los supuestos de los métodos paramétricos no se pueden comprobar. El profesor indicó descartar los métodos paramétricos, usar one-hot encoding y regresión logística, y no cambiar a una medida cuantitativa. Esta entrada cambia D-19 en lo que corresponde.
+**Decisión.**
+- **Respuesta:** binaria, por cadena exacta (D-11, D-19). Sin medida cuantitativa.
+- **Resultados principales (no paramétricos):** intervalos de Clopper-Pearson, Fisher por pares con corrección de Holm y prueba de permutación dentro de bloques (estadístico: rango de proporciones de acierto entre niveles; 10,000 permutaciones; semilla 42). Los justifica la aleatorización del orden dentro de cada bloque.
+- **Modelo:** regresión logística con codificación one-hot, penalizada (L2), como análisis exploratorio. [POR DECIDIR: muestra (propuesta: solo `llama3.2:3b` y `phi4-mini`, porque `gemma3:4b` no tiene fallos); términos (propuesta: modelo, posición, nivel y bloque, sin interacción); categorías de referencia (propuesta: inicio, 4,000 y bloque 1); fuerza de la penalización.] Se reportan razones de momios con su incertidumbre, sin usarlas para contrastar hipótesis.
+- **Sensibilidad:** formato numérico (D-20, ya hecha: 2 de 19 fallos pasan a acierto y no cambia ninguna conclusión), sin el bloque 4 y con la posición lograda del dato.
+**Alternativas descartadas.**
+- ANOVA y pruebas paramétricas: sus supuestos (normalidad, varianza constante) no se pueden comprobar con respuesta binaria y 19 fallos; la varianza de una respuesta 0/1 depende de la media.
+- Medida cuantitativa: 116 de 135 corridas son aciertos exactos, así que casi todas valdrían lo mismo; además, adoptarla después de ver los resultados exige un tiempo que no hay.
+- Enfoque bayesiano (PyMC) o Firth como modelo principal, que prevé D-19: no se hace por tiempo y por indicación del profesor. Se mantiene el compromiso de D-19 de manejar la separación de `gemma3:4b`, aquí con penalización L2 y excluyéndola de la muestra.
+- Regresión logística sin penalizar: no converge bien con celdas sin fallos.
+- Chi-cuadrado y la prueba de Freeman-Halton para tablas de 3×2: la primera por frecuencias esperadas bajas, y la segunda no está en `scipy`; se usa Fisher por pares con Holm.
+**Límites.** Con 17 a 19 fallos la potencia es baja: "no se detecta efecto" no equivale a "no hay efecto". Las corridas de un mismo dato se parecen (11 de los 19 fallos están en el bloque 4), por lo que la independencia se cumple solo en parte. La permutación supone intercambiabilidad dentro de cada bloque, que el diseño aleatorizado justifica salvo una deriva de la máquina que el EDA no mostró. Los coeficientes de la logística describen estos datos y no se generalizan. Los resultados valen para estos tres modelos y hasta 12K tokens.

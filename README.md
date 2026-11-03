@@ -2,7 +2,8 @@
 
 Sistema que evalúa en qué punto los modelos de lenguaje locales dejan de retener un dato inventado, según la posición del dato, el nivel de longitud en tokens y el modelo (fenómeno "lost in the middle"). Proyecto de Consultoría e Investigación, Universidad Santo Tomás.
 
-> **Estado (28 de octubre de 2026):** el diseño experimental (D-14) está implementado y las 135 corridas finales están completas: `resultados/final_D14.csv` tiene 139 filas (135 celdas con resultado más 4 filas `invalida_tecnica` conservadas como historial, ver D-18). Hay un resumen descriptivo en "Resultados finales", sin inferencia. **Pendiente:** el etiquetado por segundo evaluador y el kappa, el análisis estadístico planeado en D-19 y D-20, y la decisión de alcance sobre Laya y los agentes de D-08. Los resultados del primer corte y del piloto son exploratorios. Detalle en `docs/DISENO.md` y `docs/decisiones.md`.
+**Estado (3 de noviembre de 2026):**
+El análisis estadístico principal es no paramétrico y ya está ejecutado (D-21, sección "Análisis estadístico"). **Pendiente:** el etiquetado de Juan Pablo y el kappa, la regresión logística exploratoria con one-hot (D-21) y la decisión de alcance sobre Laya y los agentes de D-08.
 
 ## Problema y contraparte
 
@@ -115,16 +116,16 @@ Factorial completo en bloques completos aleatorizados (D-14, D-15). Detalle y ju
 - **Respuesta:** acierto binario por cadena exacta, sin negación; sin LLM juez (D-11, D-19).
 - **Nivel de tokens:** "5 turnos" no es comparable entre modelos (`phi3:mini` procesó 10,259 tokens en 5 turnos y `gemma2:2b`, 1,903). El nivel es el contexto en la pregunta final (D-06).
 - **Justificación:** sigue la estructura de Liu et al. (2023: posición × longitud del contexto × modelo) y de Zhang et al. (2024), formalizada con principios de diseño de experimentos. Nuestra variante inserta el dato dentro de la conversación y no en un documento recuperado. **[Texto de diseño de experimentos por citar.]**
-- **Plan de análisis (D-19 y D-20, aún no ejecutado):**
-  - Descriptivo: acierto por celda con intervalo exacto de Clopper-Pearson al 95 %.
-  - Modelo: regresión logística con modelo, posición, nivel, interacción posición × nivel y bloque. Con separación probable se ajusta con enfoque bayesiano o con regresión penalizada de Firth.
-  - Tablas marginales: prueba exacta de Fisher en lugar de chi-cuadrado.
-  - Sensibilidad: respuestas vacías o cortadas, posición lograda del dato, tema, `contexto_final` (solo aquí) y criterio ampliado a variantes de formato numérico (D-20). El criterio principal (`verificar_acierto`) no se modifica.
+- **Análisis (D-19, D-20 y D-21):** la respuesta es binaria y con 19 fallos los supuestos paramétricos no se pueden comprobar, así que los resultados principales son no paramétricos.
+  - Descriptivo: acierto por celda y por factor con intervalo exacto de Clopper-Pearson al 95 %.
+  - Pruebas: Fisher por pares con corrección de Holm (3 comparaciones por factor) y permutación estratificada (se baraja el acierto dentro de grupos de 3 corridas con el mismo bloque y los mismos otros dos factores; 20,000 permutaciones, semilla 42). Se justifican por intercambiabilidad bajo la hipótesis nula, no por una asignación aleatoria de tratamientos.
+  - Modelo: regresión logística con one-hot y penalización L2, **exploratoria**, aún no ajustada (D-21). Reemplaza al plan bayesiano o de Firth de D-19.
+  - Sensibilidad (hecha): criterio ampliado de formato (D-20), sin el bloque 4 y posición lograda del dato. Pendiente: tema como covariable. El criterio principal (`verificar_acierto`) no se modifica.
 - **Alcance:** el estudio solo dice algo sobre estos tres modelos y los niveles medidos (hasta 12K), no sobre contextos mayores aunque el modelo los soporte.
 
 ## Resultados finales (`final_D14`)
 
-**Solo descriptivos, sin inferencia.** Las 135 celdas tienen resultado válido y hay 19 fallos. Conteos de acierto sobre las corridas válidas (45 por grupo):
+**Conteos descriptivos** (las pruebas están en "Análisis estadístico").
 
 | Factor | Nivel | Aciertos |
 |---|---|---|
@@ -144,6 +145,35 @@ Observaciones, con cautela:
 - Solo 13 de las 27 celdas tienen algún fallo.
 - En estos conteos no se ve el patrón clásico de "lost in the middle": la posición mitad tiene el mayor acierto y el nivel no baja de forma ordenada. Con 45 corridas por grupo, diferencias de pocos fallos pueden ser azar; la inferencia queda para D-19.
 - Dos de los 19 fallos (F003 y F004 en la hoja de etiquetado) contienen el número correcto con coma ("44,295") y el criterio exacto los cuenta como fallo. El análisis de sensibilidad de D-20 los trata aparte.
+
+## Análisis estadístico (D-21)
+
+Resultados principales no paramétricos, con respuesta binaria. Todos salen de `analisis/`; ejecuta desde la raíz del proyecto:
+
+```bash
+python analisis/descriptivo.py                      # acierto e intervalos de Clopper-Pearson
+python analisis/fisher.py                           # Fisher por pares con Holm
+python analisis/permutaciones.py                    # permutación estratificada
+python analisis/eda.py                              # fallos por bloque, orden y tema
+python analisis/posicion_lograda.py                 # dónde quedó realmente el dato
+python analisis/sensibilidad_bloque4.py             # sin el bloque 4
+PYTHONPATH=. python analisis/sensibilidad_formato.py   # criterio ampliado de formato (D-20)
+PYTHONPATH=. python analisis/sensibilidad_ampliado.py  # Fisher y permutación con ese criterio
+python analisis/graficas.py                         # figuras en analisis/figuras/
+```
+
+Los dos últimos scripts de formato necesitan `PYTHONPATH=.` porque importan `agente.py`, que está en la raíz.
+
+| Análisis | Modelo | Posición | Nivel |
+|---|---|---|---|
+| Permutación estratificada, 135 corridas | p ≤ 1/20 001 | 0.21 | 0.67 |
+| Sin el bloque 4 (108 corridas) | 0.035 | 0.25 | 0.71 |
+| Criterio ampliado (17 fallos) | 0.00095 | 0.38 | 0.44 |
+
+Fisher por pares con Holm (modelo): gemma frente a phi4-mini 0.0006 (sin el bloque 4, 0.075; con el criterio ampliado, 0.0015); gemma frente a llama 0.024 (sin el bloque 4, 0.52; con el criterio ampliado, 0.052); llama frente a phi4-mini 0.30. En posición y nivel ningún p ajustado baja de 0.69.
+
+Lectura: el modelo parece importar, pero la evidencia depende en buena parte de un solo dato difícil (el bloque 4), y la diferencia entre `gemma3:4b` y `llama3.2:3b` depende del criterio de formato. La posición y el nivel no muestran efecto detectable hasta 12K tokens. Con 17 a 19 fallos la potencia es baja: "no se detecta efecto" no equivale a "no hay efecto". Las pruebas suponen intercambiabilidad de las corridas dentro de cada grupo, y las corridas de un mismo dato se parecen (11 de los 19 fallos están en el bloque 4).
+
 
 ## Etiquetado de fallos y kappa
 
@@ -195,6 +225,8 @@ Declarado según la rúbrica y registrado en D-17:
 - **Asistente de IA en chat (Claude):** explicó el porqué de cada paso antes del código, redactó la función `orden_del_bloque` (que Cristian tecleó, probó y puede explicar línea por línea), las especificaciones de cada tarea y las pruebas de verificación.
 - **Claude Code, con permiso por edición y sin commits:** escribió el cambio mecánico en `agente.py` y `correr_experimento.py` (parámetros `indice_dato` e `indice_tema`, configuración `final_D14`, bucle por bloques, columnas nuevas, guardado determinista, manejo de errores del runner, campos de registro, reintentos de D-18).
 - **Asistente de IA en chat, fase de análisis y etiquetado:** redactó la función `kappa_cohen` (probada con un caso calculado a mano), el borrador de la entrada D-20, el script que escribió las etiquetas de Cristian en su hoja (las categorías las decidió Cristian; el asistente solo mostró los textos y pasó los números a CSV sin sugerir categorías) y los comandos de conteo por terminal usados en "Resultados finales".
+- **Scripts de `analisis/`** (`descriptivo.py`, `fisher.py`, `eda.py`, `graficas.py`, `posicion_lograda.py`, `sensibilidad_formato.py`, `permutaciones.py`, `sensibilidad_bloque4.py`, `sensibilidad_ampliado.py`): los redactó el asistente de IA en chat; Cristian los tecleó, los ejecutó y contrastó sus salidas con las del asistente. Los métodos (no paramétrico, one-hot y regresión logística) siguen la indicación del profesor, y las decisiones están en D-21.
+- **Sesión de Claude en la nube, solo lectura:** auditó el repositorio, repitió los análisis y propuso preguntas de sustentación. Sus hallazgos se contrastaron con el código y las salidas antes de aplicar cambios: corrigieron una frase de D-21 sobre el criterio de formato y la razón para descartar Freeman-Halton. Es de la misma familia que el asistente del chat, así que su coincidencia no es verificación independiente (D-12).
 - **Subagentes de revisión de solo lectura** (`revisor-codigo-python` y `consultor-estadistico`): auditaron el código antes de las corridas. Sus resúmenes se contrastaron con el código y con las pruebas ejecutadas.
 - **Verificación humana:** cada diff se revisó antes del commit y se ejecutaron pruebas con Ollama.
 - **Distribución del trabajo entre integrantes:** **[POR COMPLETAR: quién hizo qué, Cristian y Juan Pablo.]**
@@ -376,32 +408,44 @@ Después:
 ## Estructura del proyecto
 
 ```
-├── agente.py                    # Núcleo (ejecutar_evaluacion) y agente evaluador
-├── correr_experimento.py        # Runner: configuraciones, bloques, orden aleatorio, reintentos y CSV
-├── preparar_etiquetado.py       # Hojas de etiquetado ciegas y kappa de Cohen
-├── evaluar_calidad_texto.py     # Naturalidad/coherencia/interés del generador de relleno
-├── agente_eval_claude.md        # Plantilla de agente operador para Claude Code
-├── agente_eval_open.md          # Plantilla de agente operador para opencode
-├── CLAUDE.md                    # Contexto del proyecto para agentes de IA
-├── requirements.txt             # Dependencias con versiones fijadas (pip freeze)
-├── .env.example                 # Nombre de la variable de entorno (sin valores)
+├── agente.py # Núcleo (ejecutar_evaluacion) y agente evaluador
+├── correr_experimento.py # Runner: configuraciones, bloques, orden aleatorio, reintentos y CSV
+├── preparar_etiquetado.py # Hojas de etiquetado ciegas y kappa de Cohen
+├── evaluar_calidad_texto.py # Naturalidad/coherencia/interés del generador de relleno
+├── analisis/ # Análisis estadístico (D-19 a D-21); ver “Análisis estadístico”
+│ ├── descriptivo.py # Acierto e intervalos de Clopper-Pearson
+│ ├── fisher.py # Fisher por pares con Holm
+│ ├── permutaciones.py # Permutación estratificada por bloque
+│ ├── eda.py # Fallos por bloque, orden y tema
+│ ├── posicion_lograda.py # Dónde quedó realmente el dato
+│ ├── sensibilidad_bloque4.py # Análisis sin el bloque 4
+│ ├── sensibilidad_formato.py # Criterio ampliado de formato (D-20)
+│ ├── sensibilidad_ampliado.py # Fisher y permutación con ese criterio
+│ ├── graficas.py # Figuras
+│ └── figuras/ # Imágenes generadas
+├── agente_eval_claude.md # Plantilla de agente operador para Claude Code
+├── agente_eval_open.md # Plantilla de agente operador para opencode
+├── CLAUDE.md # Contexto del proyecto para agentes de IA
+├── requirements.txt # Dependencias con versiones fijadas (pip freeze)
+├── .env.example # Nombre de la variable de entorno (sin valores)
 ├── docs/
-│   ├── DISENO.md                # Diseño experimental completo
-│   ├── decisiones.md            # Registro de decisiones D-01 a D-20
-│   ├── guia_etiquetado.md       # Categorías y reglas del etiquetado de fallos
-│   ├── contraparte/             # Registro de la contraparte metodológica (D-12)
-│   ├── fuentes/                 # Papers descargados y verificados
-│   └── informes/                # PDF del primer corte
-├── etiquetado/                  # Hoja ciega, clave y hojas de cada evaluador
+│ ├── DISENO.md # Diseño experimental completo
+│ ├── decisiones.md # Registro de decisiones D-01 a D-21
+│ ├── guia_etiquetado.md # Categorías y reglas del etiquetado de fallos
+│ ├── contraparte/ # Registro de la contraparte metodológica (D-12)
+│ ├── fuentes/ # Papers descargados y verificados
+│ └── informes/ # PDF del primer corte
+├── etiquetado/ # Hoja ciega, clave y hojas de cada evaluador
 ├── resultados/
-│   ├── final_D14.csv             # Una fila por corrida
-│   ├── final_D14/                # JSON y TXT por corrida
-│   ├── txt/ y json/             # Corridas del primer corte y de modos interactivos
-│   ├── pruebas/                 # Pruebas con proveedores gratuitos y registros del piloto
-│   └── calidad_texto/           # Notas de calidad conversacional (exploratorio, no versionado)
-├── nada_sin_fuente/             # Otra actividad del curso (ver su propio README)
+│ ├── final_D14.csv # Una fila por corrida
+│ ├── final_D14/ # JSON y TXT por corrida
+│ ├── txt/ y json/ # Corridas del primer corte y de modos interactivos
+│ ├── pruebas/ # Pruebas con proveedores gratuitos y registros del piloto
+│ └── calidad_texto/ # Notas de calidad conversacional (exploratorio, no versionado)
+├── nada_sin_fuente/ # Otra actividad del curso (ver su propio README)
 └── README.md
 ```
+
 
 ## Limitaciones conocidas
 

@@ -3,7 +3,7 @@
 Sistema que evalúa en qué punto los modelos de lenguaje locales dejan de retener un dato inventado, según la posición del dato, el nivel de longitud en tokens y el modelo (fenómeno "lost in the middle"). Proyecto de Consultoría e Investigación, Universidad Santo Tomás.
 
 **Estado (3 de noviembre de 2026):**
-El análisis estadístico principal es no paramétrico y ya está ejecutado (D-21, sección "Análisis estadístico"). **Pendiente:** el etiquetado de Juan Pablo y el kappa, la regresión logística exploratoria con one-hot (D-21) y la decisión de alcance sobre Laya y los agentes de D-08.
+El análisis estadístico principal es no paramétrico y ya está ejecutado (D-21, sección "Análisis estadístico"). **Pendiente:** el etiquetado de Juan Pablo y el kappa, la regresión logística exploratoria con one-hot (D-21). Laya y los agentes planeados en D-08 quedaron fuera del alcance (D-22).
 
 ## Problema y contraparte
 
@@ -194,14 +194,14 @@ Los 19 fallos se clasifican a mano con `docs/guia_etiquetado.md` (6 categorías:
 Cada decisión se documenta con su alternativa descartada. Registro completo en `docs/decisiones.md`.
 
 - **Agente CrewAI con una herramienta.** El agente es una capa delgada para uso interactivo. La lógica del experimento es código determinista. Alternativa descartada: tres herramientas separadas, porque pasar el texto de la conversación por el agente entre cada una saturaba su contexto.
-- **Agentes solo donde hay juicio de lenguaje (D-08).** No hay agente selector local/nube (un diccionario lo resuelve) ni agente para verificar supuestos estadísticos (código plano). Están planeados un verificador de checkpoints intermedios, un clasificador de tipo de fallo y un analista de hallazgos; su alcance final está sin decidir.
+- **Agentes solo donde hay juicio de lenguaje (D-08).** No hay agente selector local/nube (un diccionario lo resuelve) ni agente para verificar supuestos estadísticos (código plano). Se planearon un verificador de checkpoints intermedios, un clasificador de tipo de fallo y un analista de hallazgos, y **no se implementaron** (D-22): el etiquetado manual con kappa cumple el papel del clasificador, el análisis es determinista y los puntos de control dentro de la conversación se dejaron como trabajo futuro (D-14).
 - **CrewAI.** Alternativas descartadas: LangChain (más componentes para el mismo formato ReAct), LangGraph (sobrediseño para un flujo lineal) y AutoGen (complejidad sin beneficio).
 - **Datos inventados, no conocimiento general (D-11).** La primera versión usaba "la capital de Australia es Canberra" y todos acertaban por conocimiento de entrenamiento.
 - **Evaluación determinista, no LLM juez, para retención (D-09, D-11).** Alternativa descartada: otro modelo como evaluador (ruido y circularidad).
 - **Manejo de errores unificado (D-11).** Un solo punto (`consultar_modelo`) convierte errores de red en corridas inválidas tipadas. Alternativa descartada: copiar el parche en cada rama.
 - **D-01:** `gemma2:2b` → `gemma3:4b`, por la ventana de contexto.
 - **D-02:** pagar créditos de OpenRouter (~US$20) en lugar de depender de planes gratuitos, que producían corridas inválidas (Groq: límites de 8,000 y 1,000 tokens por minuto según el modelo; NVIDIA: ~7 min por corrida de 5 turnos y un endpoint anunciado como deprecado; Gemini: 503 intermitentes; OpenRouter `:free`: límites propios).
-- **D-03:** Laya explorado y pospuesto como clasificador de tipo de fallo: zero-shot rinde 38 % en 5 categorías (frente a 20 % de azar uniforme, con n = 13) y falta un conjunto de fallos reales etiquetados. Con 19 fallos, el alcance final de Laya está sin decidir.
+- **D-03:** Laya explorado y pospuesto como clasificador de tipo de fallo: zero-shot rinde 38 % en 5 categorías (frente a 20 % de azar uniforme, con n = 13) y falta un conjunto de fallos reales etiquetados. Con 19 fallos no se entrena ni se evalúa en este proyecto (D-22); queda como trabajo futuro con más corridas y más fallos etiquetados.
 - **D-04:** evaluador de calidad de texto con LLM juez (exploratorio).
 - **D-05:** el diseño factorial se justifica con la literatura del propio campo (Liu et al.; Zhang et al.).
 - **D-06:** migración de turnos a niveles de tokens (4K, 8K, 12K).

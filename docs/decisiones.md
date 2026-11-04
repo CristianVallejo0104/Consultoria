@@ -362,3 +362,17 @@ lenguaje (verificador de checkpoints, clasificador de fallos, analista), aún si
 - Regresión logística sin penalizar: no converge bien con celdas sin fallos.
 Chi-cuadrado: por frecuencias esperadas bajas. La prueba exacta de Fisher para tablas de 3×2 (Freeman-Halton) existe en `scipy` y da p = 0.0004 para el modelo (criterio exacto, 135 corridas, calculada fuera del repo); no es el análisis principal. Se usa Fisher por pares con Holm, con la familia de comparaciones definida por factor (3 pares cada vez), para decir qué pares difieren.
 **Límites.** Con 17 a 19 fallos la potencia es baja: "no se detecta efecto" no equivale a "no hay efecto". Las corridas de un mismo dato se parecen (11 de los 19 fallos están en el bloque 4), por lo que la independencia se cumple solo en parte. La permutación supone intercambiabilidad dentro de cada grupo de 3 corridas bajo la hipótesis nula. El orden aleatorio dentro del bloque protege contra una deriva de la máquina, que el EDA no mostró (5, 6 y 8 fallos por tercio de 45), pero no es una asignación aleatoria de tratamientos. Es una prueba global por factor: indica si hay alguna diferencia entre niveles, no cuáles; para eso se usan los pares de Fisher con Holm. Los coeficientes de la logística describen estos datos y no se generalizan. Los resultados valen para estos tres modelos y hasta 12K tokens.
+
+---
+
+## D-22 · Alcance de Laya y de los agentes planeados en D-08
+**Fecha:** 2026-11-03
+**Contexto.** D-03 pospuso a Laya como clasificador de tipo de fallo por falta de fallos reales etiquetados, y D-08 planeó tres agentes (verificador de checkpoints, clasificador de tipo de fallo y analista de hallazgos) sin implementarlos. `final_D14` dejó 19 fallos (17 con el criterio ampliado de D-20), que dos integrantes etiquetan por separado con `docs/guia_etiquetado.md`; el kappa está pendiente.
+**Decisión.** En este proyecto no se entrena ni se evalúa a Laya, y no se implementan los tres agentes. El etiquetado manual con kappa de Cohen cumple el papel del clasificador, y los tipos de fallo se reportan por modelo a partir de las etiquetas humanas. El agente CrewAI sigue siendo solo la entrada interactiva (D-08).
+**Alternativas descartadas.**
+- Entrenar o ajustar a Laya con los fallos de `final_D14`: son 19 casos en seis categorías; según las etiquetas de Cristian la categoría 1 tiene un caso y la 5 ninguno, así que no habría conjunto de validación. No se verificó cuántos ejemplos usa el procedimiento oficial de ajuste.
+- Usar a Laya zero-shot como clasificador: D-03 midió 38 % de coincidencia en cinco categorías con n = 13, frente a 20 % de azar.
+- Agente verificador de checkpoints: necesita puntos de control dentro de la conversación, que D-14 descartó por tratarse de medidas repetidas y dejó como trabajo futuro.
+- Agente analista de hallazgos: el análisis es determinista (scripts de `analisis/`) y se sustenta línea por línea; un agente con un modelo pequeño añadiría variabilidad donde hay una respuesta calculable (D-08).
+- Clasificador automático de tipo de fallo con un LLM: tendría que validarse contra el etiquetado humano, y no hay datos suficientes para hacerlo.
+**Límites.** El proyecto no clasifica fallos de forma automática. Con 19 casos y dos etiquetadores, el kappa es inestable: un solo desacuerdo lo mueve mucho. Queda como trabajo futuro con más corridas y más fallos etiquetados.

@@ -71,6 +71,24 @@ El plan se fijó en D-19 y D-20. D-21 cambió parte de D-19 después de ver los 
 - **Verificación de supuestos:** del diseño: balance (5 por celda), orden sin deriva evidente (5, 6 y 8 fallos por tercio), posición lograda (inicio, mitad y final no se solapan), independencia solo en parte (11 de los 19 fallos están en el bloque 4) y medición (2 de 19 fallos pasan a acierto con el criterio ampliado). Los supuestos paramétricos no se pueden comprobar con respuesta binaria y 19 fallos, y esa es la razón de usar pruebas no paramétricas.
 [Texto de diseño de experimentos por citar: elegir de la bibliografía del curso y verificar edición y páginas antes de citar.]
 
+### Tabla de supuestos
+
+| Supuesto | Cómo se verificó | Resultado | Qué se hizo |
+|---|---|---|---|
+| Balance | Conteo por celda (`descriptivo.py`) | 5 corridas válidas en cada una de las 27 celdas (135 de 135) | Nada |
+| Medición válida | Estado de cada corrida (`final_D14.csv`) | 4 filas `invalida_tecnica`, reintentadas; todas las celdas cerraron como válidas | Reintento acotado (D-18) |
+| Aleatorización, sin deriva de la máquina | Fallos por tercio del orden en el bloque (`eda.py`) | 5, 6 y 8 fallos de 45; sin deriva evidente, sin prueba formal por falta de potencia | Se declara como límite |
+| El tratamiento se aplicó como se planeó | Fracción del nivel en que quedó el dato (`posicion_lograda.py`) | Inicio 0.01 a 0.09, mitad 0.50 a 0.59 y final 0.85 a 0.94: no se solapan; en 2 de 45 corridas de "final" el dato superó el nivel | Se declara; sensibilidad con posición lograda pendiente |
+| Independencia entre corridas | Fallos por bloque (`eda.py`) | 1, 1, 1, 11 y 5: las corridas de un mismo dato se parecen; se cumple en parte | Permutación estratificada por bloque; análisis sin el bloque 4 |
+| Bloque sin interacción con el modelo | Fallos por bloque y modelo (`eda.py`) | En el bloque 4 fallaron llama (5 de 9) y phi4-mini (6 de 9); gemma 0 | Descriptivo: con una observación por celda y bloque no hay prueba formal |
+| Tema sin confundirse con la posición | Fallos por tema (`eda.py`) | Geografía 6 de 22; el tema no quedó parejo entre posiciones (D-14) | Pendiente: tema como covariable |
+| Criterio de acierto consistente | Criterio ampliado de formato (`sensibilidad_formato.py`, `sensibilidad_ampliado.py`) | 2 de 19 fallos pasan a acierto; gemma frente a llama pasa de p ajustado 0.024 a 0.052 | Se reporta como sensibilidad (D-20, D-21) |
+| Sin separación completa | Celdas con 0 fallos | `gemma3:4b` no falla en ninguna de sus 9 celdas | Pruebas exactas y de permutación; la logística, si se ajusta, con penalización L2 |
+| Normalidad y varianza constante | No se pueden comprobar | La respuesta es 0/1: su varianza es p(1 - p) y depende de la media (0 en gemma, 0.13 en llama, 0.20 en phi4-mini) | Se descartan las pruebas paramétricas (D-21) |
+| Intercambiabilidad dentro de cada grupo de 3 corridas (la exige la permutación) | No verificable | Se supone bajo la hipótesis nula; todos los tratamientos están en todos los bloques y el orden fue aleatorio | Se declara en D-21 |
+| Potencia suficiente | Intervalos de Clopper-Pearson | Con 17 a 19 fallos solo se detectan diferencias grandes | "No se detecta efecto" no equivale a "no hay efecto" |
+
+
 ## 10. Límites
 - Cinco réplicas por celda dan poca potencia; la interacción triple probablemente no es estimable.
 - Con 19 fallos en total y ninguno de `gemma3:4b`, el modelo completo de D-19 tiene muchos más parámetros de los que los fallos permiten estimar con holgura; puede requerir simplificarse, y se registraría como decisión nueva.

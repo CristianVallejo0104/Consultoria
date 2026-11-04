@@ -1,6 +1,7 @@
 # Diseño experimental
 
-Estado al 2026-10-28. Cada decisión, con su alternativa descartada, está en `docs/decisiones.md`; aquí se resume el diseño completo.
+Estado al 2026-11-03.
+
 
 ## 1. Pregunta
 ¿A partir de qué longitud de conversación y en qué posición deja un LLM local de retener un dato inventado, y cambia según el modelo?
@@ -58,15 +59,16 @@ Categorías observadas en el primer corte: alucinación, admisión, negación de
 ## 8. Calidad del texto de relleno (D-04)
 Se evalúan naturalidad, coherencia e interés de los turnos del «usuario» con un LLM juez pequeño. Es exploratorio y **no está validado contra criterio humano**: no se usan esas notas en el análisis final hasta validarlas.
 
-## 9. Análisis (D-19 y D-20)
-Plan fijado antes del análisis; cualquier cambio posterior se registra como entrada nueva.
-- **Descriptivo:** acierto por celda con intervalo exacto de Clopper-Pearson al 95 %.
-- **Modelo:** regresión logística con modelo, posición, nivel, interacción posición × nivel y bloque. Con separación probable, enfoque bayesiano con previas débilmente informativas o regresión penalizada de Firth.
-- **Tablas marginales:** prueba exacta de Fisher en lugar de chi-cuadrado.
+## 9. Análisis (D-19, D-20 y D-21)
+El plan se fijó en D-19 y D-20. D-21 cambió parte de D-19 después de ver los resultados descriptivos, y lo registra como entrada nueva.
+- **Respuesta:** binaria, por cadena exacta (D-11). Sin medida cuantitativa (D-21).
+- **Descriptivo:** acierto por celda y por factor con intervalo exacto de Clopper-Pearson al 95 %.
+- **Pruebas principales, no paramétricas:** Fisher por pares con corrección de Holm (3 comparaciones por factor) y permutación estratificada (se baraja el acierto dentro de grupos de 3 corridas con el mismo bloque y los mismos otros dos factores; 20,000 permutaciones; semilla 42). Suponen intercambiabilidad bajo la hipótesis nula. No hay asignación aleatoria de tratamientos, porque todos se aplican en todos los bloques; lo aleatorizado fue el orden de las corridas.
+- **Modelo:** regresión logística con one-hot y penalización L2, **exploratoria y aún no ajustada** (D-21). Sustituye el plan bayesiano o de Firth de D-19. La muestra, los términos y las referencias están por decidir.
 - **Cobertura:** por celda, cuántas corridas son válidas, `no_alcanzo_nivel` o `rechazo_seguridad`.
-- **Sensibilidad:** con y sin respuestas vacías o cortadas; posición lograda del dato; tema; `contexto_final` (solo aquí, porque es posterior al tratamiento); y criterio ampliado a variantes de formato numérico (D-20).
-- **Descartado:** ANOVA sobre el acierto 0/1, chi-cuadrado como prueba principal, modelo sin bloque, interacción triple e imputación de corridas inválidas.
-- **Verificación de supuestos:** antes del ajuste, cuántos fallos hay y si hay celdas sin fallos (separación); después, convergencia y ajuste.
+- **Sensibilidad hecha:** formato numérico (D-20), sin el bloque 4 y posición lograda del dato. **Pendiente:** respuestas vacías o cortadas, tema y `contexto_final` (solo aquí, porque es posterior al tratamiento).
+- **Descartado:** ANOVA y pruebas paramétricas, medida cuantitativa, chi-cuadrado como prueba principal, interacción triple, imputación de corridas inválidas y el enfoque bayesiano o Firth como análisis principal (D-19 y D-21).
+- **Verificación de supuestos:** del diseño: balance (5 por celda), orden sin deriva evidente (5, 6 y 8 fallos por tercio), posición lograda (inicio, mitad y final no se solapan), independencia solo en parte (11 de los 19 fallos están en el bloque 4) y medición (2 de 19 fallos pasan a acierto con el criterio ampliado). Los supuestos paramétricos no se pueden comprobar con respuesta binaria y 19 fallos, y esa es la razón de usar pruebas no paramétricas.
 [Texto de diseño de experimentos por citar: elegir de la bibliografía del curso y verificar edición y páginas antes de citar.]
 
 ## 10. Límites
@@ -81,11 +83,12 @@ Plan fijado antes del análisis; cualquier cambio posterior se registra como ent
 - El criterio exacto cuenta como fallo el número correcto con otro formato (2 casos); D-20 lo trata como sensibilidad.
 - 4 filas `invalida_tecnica` por `generador_relleno` (todas de `gemma3:4b`) tienen causa no determinada, porque el error no se guarda (D-18).
 
-## 11. Estado de la ejecución (2026-10-28)
-`final_D14` está completo: 135 celdas con resultado válido y 139 filas en el CSV (4 filas técnicas inválidas conservadas como historial). Hay 19 fallos: `llama3.2:3b` 7, `phi4-mini` 12, `gemma3:4b` 0. Son conteos descriptivos, sin inferencia.
+## 11. Estado de la ejecución (2026-11-03)
+`final_D14` está completo: 135 celdas con resultado válido y 139 filas en el CSV (4 filas técnicas inválidas conservadas como historial). Hay 19 fallos: `llama3.2:3b` 7, `phi4-mini` 12, `gemma3:4b` 0. Las pruebas (Fisher por pares con Holm, permutación estratificada y sensibilidades) y sus resultados están en el README, sección "Análisis estadístico", y en D-21. Resumen: el modelo parece importar, pero la evidencia depende en buena parte del bloque 4; la posición y el nivel no muestran efecto detectable hasta 12K tokens, con poca potencia.
 
 ## 12. Pendiente
 - Etiquetado del segundo integrante y kappa entre los dos.
-- Ejecutar el análisis de D-19 y D-20 y verificar sus supuestos.
+- Regresión logística exploratoria con one-hot (D-21): decidir muestra, términos y referencias; no está ajustada.
+- Sensibilidades pendientes de D-19: respuestas vacías o cortadas, tema y `contexto_final`.
 - Decidir el alcance de Laya y de los agentes de D-08 con el número real de fallos.
 - Verificar las constantes de `agente.py` contra D-06.

@@ -25,7 +25,7 @@ OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 # 1. PARAMETROS FIJOS DEL EXPERIMENTO
 # ============================================================
 SEMILLA = 42
-random.seed(SEMILLA)  # fija SOLO la eleccion de dato y tema; NO el muestreo del modelo (pendiente, D-07)
+random.seed(SEMILLA)  # solo modo interactivo: final_D14 usa indices (ver D-15); NO fija el muestreo del modelo
 
 TEMPERATURA = 0.7              # modelos evaluados y generador de relleno
 TEMPERATURA_ORQUESTADOR = 0.0  # el orquestador solo copia parametros: sin aleatoriedad

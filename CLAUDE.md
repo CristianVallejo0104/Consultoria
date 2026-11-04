@@ -2,7 +2,7 @@
 
 Contexto para Claude Code, opencode o cualquier asistente que trabaje en este repositorio. Proyecto académico en curso, con decisiones ya tomadas y justificadas en `docs/decisiones.md`.
 
-*Última actualización: 2026-10-28.*
+## Estado (2026-11-03)
 
 ## Qué es este proyecto
 
@@ -19,7 +19,7 @@ Evaluador de confiabilidad de LLMs en conversaciones largas (fenómeno "lost in 
 - Las 135 corridas de `final_D14` están completas: 135 celdas válidas y 139 filas en `resultados/final_D14.csv` (4 filas `invalida_tecnica` por `generador_relleno`, todas de `gemma3:4b`, conservadas como historial; D-18).
 - 19 fallos: `llama3.2:3b` 7, `phi4-mini` 12, `gemma3:4b` 0. Más de la mitad está en el bloque 4.
 - Etiquetado de los 19 fallos en curso (`etiquetado/`, `docs/guia_etiquetado.md`). Cristian terminó el suyo; falta Juan Pablo y el kappa.
-- Análisis de D-19 y D-20: **aún no ejecutado, no hay script de análisis en el repo.**
+- Análisis no paramétrico ejecutado (D-21), en `analisis/`: descriptivo, Fisher por pares con Holm, permutación estratificada, EDA y sensibilidades (formato, sin el bloque 4, posición lograda). Pendiente: regresión logística exploratoria con one-hot y el tema como covariable.
 - Pendiente de decidir: alcance de Laya y de los agentes de D-08.
 
 ## Reglas para el asistente
@@ -50,9 +50,10 @@ Los modelos evaluados son de empresas distintas a la del orquestador (Alibaba), 
 - `agente.py`: núcleo y agente. Solo conserva Ollama y OpenRouter (D-07).
 - `correr_experimento.py`: runner. Bloques, orden con `crc32`, reintentos (`ya_hechas`, `es_reintentable`, `intentos_previos`) y parada tras 3 fallas reintentables seguidas (D-15, D-18).
 - `preparar_etiquetado.py`: `cargar_fallos`, `escribir_hojas` (hoja ciega y clave) y `kappa_cohen`.
+- `analisis/`: scripts del análisis estadístico (ver README, "Análisis estadístico"). Se ejecutan desde la raíz con `python analisis/<script>.py`; `sensibilidad_formato.py` y `sensibilidad_ampliado.py` necesitan `PYTHONPATH=.` porque importan `agente.py`.
 - `evaluar_calidad_texto.py`: evaluador exploratorio del texto de relleno (D-04).
 
-Mapa de funciones de `agente.py` (de la versión anterior; **sin recontrastar con el código actual**): `consultar_modelo` (punto único de manejo de errores de red), `_despachar_modelo`, `_procesar_openai_compat`, `_invalida`, `_valida`, `_generar_relleno` (devuelve `None` si falla y no guarda la excepción), `simular_conversacion` (aborta si falla cualquier turno), `ejecutar_evaluacion`, `verificar_acierto`, `guardar_resultado`, `seleccionar_dato_clave`, `seleccionar_tema`.
+Mapa de funciones de `agente.py` (las funciones nombradas existen según una revisión del 2026-11-03; además existen `validar_parametros`, `_consultar_ollama`, `_consultar_openrouter`, `_toca_insertar_dato`, `_resultado_vacio`, `_contar_error`, `generar_nombre_archivo`, `texto_resultado` y `evaluar_retencion`): `consultar_modelo` (punto único de manejo de errores de red), `_despachar_modelo`, `_procesar_openai_compat`, `_invalida`, `_valida`, `_generar_relleno` (devuelve `None` si falla y no guarda la excepción), `simular_conversacion` (aborta si falla cualquier turno), `ejecutar_evaluacion`, `verificar_acierto`, `guardar_resultado`, `seleccionar_dato_clave`, `seleccionar_tema`.
 
 ## Diseño experimental (cerrado, D-14 y D-15)
 
@@ -106,7 +107,7 @@ Diseño B con modelos en la nube: por cerrar. `MODELOS_CLOUD` está vacío; se u
 - **D-14, D-15:** factorial en bloques; semilla solo del diseño; `crc32` y no `hash()`.
 - **D-16:** guardado determinista y campos de registro de validez.
 - **D-18:** reintento manual acotado de fallas técnicas externas; parada tras 3 seguidas.
-- **D-19, D-20:** plan de análisis (Clopper-Pearson, modelo logístico con bloque, Firth o bayesiano, Fisher, sensibilidades) y criterio ampliado por formato como análisis aparte.
+- **D-19, D-20, D-21:** plan de análisis, criterio ampliado por formato como análisis aparte, y cambio a pruebas no paramétricas como resultado principal (Fisher por pares con Holm y permutación estratificada), con regresión logística con one-hot como modelo exploratorio. D-21 sustituye el plan bayesiano o de Firth de D-19.
 - **D-08:** agentes solo donde hay juicio de lenguaje; el alcance de verificador, clasificador y analista está sin decidir.
 - **D-03:** Laya pospuesto; sin decidir con los 19 fallos reales.
 

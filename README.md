@@ -3,7 +3,7 @@
 Sistema que evalúa en qué punto los modelos de lenguaje locales dejan de retener un dato inventado, según la posición del dato, el nivel de longitud en tokens y el modelo (fenómeno "lost in the middle"). Proyecto de Consultoría e Investigación, Universidad Santo Tomás.
 
 **Estado (3 de noviembre de 2026):**
-El análisis estadístico principal es no paramétrico y ya está ejecutado (D-21, sección "Análisis estadístico"). **Pendiente:** el etiquetado de Juan Pablo y el kappa. La regresión logística exploratoria con one-hot ya está ajustada (D-21, + “analisis/logistica.py” + ). Laya y los agentes planeados en D-08 quedaron fuera del alcance (D-22), y el Diseño B con modelos en la nube no se ejecutó (D-23).
+El análisis estadístico principal es no paramétrico y ya está ejecutado (D-21, sección "Análisis estadístico"). **Pendiente:** el etiquetado de Juan Pablo y el kappa. La regresión logística exploratoria con one-hot ya está ajustada (D-21, `analisis/logistica.py`). Laya y los agentes planeados en D-08 quedaron fuera del alcance (D-22), y el Diseño B con modelos en la nube no se ejecutó (D-23).
 
 ## Problema y contraparte
 
@@ -94,7 +94,7 @@ Las corridas inválidas **no** cuentan como "el modelo olvidó el dato". Si cual
 
 **Política de reintentos (D-18).** Una falla técnica externa es reintentable: se repite al relanzar el mismo comando y cada intento queda como fila nueva con la columna `intento`. `no_alcanzo_nivel` no es reintentable, porque depende del tratamiento y no es una falla externa. El runner se detiene tras 3 fallas reintentables seguidas. En el análisis, cada celda se toma de la fila que la cierra.
 
-En `final_D14` hubo 4 filas `invalida_tecnica`, todas con `generador_relleno` y todas de `gemma3:4b`. Al relanzar, las 2 celdas que seguían sin resultado salieron válidas. La causa de las fallas no está determinada: el código descarta el mensaje de la excepción (`detalle_error` queda en `None`). Una hipótesis, sin probar, es el tope de 600 s de la llamada al generador.
+En `final_D14` hubo 4 filas `invalida_tecnica`, todas con `generador_relleno` y todas de `gemma3:4b`. Las 4 filas corresponden a 3 celdas (bloque 1 mitad 12K, bloque 1 final 4K y bloque 5 inicio 8K); al relanzar, las 3 cerraron como válidas (la de bloque 1 final 4K, en el tercer intento). La causa de las fallas no está determinada: el código descarta el mensaje de la excepción (`detalle_error` queda en `None`). Una hipótesis, sin probar, es el tope de 600 s de la llamada al generador.
 
 Límite conocido: los rechazos de seguridad escritos en texto ("no puedo ayudar con eso") no se detectan automáticamente, y la detección de `rechazo_seguridad` solo existe en las API en la nube.
 
@@ -112,7 +112,7 @@ Factorial completo en bloques completos aleatorizados (D-14, D-15). Detalle y ju
 
 - **Factores fijos:** modelo (`phi4-mini`, `llama3.2:3b`, `gemma3:4b`) × posición del dato (inicio, mitad, final) × nivel de tokens (4,000, 8,000, 12,000) = 27 tratamientos.
 - **Réplicas y bloques:** 5 réplicas organizadas en 5 bloques completos; el bloque es el dato inventado. Son 135 corridas. Dentro de cada bloque se baraja el orden de los 27 tratamientos con una semilla derivada del bloque (`crc32`, porque el `hash()` de Python cambia entre ejecuciones).
-- **Tema:** 6 temas asignados por rotación, `(posición en el bloque + bloque) mod 6`. No es un bloque completo, y las corridas por tema no quedan parejas dentro de cada posición del dato (medido sobre el plan: inicio [10, 8, 5, 9, 7, 6], mitad [2, 6, 7, 8, 12, 10], final [10, 8, 10, 6, 4, 7]); se documenta como límite.
+- **Tema:** 6 temas asignados por rotación, `((orden_en_bloque − 1) + bloque) mod 6`, con `orden_en_bloque` contando desde 1. No es un bloque completo, y las corridas por tema no quedan parejas dentro de cada posición del dato (medido sobre el plan: inicio [10, 8, 5, 9, 7, 6], mitad [2, 6, 7, 8, 12, 10], final [10, 8, 10, 6, 4, 7]); se documenta como límite.
 - **Respuesta:** acierto binario por cadena exacta, sin negación; sin LLM juez (D-11, D-19).
 - **Nivel de tokens:** "5 turnos" no es comparable entre modelos (`phi3:mini` procesó 10,259 tokens en 5 turnos y `gemma2:2b`, 1,903). El nivel es el contexto en la pregunta final (D-06).
 - **Justificación:** sigue la estructura de Liu et al. (2023: posición × longitud del contexto × modelo) y de Zhang et al. (2024), formalizada con principios de diseño de experimentos. Nuestra variante inserta el dato dentro de la conversación y no en un documento recuperado. La estructura (factorial completo con réplicas, bloques completos y orden aleatorio) sigue lo que presentan Montgomery y Runger (2018, pp. 353, 368 a 369 y 378) y el modelo de tres factores del material del curso (sin autor indicado, pp. 1 a 3 y 6 a 7).
@@ -189,7 +189,7 @@ Fisher por pares con Holm (modelo): gemma frente a phi4-mini 0.0006 (sin el bloq
 
 Lectura: el modelo parece importar, pero la evidencia depende en buena parte de un solo dato difícil (el bloque 4), y la diferencia entre `gemma3:4b` y `llama3.2:3b` depende del criterio de formato. La posición y el nivel no muestran efecto detectable hasta 12K tokens. Con 17 a 19 fallos la potencia es baja: "no se detecta efecto" no equivale a "no hay efecto". Las pruebas suponen intercambiabilidad de las corridas dentro de cada grupo, y las corridas de un mismo dato se parecen (11 de los 19 fallos están en el bloque 4).
 
-Regresión logística exploratoria (one-hot, penalización L2; razones de momios de acierto frente a `phi4-mini`, inicio, 4,000 y bloque 1; de C = 1 a C = 1000): `gemma3:4b` pasa de 7.29 a 5,027, es decir, crece sin tope al quitar la penalización (es la separación, y el valor con C = 1 lo fija la penalización); `llama3.2:3b` de 1.47 a 2.87; el bloque 4 de 0.16 a 0.02, el efecto más estable (el dato 44295 fue mucho más difícil); posición y nivel cambian con la penalización y no muestran un patrón estable. No hay errores estándar ni intervalos, la penalización encoge las razones hacia 1 y son 10 parámetros para 19 fallos: describe estos datos y no se generaliza.
+Regresión logística exploratoria (one-hot, penalización L2; razones de momios de acierto frente a `phi4-mini`, inicio, 4,000 y bloque 1; de C = 1 a C = 1000): `gemma3:4b` pasa de 7.29 a 5,027, es decir, crece sin tope al quitar la penalización (es la separación, y el valor con C = 1 lo fija la penalización); `llama3.2:3b` de 1.47 a 2.87; el bloque 4 de 0.16 a 0.02, el efecto más grande y de dirección constante (el dato 44295 fue mucho más difícil); en posición y nivel la dirección se mantiene (final y 8,000 por debajo de la referencia, mitad por encima) pero la magnitud cambia con la penalización, y las pruebas exactas no detectan efecto en ninguno de los dos. No hay errores estándar ni intervalos, la penalización encoge las razones hacia 1 y son 10 parámetros para 19 fallos: describe estos datos y no se generaliza.
 
 ## Etiquetado de fallos y kappa
 
@@ -279,7 +279,7 @@ Son exploratorios, con una réplica por combinación, y no permiten inferencia e
 
 ### Primer corte (septiembre 2026)
 
-9 pruebas, dato en posición *inicio*, longitud en turnos. La columna *Tokens* cuenta solo los tokens generados por el modelo.
+9 pruebas, dato en posición *inicio*, longitud en turnos. Las cifras vienen del informe del primer corte (Cuadro 3) y no se reproducen con los JSON del repositorio (el de `phi3:mini` a 5 turnos da 10,304 tokens totales y 2,221 de respuesta), así que qué mide esa columna no está verificado.
 
 | Modelo | Turnos | Tokens | Tiempo | Resultado |
 |---|---|---|---|---|
@@ -483,12 +483,12 @@ Después:
 - Métrica binaria (acierto/fallo): no captura degradación parcial.
 - Los rechazos de seguridad escritos en texto no se detectan automáticamente.
 - Cinco réplicas por celda dan poca potencia; con 5 de 5 aciertos, el intervalo exacto al 95 % va de 0.48 a 1.00. La interacción triple probablemente no es estimable (D-14).
-- Con 19 fallos en total y ninguno de `gemma3:4b`, el modelo completo de D-19 tiene muchos más parámetros de los que los fallos permiten estimar con holgura; puede requerir simplificarse, y eso se registraría como decisión nueva.
+- Con 19 fallos en total y ninguno de `gemma3:4b`, el modelo completo de D-19 tiene muchos más parámetros de los que los fallos permiten estimar con holgura; por eso D-21 lo simplifica (sin interacción, con penalización L2) y lo declara exploratorio.
 - El criterio exacto cuenta como fallo el número correcto escrito con otro formato (2 casos); D-20 lo trata como sensibilidad.
 - 4 corridas técnicas inválidas por `generador_relleno` (todas de `gemma3:4b`) tienen causa no determinada porque el error no se guarda (`detalle_error` en `None`).
 - El tema no queda perfectamente balanceado entre posiciones (ver "Diseño experimental").
 - La posición lograda del dato se aparta de la nominal; se reporta de forma descriptiva (analisis/posicion_lograda.py) y no se usó como covariable (D-23) (en una corrida de prueba de `llama3.2:3b` a 4K, "mitad" quedó en el 56 % del nivel antes del dato y en el 65 % al cierre de su turno).
-- El tope de 300 tokens por respuesta puede truncar muchas respuestas en algunos modelos; se registra `done_reason`.
+- El tope de 300 tokens cortó respuestas del modelo evaluado en las 135 corridas válidas (1,795 turnos en total): cerca del 37 % de los turnos de `gemma3:4b`, 65 % de `llama3.2:3b` y 60 % de `phi4-mini` (calculado a mano sobre el CSV, sin script, con `turnos_reales` como denominador). La proporción cambia con el modelo, así que el efecto del modelo puede incluir el del tope (D-06, D-16).
 - Hay 5 datos para 5 bloques: con más réplicas el código daría `IndexError`.
 - Cada modelo usa su propio tokenizador; las cifras de ambos cortes no son comparables.
 - `top_k` y `top_p` no están fijados.
@@ -500,6 +500,7 @@ Después:
 - Resultados del primer corte: una réplica y solo posición *inicio*; los de `phi3:mini` y `gemma2:2b` no entran al análisis final.
 - El texto final del agente interactivo lo redacta un modelo de 1.5B y puede sobreinterpretar una sola corrida (en la prueba del 3 de noviembre dijo que el resultado «demuestra la confiabilidad»); la medición es la línea «Resultado» de la herramienta.
 - Al terminar, CrewAI 1.15.17 mostró un enlace de traza en `app.crewai.com`: el modo interactivo parece enviar la traza de la ejecución a ese servicio. No se verificó qué contiene ni cómo desactivarlo. Las 135 corridas no pasan por CrewAI.
+- La hipótesis central de D-14 (interacción posición × nivel) no se contrasta: D-21 usa un modelo sin interacción por la baja potencia (19 fallos).
 
 ## Fuentes y trazabilidad
 

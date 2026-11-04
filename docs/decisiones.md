@@ -132,7 +132,7 @@ de "mitad" entró entre el 50.2 % y el 58.4 % del nivel; el contexto final super
 nominal entre 0.5 % y 10.3 % (en D-23 se decidió no usarlo como covariable).
 **Límites.** Cada modelo usa su tokenizador; las cifras de ambos cortes no son
 comparables; phi3:mini a 12K hizo 57 turnos con un máximo de 60.
-**Pendiente.** Evaluar subir el máximo de turnos. `done_reason` ya se guarda (D-16).
+**Cierre.** En `final_D14` el máximo de 60 turnos no limitó el diseño: las 135 corridas válidas alcanzaron su nivel y la que más turnos usó llegó a 55 (CSV, `turnos_reales`). Se mantiene 60. `done_reason` ya se guarda (D-16).
 
 ---
 
@@ -167,7 +167,7 @@ lenguaje (verificador de checkpoints, clasificador de fallos, analista), aún si
 **Decisión.** Ninguna de las tres se usa para medir retención. RAG genera respuestas con documentos recuperados (no evalúa). RAGAS evalúa sistemas RAG sobre tripletas (pregunta, contexto recuperado, respuesta) con un LLM (`gpt-3.5-turbo-16k` vía OpenAI, p. 3). G-Eval evalúa la calidad de un texto con un LLM juez; su mecanismo sí se adapta a la calidad del texto de relleno (D-04).
 **Alternativas descartadas.** Usar G-Eval para verificar retención (añade variabilidad donde conocemos la respuesta); adaptar *faithfulness* de RAGAS con la conversación como contexto (añade un juez LLM donde hay respuesta conocida); implementar RAG (no hay documentos que recuperar).
 **Fuentes.** Lewis et al. v4 (pp. 1–2); Liu, Y. et al. v3 (pp. 1–4, 6); Es et al. v2 (pp. 1, 3–5).
-**Pendiente.** Aclarar el alcance de «implementarlo y probarlo» para RAG.
+**Alcance (decisión del equipo, no confirmada con el profesor).** RAG se contrasta con el proyecto pero no se implementa, porque no hay documentos que recuperar: el dato viene de la propia conversación. Ver «Alternativas descartadas».
 
 ---
 

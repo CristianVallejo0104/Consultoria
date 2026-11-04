@@ -115,7 +115,7 @@ Factorial completo en bloques completos aleatorizados (D-14, D-15). Detalle y ju
 - **Tema:** 6 temas asignados por rotación, `(posición en el bloque + bloque) mod 6`. No es un bloque completo, y las corridas por tema no quedan parejas dentro de cada posición del dato (medido sobre el plan: inicio [10, 8, 5, 9, 7, 6], mitad [2, 6, 7, 8, 12, 10], final [10, 8, 10, 6, 4, 7]); se documenta como límite.
 - **Respuesta:** acierto binario por cadena exacta, sin negación; sin LLM juez (D-11, D-19).
 - **Nivel de tokens:** "5 turnos" no es comparable entre modelos (`phi3:mini` procesó 10,259 tokens en 5 turnos y `gemma2:2b`, 1,903). El nivel es el contexto en la pregunta final (D-06).
-- **Justificación:** sigue la estructura de Liu et al. (2023: posición × longitud del contexto × modelo) y de Zhang et al. (2024), formalizada con principios de diseño de experimentos. Nuestra variante inserta el dato dentro de la conversación y no en un documento recuperado. **[Texto de diseño de experimentos por citar.]**
+- **Justificación:** sigue la estructura de Liu et al. (2023: posición × longitud del contexto × modelo) y de Zhang et al. (2024), formalizada con principios de diseño de experimentos. Nuestra variante inserta el dato dentro de la conversación y no en un documento recuperado. La estructura (factorial completo con réplicas, bloques completos y orden aleatorio) sigue lo que presentan Montgomery y Runger (2018, pp. 353, 368 a 369 y 378) y el modelo de tres factores del material del curso (sin autor indicado, pp. 1 a 3 y 6 a 7).
 - **Análisis (D-19, D-20 y D-21):** la respuesta es binaria y con 19 fallos los supuestos paramétricos no se pueden comprobar, así que los resultados principales son no paramétricos.
   - Descriptivo: acierto por celda y por factor con intervalo exacto de Clopper-Pearson al 95 %.
   - Pruebas: Fisher por pares con corrección de Holm (3 comparaciones por factor) y permutación estratificada (se baraja el acierto dentro de grupos de 3 corridas con el mismo bloque y los mismos otros dos factores; 20,000 permutaciones, semilla 42). Se justifican por intercambiabilidad bajo la hipótesis nula, no por una asignación aleatoria de tratamientos.
@@ -508,6 +508,12 @@ El corpus son 11 artículos públicos guardados en `docs/fuentes/`. Su origen, v
 Las afirmaciones del estado del arte se comprueban una por una en `nada_sin_fuente/03_sistema/trazabilidad.md`, con página y cita corta. Las que no se sostienen como estaban escritas se registran en la tabla «Afirmaciones corregidas» de ese archivo.
 
 Los PDF son copias para uso académico. Varios están bajo la licencia no exclusiva de arXiv, que no autoriza expresamente la redistribución, así que se enlaza la fuente original y se retiran si un autor lo pide.
+
+## Referencias del diseño experimental
+
+- Montgomery, D. C., y Runger, G. C. (2018). *Applied statistics and probability for engineers* (7.ª ed.). John Wiley & Sons. Páginas citadas: 353, 361 a 363, 368 a 369, 378 y 381.
+- Material del curso: «Capítulo 6: Diseños factoriales con tres factores» (sin autor indicado en el archivo), pp. 1 a 3 y 6 a 7.
+- Permutación, Fisher exacto, Clopper-Pearson y Holm: sin cita; los scripts de `analisis/` y D-21 los describen.
 
 ## Autores
 

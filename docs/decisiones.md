@@ -244,7 +244,7 @@ lenguaje (verificador de checkpoints, clasificador de fallos, analista), aún si
 **Estado (2026-10-21).** Implementado en `main` (commits `8a821f8`, `9c4270f` y `b8a8fa7`; unión `de2dfff`): bloques, orden aleatorio por bloque, dato por bloque y tema por rotación (D-15), guardado por corrida y campos de registro (D-16). Verificado sin ejecutar modelos: el plan tiene 135 corridas con 135 claves únicas y cada bloque contiene los 27 tratamientos. 
 **Pendiente antes de lanzar las 135:** política de corridas inválidas y reintentos (resuelta en D-18). `final_D14` aún no se había lanzado a esa fecha.
 **Estado (2026-10-28).** Las 135 corridas de `final_D14` están completas: 135 celdas (modelo × posición × nivel × bloque) con resultado válido y 139 filas en `resultados/final_D14.csv`, porque 4 filas `invalida_tecnica` se conservan como historial (D-18). Hay 19 fallos (`llama3.2:3b` 7, `phi4-mini` 12, `gemma3:4b` 0). Son conteos descriptivos, sin inferencia.
-**Fuente de respaldo.** Liu et al. (2023), Fig. 5 y p. 3. [Texto de diseño de experimentos: por citar]
+**Fuente de respaldo.** Liu et al. (2023), Fig. 5 y p. 3. Estructura del factorial en bloques: Montgomery y Runger (2018), pp. 353, 368 a 369 y 378 (un factor a la vez no detecta interacciones: p. 381); modelo de tres factores con réplicas: material del curso, «Capítulo 6» (sin autor indicado, pp. 1 a 3 y 6 a 7).
 
 ---
 

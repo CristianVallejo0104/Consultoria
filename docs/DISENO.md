@@ -69,7 +69,7 @@ El plan se fijó en D-19 y D-20. D-21 cambió parte de D-19 después de ver los 
 - **Sensibilidad hecha:** formato numérico (D-20), sin el bloque 4 y posición lograda del dato. Respuestas finales vacías o cortadas: ninguna en las 135 válidas. **Pendiente:** tema y `contexto_final`
 - **Descartado:** ANOVA y pruebas paramétricas, medida cuantitativa, chi-cuadrado como prueba principal, interacción triple, imputación de corridas inválidas y el enfoque bayesiano o Firth como análisis principal (D-19 y D-21).
 - **Verificación de supuestos:** del diseño: balance (5 por celda), orden sin deriva evidente (5, 6 y 8 fallos por tercio), posición lograda (inicio, mitad y final no se solapan), independencia solo en parte (11 de los 19 fallos están en el bloque 4) y medición (2 de 19 fallos pasan a acierto con el criterio ampliado). Los supuestos paramétricos no se pueden comprobar con respuesta binaria y 19 fallos, y esa es la razón de usar pruebas no paramétricas.
-[Texto de diseño de experimentos por citar: elegir de la bibliografía del curso y verificar edición y páginas antes de citar.]
+Fuentes del diseño: factorial completo con réplicas, Montgomery y Runger (2018, p. 378) y el «Capítulo 6: Diseños factoriales con tres factores» del material del curso (sin autor indicado, pp. 1 a 3 y 6 a 7); aleatorización y bloques completos, Montgomery y Runger (2018, pp. 353 y 368 a 369); los supuestos del ANOVA que se descartan (normalidad, independencia y varianza constante) están en las pp. 361 a 363.
 
 ### Tabla de supuestos
 
@@ -106,4 +106,4 @@ El plan se fijó en D-19 y D-20. D-21 cambió parte de D-19 después de ver los 
 
 ## 12. Pendiente
 - Etiquetado del segundo integrante y kappa entre los dos.
-- Sensibilidades pendientes de D-19: tema y `contexto_final`.
+- Sensibilidades de D-19 no hechas (D-23): tema y `contexto_final`.

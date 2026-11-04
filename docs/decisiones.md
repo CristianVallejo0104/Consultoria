@@ -385,7 +385,7 @@ Chi-cuadrado: por frecuencias esperadas bajas. La prueba exacta de Fisher para t
 **Contexto.** Varias entradas dejaron pendientes que no se resolvieron: el Diseño B con modelos en la nube (D-02, D-07), el costo real de OpenRouter (D-02), el máximo de turnos (D-06), el alcance de RAG (D-09), la comparación de `rope.scaling` de `llama3.2:3b` y `gemma3:4b` (D-13), y las sensibilidades de D-19 con el tema y con `contexto_final`. El profesor había propuesto comparar modelos en la nube con los locales.
 **Decisión.** El proyecto se limita a tres modelos locales (`phi4-mini`, `llama3.2:3b`, `gemma3:4b`) y hasta 12K tokens, y los pendientes anteriores no se ejecutan. Los modelos en la nube, por tiempo y por costo según el equipo, quedan como trabajo futuro. Alcance de cada pendiente:
 - **Diseño B:** no ejecutado; `MODELOS_CLOUD` queda vacío. El costo real nunca se calculó.
-- **Máximo de turnos:** ninguna corrida de `final_D14` quedó como `no_alcanzo_nivel` (las 4 filas técnicas inválidas fueron por `generador_relleno`), así que el tope de 60 no afectó el diseño final.
+- **Máximo de turnos:** ninguna corrida de `final_D14` quedó como `no_alcanzo_nivel` (las 4 filas técnicas inválidas fueron por `generador_relleno`), así que el tope de 60 no afectó el diseño final (el máximo de turnos en las 135 corridas válidas fue 55).
 - **RAG:** no se implementa (D-09).
 - **`rope.scaling` de llama y gemma:** no se comparó.
 - **Tema como covariable y `contexto_final`:** no se hicieron; se declaran como límite.

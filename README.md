@@ -3,7 +3,7 @@
 Sistema que evalúa en qué punto los modelos de lenguaje locales dejan de retener un dato inventado, según la posición del dato, el nivel de longitud en tokens y el modelo (fenómeno "lost in the middle"). Proyecto de Consultoría e Investigación, Universidad Santo Tomás.
 
 **Estado (3 de noviembre de 2026):**
-El análisis estadístico principal es no paramétrico y ya está ejecutado (D-21, sección "Análisis estadístico"). **Pendiente:** el etiquetado de Juan Pablo y el kappa, la regresión logística exploratoria con one-hot (D-21). Laya y los agentes planeados en D-08 quedaron fuera del alcance (D-22).
+El análisis estadístico principal es no paramétrico y ya está ejecutado (D-21, sección "Análisis estadístico"). **Pendiente:** el etiquetado de Juan Pablo y el kappa, la regresión logística exploratoria con one-hot (D-21). Laya y los agentes planeados en D-08 quedaron fuera del alcance (D-22), y el Diseño B con modelos en la nube no se ejecutó (D-23).
 
 ## Problema y contraparte
 
@@ -120,7 +120,7 @@ Factorial completo en bloques completos aleatorizados (D-14, D-15). Detalle y ju
   - Descriptivo: acierto por celda y por factor con intervalo exacto de Clopper-Pearson al 95 %.
   - Pruebas: Fisher por pares con corrección de Holm (3 comparaciones por factor) y permutación estratificada (se baraja el acierto dentro de grupos de 3 corridas con el mismo bloque y los mismos otros dos factores; 20,000 permutaciones, semilla 42). Se justifican por intercambiabilidad bajo la hipótesis nula, no por una asignación aleatoria de tratamientos.
   - Modelo: regresión logística con one-hot y penalización L2, **exploratoria**, aún no ajustada (D-21). Reemplaza al plan bayesiano o de Firth de D-19.
-  - Sensibilidad (hecha): criterio ampliado de formato (D-20), sin el bloque 4 y posición lograda del dato. Pendiente: tema como covariable. El criterio principal (`verificar_acierto`) no se modifica.
+  - Sensibilidad (hecha): criterio ampliado de formato (D-20) y sin el bloque 4; la posición lograda del dato se verificó de forma descriptiva. No se hicieron (D-23): tema, `contexto_final` y la posición lograda como covariables. El criterio principal (`verificar_acierto`) no se modifica.
 - **Alcance:** el estudio solo dice algo sobre estos tres modelos y los niveles medidos (hasta 12K), no sobre contextos mayores aunque el modelo los soporte.
 
 ## Resultados finales (`final_D14`)
@@ -140,10 +140,10 @@ Factorial completo en bloques completos aleatorizados (D-14, D-15). Detalle y ju
 | Nivel | 12,000 | 39 de 45 (0.867) |
 
 Observaciones, con cautela:
-- Los fallos son de `llama3.2:3b` (7) y `phi4-mini` (12). `gemma3:4b` acertó sus 45 corridas, sus 9 celdas con 5 de 5, lo que genera separación en el modelo logístico (por eso D-19 prevé Firth o enfoque bayesiano).
+- Los fallos son de `llama3.2:3b` (7) y `phi4-mini` (12). `gemma3:4b` acertó sus 45 corridas, sus 9 celdas con 5 de 5, lo que genera separación en el modelo logístico (por eso D-21 usa penalización L2 en la logística exploratoria)
 - Por bloque (dato inventado) hay 1, 1, 1, 11 y 5 fallos. Más de la mitad está en un solo dato, y por eso el bloque entra como efecto en el modelo.
 - Solo 13 de las 27 celdas tienen algún fallo.
-- En estos conteos no se ve el patrón clásico de "lost in the middle": la posición mitad tiene el mayor acierto y el nivel no baja de forma ordenada. Con 45 corridas por grupo, diferencias de pocos fallos pueden ser azar; la inferencia queda para D-19.
+- En estos conteos no se ve el patrón clásico de "lost in the middle": la posición mitad tiene el mayor acierto y el nivel no baja de forma ordenada. Con 45 corridas por grupo, diferencias de pocos fallos pueden ser azar; las pruebas están en "Análisis estadístico"
 - Dos de los 19 fallos (F003 y F004 en la hoja de etiquetado) contienen el número correcto con coma ("44,295") y el criterio exacto los cuenta como fallo. El análisis de sensibilidad de D-20 los trata aparte.
 
 ## Tiempo de ejecución (`final_D14`)
@@ -229,6 +229,9 @@ Cada decisión se documenta con su alternativa descartada. Registro completo en 
 - **D-18:** corridas inválidas: reintento manual acotado a fallas técnicas externas y parada del runner tras 3 seguidas. Alternativas descartadas: no reintentar nunca y reintentar sin límite.
 - **D-19:** medida de respuesta y plan de análisis (ver "Diseño experimental"). Alternativas descartadas: ANOVA sobre el acierto 0/1, chi-cuadrado como prueba principal, modelo sin bloque, interacción triple e imputación de corridas inválidas.
 - **D-20:** análisis de sensibilidad por variantes de formato numérico. Alternativas descartadas: modificar `verificar_acierto` y decidir caso por caso a mano.
+- **D-21:** análisis no paramétrico como resultado principal y regresión logística con one-hot como modelo exploratorio. Alternativas descartadas: ANOVA y pruebas paramétricas, medida cuantitativa, enfoque bayesiano o Firth como principal, y regresión sin penalizar.
+- **D-22:** Laya y los agentes planeados en D-08 quedan fuera del alcance. Alternativas descartadas: entrenar a Laya con 19 fallos, Laya zero-shot y un clasificador automático con LLM.
+- **D-23:** cierre de alcance: el Diseño B con modelos en la nube y otros pendientes no se ejecutaron; quedan como trabajo futuro. Alternativas descartadas: ejecutar el Diseño B completo y una prueba parcial con un solo modelo en la nube. 
 
 ## Uso de IA en el desarrollo
 
@@ -237,8 +240,8 @@ Declarado según la rúbrica y registrado en D-17:
 - **Decisiones de diseño:** del equipo (semilla que solo fija el diseño; tema por posición en el orden; reemplazos de modelos; contraparte metodológica; categorías del etiquetado y sus reglas de borde).
 - **Asistente de IA en chat (Claude):** explicó el porqué de cada paso antes del código, redactó la función `orden_del_bloque` (que Cristian tecleó, probó y puede explicar línea por línea), las especificaciones de cada tarea y las pruebas de verificación.
 - **Claude Code, con permiso por edición y sin commits:** escribió el cambio mecánico en `agente.py` y `correr_experimento.py` (parámetros `indice_dato` e `indice_tema`, configuración `final_D14`, bucle por bloques, columnas nuevas, guardado determinista, manejo de errores del runner, campos de registro, reintentos de D-18).
-- **Asistente de IA en chat, fase de análisis y etiquetado:** redactó la función `kappa_cohen` (probada con un caso calculado a mano), el borrador de la entrada D-20, el script que escribió las etiquetas de Cristian en su hoja (las categorías las decidió Cristian; el asistente solo mostró los textos y pasó los números a CSV sin sugerir categorías) y los comandos de conteo por terminal usados en "Resultados finales".
-- **Scripts de `analisis/`** (`descriptivo.py`, `fisher.py`, `eda.py`, `graficas.py`, `posicion_lograda.py`, `sensibilidad_formato.py`, `permutaciones.py`, `sensibilidad_bloque4.py`, `sensibilidad_ampliado.py`): los redactó el asistente de IA en chat; Cristian los tecleó, los ejecutó y contrastó sus salidas con las del asistente. Los métodos (no paramétrico, one-hot y regresión logística) siguen la indicación del profesor, y las decisiones están en D-21.
+- **Asistente de IA en chat, fase de análisis y etiquetado:** redactó la función `kappa_cohen` (probada con un caso calculado a mano), los borradores de las entradas D-20 a D-23, el script que escribió las etiquetas de Cristian en su hoja (las categorías las decidió Cristian; el asistente solo mostró los textos y pasó los números a CSV sin sugerir categorías) y los comandos de conteo por terminal usados en "Resultados finales".
+- **Scripts de `analisis/`** (`descriptivo.py`, `fisher.py`, `eda.py`, `graficas.py`, `posicion_lograda.py`, `sensibilidad_formato.py`, `permutaciones.py`, `sensibilidad_bloque4.py`, `sensibilidad_ampliado.py`, `tiempos.py`): los redactó el asistente de IA en chat; Cristian los tecleó, los ejecutó y contrastó sus salidas con las del asistente. Los métodos (no paramétrico, one-hot y regresión logística) siguen la indicación del profesor, y las decisiones están en D-21.
 - **Sesión de Claude en la nube, solo lectura:** auditó el repositorio, repitió los análisis y propuso preguntas de sustentación. Sus hallazgos se contrastaron con el código y las salidas antes de aplicar cambios: corrigieron una frase de D-21 sobre el criterio de formato y la razón para descartar Freeman-Halton. Es de la misma familia que el asistente del chat, así que su coincidencia no es verificación independiente (D-12).
 - **Subagentes de revisión de solo lectura** (`revisor-codigo-python` y `consultor-estadistico`): auditaron el código antes de las corridas. Sus resúmenes se contrastaron con el código y con las pruebas ejecutadas.
 - **Verificación humana:** cada diff se revisó antes del commit y se ejecutaron pruebas con Ollama.
@@ -377,7 +380,7 @@ python -c "from agente import ejecutar_evaluacion as e, guardar_resultado as g; 
 python3 agente.py
 ```
 
-El modo interactivo imprime los modelos, posiciones y niveles de tokens permitidos y pide tres datos: modelo, posición del dato y nivel de tokens; el agente orquestador llama a la herramienta con esos valores. Guarda el resultado en `resultados/txt/` y `resultados/json/`. Prueba del 3 de noviembre de 2026: `gemma3:4b`, mitad, 8,000 tokens → acierto en 349.5 s, coherente con la mediana de esa celda en `final_D14`.Prueba del 3 de noviembre de 2026: `gemma3:4b`, mitad, 8,000 tokens → acierto en 349.5 s, coherente con la mediana de esa celda en `final_D14`.
+El modo interactivo imprime los modelos, posiciones y niveles de tokens permitidos y pide tres datos: modelo, posición del dato y nivel de tokens; el agente orquestador llama a la herramienta con esos valores. Guarda el resultado en `resultados/txt/` y `resultados/json/`. Prueba del 3 de noviembre de 2026: `gemma3:4b`, mitad, 8,000 tokens → acierto en 349.5 s, coherente con la mediana de esa celda en `final_D14`.
 
 **4. Hojas de etiquetado y kappa:**
 
@@ -444,7 +447,7 @@ Después:
 ├── .env.example # Nombre de la variable de entorno (sin valores)
 ├── docs/
 │ ├── DISENO.md # Diseño experimental completo
-│ ├── decisiones.md # Registro de decisiones D-01 a D-21
+│ ├── decisiones.md # Registro de decisiones D-01 a D-23
 │ ├── guia_etiquetado.md # Categorías y reglas del etiquetado de fallos
 │ ├── contraparte/ # Registro de la contraparte metodológica (D-12)
 │ ├── fuentes/ # Papers descargados y verificados
@@ -479,7 +482,7 @@ Después:
 - El criterio exacto cuenta como fallo el número correcto escrito con otro formato (2 casos); D-20 lo trata como sensibilidad.
 - 4 corridas técnicas inválidas por `generador_relleno` (todas de `gemma3:4b`) tienen causa no determinada porque el error no se guarda (`detalle_error` en `None`).
 - El tema no queda perfectamente balanceado entre posiciones (ver "Diseño experimental").
-- La posición lograda del dato se aparta de la nominal; se reporta y se analizará como sensibilidad (en una corrida de prueba de `llama3.2:3b` a 4K, "mitad" quedó en el 56 % del nivel antes del dato y en el 65 % al cierre de su turno).
+- La posición lograda del dato se aparta de la nominal; se reporta de forma descriptiva (analisis/posicion_lograda.py) y no se usó como covariable (D-23) (en una corrida de prueba de `llama3.2:3b` a 4K, "mitad" quedó en el 56 % del nivel antes del dato y en el 65 % al cierre de su turno).
 - El tope de 300 tokens por respuesta puede truncar muchas respuestas en algunos modelos; se registra `done_reason`.
 - Hay 5 datos para 5 bloques: con más réplicas el código daría `IndexError`.
 - Cada modelo usa su propio tokenizador; las cifras de ambos cortes no son comparables.

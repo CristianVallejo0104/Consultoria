@@ -10,3 +10,4 @@ medir_tokens.py
 test_paso*.py
 *.pptx
 resultados/calidad_texto/
+!video_proyecto/*.html

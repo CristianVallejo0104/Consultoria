@@ -377,3 +377,20 @@ Chi-cuadrado: por frecuencias esperadas bajas. La prueba exacta de Fisher para t
 - Agente analista de hallazgos: el análisis es determinista (scripts de `analisis/`) y se sustenta línea por línea; un agente con un modelo pequeño añadiría variabilidad donde hay una respuesta calculable (D-08).
 - Clasificador automático de tipo de fallo con un LLM: tendría que validarse contra el etiquetado humano, y no hay datos suficientes para hacerlo.
 **Límites.** El proyecto no clasifica fallos de forma automática. Con 19 casos y dos etiquetadores, el kappa es inestable: un solo desacuerdo lo mueve mucho. Queda como trabajo futuro con más corridas y más fallos etiquetados.
+
+---
+
+## D-23 · Cierre de alcance: lo que no se hizo
+**Fecha:** 2026-11-03
+**Contexto.** Varias entradas dejaron pendientes que no se resolvieron: el Diseño B con modelos en la nube (D-02, D-07), el costo real de OpenRouter (D-02), el máximo de turnos (D-06), el alcance de RAG (D-09), la comparación de `rope.scaling` de `llama3.2:3b` y `gemma3:4b` (D-13), y las sensibilidades de D-19 con el tema y con `contexto_final`. El profesor había propuesto comparar modelos en la nube con los locales.
+**Decisión.** El proyecto se limita a tres modelos locales (`phi4-mini`, `llama3.2:3b`, `gemma3:4b`) y hasta 12K tokens, y los pendientes anteriores no se ejecutan. Los modelos en la nube, por tiempo y por costo según el equipo, quedan como trabajo futuro. Alcance de cada pendiente:
+- **Diseño B:** no ejecutado; `MODELOS_CLOUD` queda vacío. El costo real nunca se calculó.
+- **Máximo de turnos:** ninguna corrida de `final_D14` quedó como `no_alcanzo_nivel` (las 4 filas técnicas inválidas fueron por `generador_relleno`), así que el tope de 60 no afectó el diseño final.
+- **RAG:** no se implementa (D-09).
+- **`rope.scaling` de llama y gemma:** no se comparó.
+- **Tema como covariable y `contexto_final`:** no se hicieron; se declaran como límite.
+**Alternativas descartadas.**
+- Ejecutar el Diseño B completo (otros 3 modelos × 27 tratamientos × 5 bloques): no cabe en el tiempo restante y no se calculó su costo.
+- Una prueba parcial con un solo modelo en la nube: no permite comparar con el diseño factorial y mezclaría el tamaño del modelo con el proveedor.
+- Borrar la rama de OpenRouter de `agente.py`: es código que ya está probado y no estorba; se deja sin uso.
+**Límites.** Los resultados no dicen nada sobre modelos en la nube ni sobre contextos mayores a 12K. La comparación local frente a nube que propuso el profesor no se hizo.

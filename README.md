@@ -64,7 +64,7 @@ Datos verificados con `ollama show` (D-01, D-13).
 
 Un modelo por empresa. `gemma2:2b` se reemplazó por `gemma3:4b` (D-01: su ventana de 8,192 no llega a 12K) y `phi3:mini` por `phi4-mini` (D-13: memoria, tiempo y paridad de cuantización, razón operativa registrada antes de correr datos con el modelo nuevo). Los resultados de los dos modelos reemplazados quedan como preliminares y no entran al análisis final.
 
-**Modelos en la nube (Diseño B, lista final pendiente).** `agente.py` conserva solo Ollama y OpenRouter; se retiraron las ramas de NVIDIA, Groq y Gemini (D-07) tras comprobar que sus planes gratuitos producían corridas inválidas (D-02). `MODELOS_CLOUD` está vacío hasta cerrar el Diseño B. Los modelos en la nube solo serían sujetos evaluados, nunca orquestador.
+**Modelos en la nube (Diseño B, no ejecutado; D-23).** `agente.py` conserva solo Ollama y OpenRouter; se retiraron las ramas de NVIDIA, Groq y Gemini (D-07) tras comprobar que sus planes gratuitos producían corridas inválidas (D-02). `MODELOS_CLOUD` está vacío porque el Diseño B no se ejecutó.
 
 ## Parámetros controlados
 
@@ -459,6 +459,15 @@ Después:
 ├── nada_sin_fuente/ # Otra actividad del curso (ver su propio README)
 └── README.md
 ```
+## Trabajo futuro
+
+- Evaluar modelos en la nube (Diseño B) con el mismo diseño factorial, para compararlos con los locales; antes hay que calcular el costo real (D-02, D-23).
+- Más réplicas y más datos inventados en el banco (hoy 5 datos y 5 bloques) para ganar potencia y poder estimar la interacción posición × nivel.
+- Niveles de contexto mayores a 12K y otros modelos locales.
+- Clasificador de tipo de fallo (Laya u otro) con más fallos etiquetados, y agentes de verificación y análisis (D-22).
+- Puntos de control dentro de la conversación (medidas repetidas) y una medida de respuesta cuantitativa (D-14, D-21).
+- Modelo bayesiano o de Firth para la separación (D-19, D-21).
+- Guardar el mensaje de la excepción de `generador_relleno` (D-18).
 
 
 ## Limitaciones conocidas

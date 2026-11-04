@@ -2,8 +2,6 @@
 
 Contexto para Claude Code, opencode o cualquier asistente que trabaje en este repositorio. Proyecto académico en curso, con decisiones ya tomadas y justificadas en `docs/decisiones.md`.
 
-## Estado (2026-11-03)
-
 ## Qué es este proyecto
 
 Evaluador de confiabilidad de LLMs en conversaciones largas (fenómeno "lost in the middle"). Mide en qué punto un modelo local deja de retener un dato inventado según el modelo, la posición del dato y el nivel de tokens.
@@ -14,13 +12,13 @@ Evaluador de confiabilidad de LLMs en conversaciones largas (fenómeno "lost in 
 - **Restricción central:** núcleo local y reproducible en cuanto al diseño (CrewAI + Ollama).
 - **La sustentación es individual:** cada línea de código debe poder explicarla quien la presenta. Por eso se avanza paso a paso y se declara qué escribió la IA (ver README, "Uso de IA en el desarrollo").
 
-## Estado (2026-10-28)
+## Estado (2026-11-03)
 
 - Las 135 corridas de `final_D14` están completas: 135 celdas válidas y 139 filas en `resultados/final_D14.csv` (4 filas `invalida_tecnica` por `generador_relleno`, todas de `gemma3:4b`, conservadas como historial; D-18).
 - 19 fallos: `llama3.2:3b` 7, `phi4-mini` 12, `gemma3:4b` 0. Más de la mitad está en el bloque 4.
 - Etiquetado de los 19 fallos en curso (`etiquetado/`, `docs/guia_etiquetado.md`). Cristian terminó el suyo; falta Juan Pablo y el kappa.
 - Análisis no paramétrico ejecutado (D-21), en `analisis/`: descriptivo, Fisher por pares con Holm, permutación estratificada, EDA y sensibilidades (formato, sin el bloque 4, posición lograda). Pendiente: regresión logística exploratoria con one-hot y el tema como covariable.
-- Pendiente de decidir: alcance de Laya y de los agentes de D-08.
+- Fuera de alcance (D-22): Laya y los agentes planeados en D-08. Diseño B con modelos en la nube: no ejecutado (D-23).
 
 ## Reglas para el asistente
 
@@ -99,7 +97,7 @@ Claves del JSON por corrida: `modelo, empresa, posicion, nivel_tokens, tema, dat
 
 Evaluados (locales): `phi4-mini` (Microsoft, 3.8B, Q4_K_M), `llama3.2:3b` (Meta, 3.2B, Q4_K_M), `gemma3:4b` (Google, 4.3B, Q4_K_M). Un modelo por empresa. Orquestador y relleno: `qwen2.5:1.5b` (Alibaba). `phi3:mini` y `gemma2:2b` solo en el primer corte, como resultados preliminares (D-01, D-13).
 
-Diseño B con modelos en la nube: por cerrar. `MODELOS_CLOUD` está vacío; se usaría OpenRouter con créditos pagados (D-02, D-07) y los modelos de la nube serían solo sujetos evaluados.
+Diseño B con modelos en la nube: **no ejecutado** (D-23). `MODELOS_CLOUD` está vacío; `agente.py` conserva la rama de OpenRouter, que no se usó en `final_D14` (D-07).
 
 ## Decisiones clave (resumen; detalle y alternativas en `docs/decisiones.md`)
 
@@ -108,8 +106,10 @@ Diseño B con modelos en la nube: por cerrar. `MODELOS_CLOUD` está vacío; se u
 - **D-16:** guardado determinista y campos de registro de validez.
 - **D-18:** reintento manual acotado de fallas técnicas externas; parada tras 3 seguidas.
 - **D-19, D-20, D-21:** plan de análisis, criterio ampliado por formato como análisis aparte, y cambio a pruebas no paramétricas como resultado principal (Fisher por pares con Holm y permutación estratificada), con regresión logística con one-hot como modelo exploratorio. D-21 sustituye el plan bayesiano o de Firth de D-19.
-- **D-08:** agentes solo donde hay juicio de lenguaje; el alcance de verificador, clasificador y analista está sin decidir.
-- **D-03:** Laya pospuesto; sin decidir con los 19 fallos reales.
+- **D-08:** agentes solo donde hay juicio de lenguaje; verificador, clasificador y analista no se implementaron (D-22).
+- **D-03, D-22:** Laya pospuesto y fuera de alcance: con 19 fallos no se entrena.
+- **D-23:** cierre de alcance: qué no se hizo (Diseño B en la nube y otros pendientes) y por qué.
+
 
 ## Hallazgos preliminares (primer corte y piloto; no entran al análisis final)
 
@@ -117,12 +117,6 @@ Diseño B con modelos en la nube: por cerrar. `MODELOS_CLOUD` está vacío; se u
 - Cuatro tipos de fallo observados: alucinación, admisión, negación de capacidad y alucinación narrativa (D-03).
 - Las palabras del banco de datos importan: "código secreto" disparaba filtros de seguridad.
 - El orquestador pequeño se equivoca con listas largas de modelos.
-
-## Pendiente de confirmar con el profesor
-
-- Qué debe quedar exactamente en Obsidian: diseño experimental, registro de decisiones, o ambos.
-- Si la calidad de texto a evaluar es la del generador de relleno, la del modelo evaluado, o ambas.
-- Alcance esperado de la contraparte (hoy: D-12).
 
 ## Actividad separada: "Nada sin fuente"
 

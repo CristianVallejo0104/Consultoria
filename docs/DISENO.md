@@ -64,7 +64,7 @@ El plan se fijó en D-19 y D-20. D-21 cambió parte de D-19 después de ver los 
 - **Respuesta:** binaria, por cadena exacta (D-11). Sin medida cuantitativa (D-21).
 - **Descriptivo:** acierto por celda y por factor con intervalo exacto de Clopper-Pearson al 95 %.
 - **Pruebas principales, no paramétricas:** Fisher por pares con corrección de Holm (3 comparaciones por factor) y permutación estratificada (se baraja el acierto dentro de grupos de 3 corridas con el mismo bloque y los mismos otros dos factores; 20,000 permutaciones; semilla 42). Suponen intercambiabilidad bajo la hipótesis nula. No hay asignación aleatoria de tratamientos, porque todos se aplican en todos los bloques; lo aleatorizado fue el orden de las corridas.
-- **Modelo:** regresión logística con one-hot y penalización L2, **exploratoria y aún no ajustada** (D-21). Sustituye el plan bayesiano o de Firth de D-19. La muestra, los términos y las referencias están por decidir.
+- **Modelo:** regresión logística con one-hot y penalización L2, **exploratoria y descriptiva** (D-21, `analisis/logistica.py`): los tres modelos, términos modelo, posición, nivel y bloque sin interacción, referencias `phi4-mini`, inicio, 4,000 y bloque 1, y C = 1 como principal con 0.1, 10 y 1000 como sensibilidad. Sustituye el plan bayesiano o de Firth de D-19.
 - **Cobertura:** por celda, cuántas corridas son válidas, `no_alcanzo_nivel` o `rechazo_seguridad`.
 - **Sensibilidad hecha:** formato numérico (D-20), sin el bloque 4 y posición lograda del dato. Respuestas finales vacías o cortadas: ninguna en las 135 válidas. **Pendiente:** tema y `contexto_final`
 - **Descartado:** ANOVA y pruebas paramétricas, medida cuantitativa, chi-cuadrado como prueba principal, interacción triple, imputación de corridas inválidas y el enfoque bayesiano o Firth como análisis principal (D-19 y D-21).
@@ -106,7 +106,4 @@ El plan se fijó en D-19 y D-20. D-21 cambió parte de D-19 después de ver los 
 
 ## 12. Pendiente
 - Etiquetado del segundo integrante y kappa entre los dos.
-- Regresión logística exploratoria con one-hot (D-21): decidir muestra, términos y referencias; no está ajustada.
 - Sensibilidades pendientes de D-19: tema y `contexto_final`.
-- Decidir el alcance de Laya y de los agentes de D-08 con el número real de fallos.
-- Verificar las constantes de `agente.py` contra D-06.

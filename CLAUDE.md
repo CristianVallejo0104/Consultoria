@@ -17,7 +17,7 @@ Evaluador de confiabilidad de LLMs en conversaciones largas (fenómeno "lost in 
 - Las 135 corridas de `final_D14` están completas: 135 celdas válidas y 139 filas en `resultados/final_D14.csv` (4 filas `invalida_tecnica` por `generador_relleno`, todas de `gemma3:4b`, conservadas como historial; D-18).
 - 19 fallos: `llama3.2:3b` 7, `phi4-mini` 12, `gemma3:4b` 0. Más de la mitad está en el bloque 4.
 - Etiquetado de los 19 fallos en curso (`etiquetado/`, `docs/guia_etiquetado.md`). Cristian terminó el suyo; falta Juan Pablo y el kappa.
-- Análisis no paramétrico ejecutado (D-21), en `analisis/`: descriptivo, Fisher por pares con Holm, permutación estratificada, EDA y sensibilidades (formato, sin el bloque 4, posición lograda). Pendiente: regresión logística exploratoria con one-hot y el tema como covariable.
+- Análisis no paramétrico ejecutado (D-21), en `analisis/`: descriptivo, Fisher por pares con Holm, permutación estratificada, EDA y sensibilidades (formato, sin el bloque 4, posición lograda). Regresión logística exploratoria con one-hot y penalización L2 ajustada (`analisis/logistica.py`). No hechas (D-23): tema y `contexto_final` como covariables.
 - Fuera de alcance (D-22): Laya y los agentes planeados en D-08. Diseño B con modelos en la nube: no ejecutado (D-23).
 
 ## Reglas para el asistente

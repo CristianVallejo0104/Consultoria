@@ -39,7 +39,7 @@ Python 3.12, CrewAI, Ollama, `requests`, `python-dotenv`. Ubuntu 24.04, GPU de 6
 
 ## Piezas del sistema (son tres)
 
-1. **Agente CrewAI (orquestador).** `qwen2.5:1.5b`, temperatura 0.0. Entrada interactiva en lenguaje natural: llama a la herramienta `evaluar_retencion` con parámetros exactos. No se usa en las corridas masivas.
+1. **Agente CrewAI (orquestador).** `qwen2.5:1.5b`, temperatura 0.0. Entrada interactiva: recibe una tarea literal armada en Python con modelo, posición y nivel ya validados, y llama a la herramienta `evaluar_retencion` con parámetros exactos. No se usa en las corridas masivas.
 2. **Núcleo en Python.** `ejecutar_evaluacion()` ejecuta la conversación turno a turno y verifica el resultado de forma determinista. Las corridas masivas lo llaman desde `correr_experimento.py`.
 3. **Generador de relleno.** `qwen2.5:1.5b` por `/api/generate`, temperatura 0.7. Escribe los mensajes del "usuario" en los turnos sin el dato.
 

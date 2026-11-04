@@ -36,7 +36,7 @@ El equipo estimó entre 2 y 3 horas por combinación, sin registros sistemático
 
 Hay tres piezas distintas:
 
-1. **Agente CrewAI (orquestador).** Modelo `qwen2.5:1.5b`, temperatura 0.0. Es la entrada interactiva en lenguaje natural: recibe la tarea y llama a la herramienta `evaluar_retencion` con los parámetros exactos. No escribe la conversación ni dirige las corridas masivas (D-08).
+1. **Agente CrewAI (orquestador).** Modelo `qwen2.5:1.5b`, temperatura 0.0. Es la entrada interactiva: el modo interactivo pide modelo, posición y nivel por consola, los valida en Python y arma una tarea literal con esos valores; el agente llama a la herramienta `evaluar_retencion` con los parámetros exactos y redacta la respuesta final. No interpreta lenguaje libre. No escribe la conversación ni dirige las corridas masivas (D-08).
 2. **Núcleo en Python.** La función `ejecutar_evaluacion()` ejecuta la conversación turno a turno y verifica el resultado de forma determinista. Las corridas masivas la llaman directamente desde `correr_experimento.py`, sin pasar por el agente.
 3. **Generador de relleno.** El mismo `qwen2.5:1.5b`, vía Ollama, escribe los mensajes del "usuario" en los turnos que no llevan el dato clave. Los modelos evaluados son de empresas distintas a la del orquestador para evitar sesgo de autopreferencia.
 
@@ -145,6 +145,19 @@ Observaciones, con cautela:
 - Solo 13 de las 27 celdas tienen algún fallo.
 - En estos conteos no se ve el patrón clásico de "lost in the middle": la posición mitad tiene el mayor acierto y el nivel no baja de forma ordenada. Con 45 corridas por grupo, diferencias de pocos fallos pueden ser azar; la inferencia queda para D-19.
 - Dos de los 19 fallos (F003 y F004 en la hoja de etiquetado) contienen el número correcto con coma ("44,295") y el criterio exacto los cuenta como fallo. El análisis de sensibilidad de D-20 los trata aparte.
+
+## Tiempo de ejecución (`final_D14`)
+
+Mediana por corrida, en minutos, de las 135 corridas válidas (`analisis/tiempos.py`):
+
+| Modelo | 4,000 tokens | 8,000 tokens | 12,000 tokens | Suma |
+|---|---|---|---|---|
+| `gemma3:4b` | 2.7 | 5.5 | 7.8 | 4.20 h |
+| `llama3.2:3b` | 2.5 | 5.9 | 9.1 | 4.74 h |
+| `phi4-mini` | 4.2 | 9.6 | 17.3 | 8.38 h |
+
+Total de las corridas válidas: 17.31 h (por nivel: 2.38 h a 4K, 5.65 h a 8K y 9.29 h a 12K). El tiempo crece con el nivel en los tres modelos, y `phi4-mini` es el más lento (hasta 28.6 min en una corrida). La causa de esa diferencia no se probó. Límites: medido en una RTX 3050 de 6 GB, con el PC en uso y con cortes manuales durante la ejecución; no incluye los intentos fallidos ni las corridas interrumpidas.
+
 
 ## Análisis estadístico (D-21)
 
@@ -364,7 +377,7 @@ python -c "from agente import ejecutar_evaluacion as e, guardar_resultado as g; 
 python3 agente.py
 ```
 
-El modo interactivo imprime los modelos, posiciones y niveles de tokens permitidos y pide tres datos: modelo, posición del dato y nivel de tokens; el agente orquestador llama a la herramienta con esos valores. Guarda el resultado en `resultados/txt/` y `resultados/json/`.
+El modo interactivo imprime los modelos, posiciones y niveles de tokens permitidos y pide tres datos: modelo, posición del dato y nivel de tokens; el agente orquestador llama a la herramienta con esos valores. Guarda el resultado en `resultados/txt/` y `resultados/json/`. Prueba del 3 de noviembre de 2026: `gemma3:4b`, mitad, 8,000 tokens → acierto en 349.5 s, coherente con la mediana de esa celda en `final_D14`.Prueba del 3 de noviembre de 2026: `gemma3:4b`, mitad, 8,000 tokens → acierto en 349.5 s, coherente con la mediana de esa celda en `final_D14`.
 
 **4. Hojas de etiquetado y kappa:**
 
@@ -421,6 +434,7 @@ Después:
 │ ├── sensibilidad_bloque4.py # Análisis sin el bloque 4
 │ ├── sensibilidad_formato.py # Criterio ampliado de formato (D-20)
 │ ├── sensibilidad_ampliado.py # Fisher y permutación con ese criterio
+│ ├── tiempos.py # Figuras
 │ ├── graficas.py # Figuras
 │ └── figuras/ # Imágenes generadas
 ├── agente_eval_claude.md # Plantilla de agente operador para Claude Code
@@ -467,6 +481,8 @@ Después:
 - El etiquetado tiene 19 casos y dos evaluadores; la independencia se protegió por acuerdo.
 - Los resultados valen para estos tres modelos y hasta 12K tokens.
 - Resultados del primer corte: una réplica y solo posición *inicio*; los de `phi3:mini` y `gemma2:2b` no entran al análisis final.
+- El texto final del agente interactivo lo redacta un modelo de 1.5B y puede sobreinterpretar una sola corrida (en la prueba del 3 de noviembre dijo que el resultado «demuestra la confiabilidad»); la medición es la línea «Resultado» de la herramienta.
+- Al terminar, CrewAI 1.15.17 mostró un enlace de traza en `app.crewai.com`: el modo interactivo parece enviar la traza de la ejecución a ese servicio. No se verificó qué contiene ni cómo desactivarlo. Las 135 corridas no pasan por CrewAI.
 
 ## Fuentes y trazabilidad
 

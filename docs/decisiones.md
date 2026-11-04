@@ -157,6 +157,7 @@ el agente CrewAI queda como entrada interactiva en lenguaje natural.
 **Justificación.** Lo determinista va en código; los agentes se reservan para juicio de
 lenguaje (verificador de checkpoints, clasificador de fallos, analista), aún sin implementar.
 **Nota.** Unificar con la entrada previa "Funciones puras + ejecutar_evaluacion()".
+**Corrección (2026-11-03).** «Entrada interactiva en lenguaje natural» era inexacto: el modo interactivo pide los tres parámetros por consola, los valida en Python y arma una tarea literal; el modelo de 1.5B solo copia los parámetros a la herramienta y redacta la respuesta final, que puede sobreinterpretar una sola corrida. En la ejecución interactiva, CrewAI además mostró un enlace de traza en `app.crewai.com` (no verificado qué se envía).
 
 ---
 

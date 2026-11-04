@@ -248,7 +248,8 @@ Declarado según la rúbrica y registrado en D-17:
 - **Sesión de Claude en la nube, solo lectura:** auditó el repositorio, repitió los análisis y propuso preguntas de sustentación. Sus hallazgos se contrastaron con el código y las salidas antes de aplicar cambios: corrigieron una frase de D-21 sobre el criterio de formato y la razón para descartar Freeman-Halton. Es de la misma familia que el asistente del chat, así que su coincidencia no es verificación independiente (D-12).
 - **Subagentes de revisión de solo lectura** (`revisor-codigo-python` y `consultor-estadistico`): auditaron el código antes de las corridas. Sus resúmenes se contrastaron con el código y con las pruebas ejecutadas.
 - **Verificación humana:** cada diff se revisó antes del commit y se ejecutaron pruebas con Ollama.
-- **Distribución del trabajo entre integrantes:** **[POR COMPLETAR: quién hizo qué, Cristian y Juan Pablo.]**
+- **Sesión de Claude en la nube, video del proyecto:** generó la animación (index.html y guion) a partir del repositorio, sin editar archivos del proyecto. Cristian contrastó cada cifra con el README y con la salida de los scripts.
+- **Distribución del trabajo entre integrantes:** el proyecto se hizo en equipo por Cristian Vallejo y Juan Pablo Tibamoso. Se trabajó en el equipo de Cristian, por eso casi todos los commits aparecen bajo su usuario de git.
 
 ## Guardarraíles
 
@@ -504,7 +505,7 @@ Después:
 
 ## Fuentes y trazabilidad
 
-El corpus son 11 artículos públicos guardados en `docs/fuentes/`. Su origen, versión, fecha de ingreso al repositorio y licencia están en `nada_sin_fuente/03_sistema/procedencia.md` (la columna «Verificó» se completa a medida que cada integrante abre el PDF). **[POR COMPLETAR: confirmar el estado de esa tabla de fuentes.]**
+El corpus son 11 artículos públicos guardados en `docs/fuentes/`. Su origen, versión, fecha de ingreso al repositorio y licencia están en `nada_sin_fuente/03_sistema/procedencia.md`  La columna «Verificó» registra quién abrió cada PDF para comprobar su origen y versión; las filas vacías no se han verificado todavía.
 
 Las afirmaciones del estado del arte se comprueban una por una en `nada_sin_fuente/03_sistema/trazabilidad.md`, con página y cita corta. Las que no se sostienen como estaban escritas se registran en la tabla «Afirmaciones corregidas» de ese archivo.
 

@@ -197,7 +197,7 @@ Regresión logística exploratoria (one-hot, penalización L2; razones de momios
 Los 19 fallos se clasifican a mano con `docs/guia_etiquetado.md` (6 categorías: alucinación, admisión, negación de capacidad, alucinación narrativa, desvío y otra/duda). `preparar_etiquetado.py` carga los fallos de `resultados/final_D14`, los baraja con semilla 42 y escribe una hoja sin modelo, posición ni nivel (`etiquetado/hoja_ciega.csv`) y una clave aparte (`etiquetado/clave.csv`). Cada integrante etiqueta su propia copia y el acuerdo se mide con `kappa_cohen`.
 
 - **Estado:** Cristian terminó sus 19 etiquetas; las de Juan Pablo están pendientes y el kappa no se ha calculado.
-- **Reglas de borde, acordadas por el equipo:** F003 y F004 (número correcto con otro formato) van en "otra/duda" con la nota "variante de formato". **[POR COMPLETAR: regla para "no recuerdo haber mencionado ese número" (admisión o categoría propia); confirmar con Juan Pablo.]**
+- **Reglas de borde, acordadas por el equipo:** F003 y F004 (número correcto con otro formato) van en "otra/duda" con la nota "variante de formato". "No recuerdo haber mencionado ese número" va en "admisión" (confirmado por Juan Pablo antes de etiquetar).
 - **Cegamiento:** la hoja es ciega respecto a modelo, posición y nivel, pero algunas respuestas nombran al modelo ("como Phi, de Microsoft"). Además, `hoja_cristian.csv` y `clave.csv` están en el repositorio, así que la independencia entre etiquetadores se protegió por acuerdo y no técnicamente.
 - **Verificación de `kappa_cohen`:** con un caso calculado a mano (50 casos, 35 coincidencias, acuerdo esperado por azar 0.5) dio 0.4, y con la misma lista contra sí misma dio 1.0.
 - **Límite:** con 19 casos, un solo desacuerdo mueve mucho el kappa.

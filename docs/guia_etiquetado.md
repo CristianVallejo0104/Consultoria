@@ -1,4 +1,4 @@
-GUÍA DE ETIQUETADO DE FALLOS (borrador para acordar)
+GUÍA DE ETIQUETADO DE FALLOS
 
 Qué se etiqueta: solo las corridas válidas con acierto = False. Una etiqueta por corrida,
 según la respuesta final del modelo.
@@ -11,8 +11,10 @@ Categorías (observadas en el primer corte, D-03):
 5. Desvío: no responde la pregunta (cambia de tema o la reformula).
 6. Otra / duda: no encaja; se anota por qué.
 
-Caso a decidir antes de etiquetar: "no recuerdo haber mencionado ese número" (niega que
-se haya mencionado). ¿Es admisión o merece categoría propia?
+Reglas de borde (acordadas por los dos antes de que Juan Pablo etiquetara):
+- "No recuerdo haber mencionado ese número" (niega que se haya mencionado) va en 2 (Admisión).
+- F003 y F004 (número correcto con otro formato, "44,295") van en 6 (Otra / duda) con la
+  nota "variante de formato".
 
 Reglas:
 - Cada uno etiqueta por separado, sin ver lo que puso el otro.

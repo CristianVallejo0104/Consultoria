@@ -43,7 +43,7 @@ Cada entrada documenta una decisión de diseño con su alternativa descartada, c
 
 **Justificación.** Los niveles de 10K a 30K tokens superan los límites por minuto de los planes gratuitos, y el diseño necesita un proveedor estable.
 
-**Pendiente.** Calcular el costo real con los precios de cada modelo antes de pagar.
+**Cierre (D-23).** El costo real no se calculó porque el Diseño B no se ejecutó.
 
 ---
 
@@ -74,7 +74,7 @@ Cada entrada documenta una decisión de diseño con su alternativa descartada, c
 
 Estas categorías (admisión, negación de capacidad) son observación propia del primer corte — los papers dan el marco conceptual bajo el que encajan, no las nombran textualmente.
 
-**Pendiente.** Etiquetado manual (Cristian y Juan Pablo, por separado, con kappa de Cohen) de las respuestas del piloto y de las 135 corridas finales del diseño local (270 si se agrega el diseño con la nube), para construir el dataset de entrenamiento.
+**Cierre (D-22).** El etiquetado manual (Cristian y Juan Pablo, por separado, con kappa de Cohen) se limitó a los 19 fallos de `final_D14`; con ese número no se entrena a Laya.
 
 ---
 
@@ -213,7 +213,7 @@ lenguaje (verificador de checkpoints, clasificador de fallos, analista), aún si
 **Resultado del piloto de verificación (2026-10-02).** `phi4-mini`, posición «mitad», 1 réplica, 3 corridas válidas. Acierto: no (4K), sí (8K), sí (12K). `contexto_final`: 4,260, 8,115 y 12,328. Turnos: 12, 23 y 37 de 60. Tiempo: 241, 523 y 915 s (28.0 min en total, frente a 49.3 min de `phi3:mini`, −43 %). `ollama ps` (42 lecturas cada 30 s): 4.8 GB y 9–15 % en CPU (mediana 9 %), frente a 9.0 GB y 54 % en CPU de `phi3:mini` (una lectura). La predicción de D-13 (cerca de 5 GB) se cumple; no cabe del todo en la GPU. Registro: `resultados/piloto_phi4.csv` y `resultados/pruebas/ollama_ps_phi4.log`.
 **Hallazgo.** En 61 lecturas, `phi4-mini` y `qwen2.5:1.5b` nunca estuvieron cargados a la vez (42 solo `phi4-mini`, 3 solo `qwen2.5:1.5b`, 16 ninguno, incluido el tiempo posterior a la corrida): consistente con que Ollama los intercambie, lo que añade tiempo por turno. No se midió directamente.
 **Límites del resultado.** Una réplica por celda: el fallo a 4K no se interpreta. Datos y temas distintos en cada corrida. `phi3:mini` y `phi4-mini` no son comparables en retención.
-**Pendiente.** Comparar `rope.scaling.original_context_length` de `llama3.2:3b` y `gemma3:4b`.
+**Cierre (D-23).** La comparación de `rope.scaling.original_context_length` de `llama3.2:3b` y `gemma3:4b` no se hizo; queda como límite.
 
 ---
 

@@ -54,7 +54,7 @@ Estado al 2026-11-03.
 - **Liu et al. (2023)** varían posición y longitud sistemáticamente; este diseño formaliza ese esquema como factorial en bloques y añade verificación estadística.
 
 ## 7. Taxonomía de fallos (D-03)
-Categorías observadas en el primer corte: alucinación, admisión, negación de capacidad y alucinación narrativa; además `rechazo_seguridad`, que no es un fallo de retención. «Admisión» y «negación de capacidad» son observación propia: la literatura (Huang et al. 2023, Zhang et al. 2023, Wen et al. 2025) da el marco, pero no las nombra. Los fallos de `final_D14` se etiquetan a mano por los dos integrantes por separado con `docs/guia_etiquetado.md` (seis categorías) y el acuerdo se mide con kappa de Cohen. El clasificador (Laya) sigue pospuesto; su alcance se decide con el número real de fallos etiquetados.
+Categorías observadas en el primer corte: alucinación, admisión, negación de capacidad y alucinación narrativa; además `rechazo_seguridad`, que no es un fallo de retención. «Admisión» y «negación de capacidad» son observación propia: la literatura (Huang et al. 2023, Zhang et al. 2023, Wen et al. 2025) da el marco, pero no las nombra. Los fallos de `final_D14` se etiquetan a mano por los dos integrantes por separado con `docs/guia_etiquetado.md` (seis categorías) y el acuerdo se mide con kappa de Cohen. Laya no se entrena ni se evalúa: con 19 fallos no alcanza (D-22).
 
 ## 8. Calidad del texto de relleno (D-04)
 Se evalúan naturalidad, coherencia e interés de los turnos del «usuario» con un LLM juez pequeño. Es exploratorio y **no está validado contra criterio humano**: no se usan esas notas en el análisis final hasta validarlas.

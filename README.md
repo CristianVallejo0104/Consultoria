@@ -174,10 +174,11 @@ PYTHONPATH=. python analisis/sensibilidad_formato.py   # criterio ampliado de fo
 PYTHONPATH=. python analisis/sensibilidad_ampliado.py  # Fisher y permutación con ese criterio
 python analisis/logistica.py                        # regresión logística exploratoria (one-hot, L2)
 python analisis/tipos_de_fallo.py                   # tipos de fallo por modelo (un evaluador)
+PYTHONPATH=. python analisis/kappa.py               # kappa de Cohen entre las dos hojas de etiquetado
 python analisis/graficas.py                         # figuras en analisis/figuras/
 ```
 
-Los dos últimos scripts de formato necesitan `PYTHONPATH=.` porque importan `agente.py`, que está en la raíz.
+Los dos scripts de formato necesitan `PYTHONPATH=.` porque importan `agente.py`, que está en la raíz, y `kappa.py` porque importa `preparar_etiquetado.py`.
 
 | Análisis | Modelo | Posición | Nivel |
 |---|---|---|---|
@@ -249,6 +250,7 @@ Declarado según la rúbrica y registrado en D-17:
 - **Subagentes de revisión de solo lectura** (`revisor-codigo-python` y `consultor-estadistico`): auditaron el código antes de las corridas. Sus resúmenes se contrastaron con el código y con las pruebas ejecutadas.
 - **Verificación humana:** cada diff se revisó antes del commit y se ejecutaron pruebas con Ollama.
 - **Sesión de Claude en la nube, video del proyecto:** generó la animación (index.html y guion) a partir del repositorio, sin editar archivos del proyecto. Pendiente: contrastar cada cifra con el README y con la salida de los scripts.
+- **Claude Code, sesión de Juan Pablo (4 de noviembre), con permiso y sin commits:** escribió `analisis/kappa.py` (probado con un caso calculado a mano: 4 casos, 3 coincidencias, kappa 0.5), volvió a ejecutar los scripts de `analisis/` para contrastar las cifras del README y de DISENO.md (coinciden; `logistica.py` no se pudo ejecutar porque `scikit-learn` no estaba instalado en ese entorno), cerró con referencia a D-22 y D-23 las notas pendientes de D-02, D-03 y D-13, y generó una página con el diagrama del diseño para la exposición (cubo 3 × 3 × 3, 27 tratamientos × 5 bloques con su orden y el flujo de una corrida), con los datos de `final_D14.csv`; la página no está en el repositorio. No sugirió categorías. En la revisión inicial del repositorio, un comando de conteo imprimió por error las categorías de `hoja_cristian.csv` en la salida de la sesión, antes de que Juan Pablo etiquetara.
 - **Distribución del trabajo entre integrantes:** el proyecto se hizo en equipo por Cristian Vallejo y Juan Pablo Tibamoso. Se trabajó en el equipo de Cristian, por eso casi todos los commits aparecen bajo su usuario de git.
 
 ## Guardarraíles
@@ -392,7 +394,7 @@ El modo interactivo imprime los modelos, posiciones y niveles de tokens permitid
 python -c "from preparar_etiquetado import cargar_fallos, escribir_hojas; escribir_hojas(cargar_fallos('resultados/final_D14'), 'etiquetado')"
 ```
 
-Genera `hoja_ciega.csv` y `clave.csv` en `etiquetado/`. `kappa_cohen(etiquetas_a, etiquetas_b)` en el mismo archivo calcula el acuerdo entre dos listas de etiquetas.
+Genera `hoja_ciega.csv` y `clave.csv` en `etiquetado/`. `kappa_cohen(etiquetas_a, etiquetas_b)` en el mismo archivo calcula el acuerdo entre dos listas de etiquetas. `PYTHONPATH=. python analisis/kappa.py` revisa primero que `hoja_juan.csv` tenga una categoría del 1 al 6 en cada fila (si falla, no muestra nada de la otra hoja) y luego imprime el kappa, la tabla cruzada y los desacuerdos.
 
 **5. Evaluar la calidad del texto del generador de relleno** (exploratorio, no forma parte del análisis final aún):
 
@@ -444,6 +446,7 @@ Después:
 │ ├── tiempos.py # Tiempo de ejecución por modelo y nivel
 │ ├── logistica.py             # Regresión logística exploratoria (one-hot, L2)
 │ ├── tipos_de_fallo.py        # Tipos de fallo por modelo (un evaluador)
+│ ├── kappa.py                 # Kappa de Cohen entre las dos hojas de etiquetado
 │ ├── graficas.py # Figuras
 │ └── figuras/ # Imágenes generadas
 ├── agente_eval_claude.md # Plantilla de agente operador para Claude Code

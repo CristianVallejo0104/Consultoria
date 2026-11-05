@@ -258,7 +258,7 @@ Declarado según la rúbrica y registrado en D-17:
   - **Trabajo conjunto:** casi todo se hizo juntos en el computador de Cristian, que corre los modelos más rápido. Ahí se ejecutaron las corridas y desde ahí se subieron los commits. Por eso casi todos los commits aparecen bajo el usuario de git de Cristian, aunque el trabajo fue de los dos.
   - **Código:** lo escribieron los dos; Cristian escribió la mayor parte.
   - **Análisis, fuentes y entregas del curso:** los hicieron entre los dos.
-  - **Etiquetado:** cada uno etiquetó por separado sus 19 fallos. Juan Pablo confirmó las reglas de borde, calculó el kappa y volvió a ejecutar los scripts de análisis para contrastar las cifras de la documentación.
+  - **Etiquetado:** cada uno etiquetó por separado sus 19 fallos. Juan Pablo confirmó las reglas de borde, pidió a Claude Code que ejecutara el kappa y volviera a ejecutar los scripts de análisis para contrastar las cifras de la documentación.
 
 ## Guardarraíles
 

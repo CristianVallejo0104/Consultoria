@@ -11,12 +11,12 @@ solo apunta a ellas.
 
 | # | Entregable | Criterio | Archivo | Estado |
 |---|---|---|---|---|
-| 1 | Inventario de fallos, uno por integrante | C1 | `01_inventarios/` | Cristian: hecho. Juan Pablo: pendiente |
+| 1 | Inventario de fallos, uno por integrante | C1 | `01_inventarios/` | Hecho: los dos inventarios |
 | 2 | Experimento con control: conteos, proporciones e intervalos | C1 | `02_experimento/resultados.md` | Hecho: clasificación de consenso, proporciones e intervalos exactos; sin kappa (ver «Clasificación») |
 | 3 | Tabla de decisión (6 criterios) | C1 | `02_experimento/decision.md` | [pendiente] |
 | 4 | Biblioteca en el gestor (Zotero) | C2 | `03_sistema/biblioteca.bib` | Hecho: 11 referencias exportadas desde Zotero |
 | 5 | README de procedencia | C2 | `03_sistema/procedencia.md` | En curso: fechas y licencias de las 11 fuentes puestas; falta la columna «Verificó» |
-| 6 | Tabla de trazabilidad | C2 | `03_sistema/trazabilidad.md` | En curso: filas 10 a 19 verificadas (Cristian); filas 1 a 9 pendientes (Juan Pablo) |
+| 6 | Tabla de trazabilidad | C2 | `03_sistema/trazabilidad.md` | Hecho: 19 filas verificadas (1 a 9 Juan Pablo, 10 a 19 Cristian); falta redactar las 3 afirmaciones corregidas |
 | 7 | Protocolo de prompts versionado | C2 | `03_sistema/protocolo/` | [pendiente] |
 | 8 | Acta de datos de la contraparte | C2 | — | **No aplica**: el corpus son 11 artículos públicos (arXiv); no hay documentos de contraparte. |
 | 9 | Sistema funcionando y reproducible | C3 | `03_sistema/como_reproducir.md` | [pendiente] |

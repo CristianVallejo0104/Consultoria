@@ -16,7 +16,7 @@ Evaluador de confiabilidad de LLMs en conversaciones largas (fenómeno "lost in 
 
 - Las 135 corridas de `final_D14` están completas: 135 celdas válidas y 139 filas en `resultados/final_D14.csv` (4 filas `invalida_tecnica` por `generador_relleno`, todas de `gemma3:4b`, conservadas como historial; D-18).
 - 19 fallos: `llama3.2:3b` 7, `phi4-mini` 12, `gemma3:4b` 0. Más de la mitad está en el bloque 4.
-- Etiquetado de los 19 fallos terminado por los dos (`etiquetado/`, `docs/guia_etiquetado.md`); kappa de Cohen 0.089 (4 de 19 coincidencias, 2 de ellas fijadas por la regla de F003 y F004): acuerdo apenas por encima del azar (`analisis/kappa.py`). Sin consenso y sin reetiquetar; los tipos de fallo por modelo no se presentan como resultado (D-24).
+- Etiquetado de los 19 fallos terminado por los dos (`etiquetado/`, `docs/guia_etiquetado.md`); kappa de Cohen 0.089 (4 de 19 coincidencias, 2 de ellas fijadas por la regla de F003 y F004): sin esos dos casos, el kappa es −0.04 sobre 17 casos, es decir, el acuerdo no supera el azar (`analisis/kappa.py`). Sin consenso y sin reetiquetar; los tipos de fallo por modelo no se presentan como resultado (D-24).
 - Análisis no paramétrico ejecutado (D-21), en `analisis/`: descriptivo, Fisher por pares con Holm, permutación estratificada, EDA y sensibilidades (formato, sin el bloque 4, posición lograda). Regresión logística exploratoria con one-hot y penalización L2 ajustada (`analisis/logistica.py`). No hechas (D-23): tema y `contexto_final` como covariables.
 - Fuera de alcance (D-22): Laya y los agentes planeados en D-08. Diseño B con modelos en la nube: no ejecutado (D-23).
 

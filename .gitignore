@@ -11,3 +11,4 @@ test_paso*.py
 *.pptx
 resultados/calidad_texto/
 !video_proyecto/*.html
+!docs/diagrama_diseno.html

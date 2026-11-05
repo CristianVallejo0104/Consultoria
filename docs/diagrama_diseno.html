@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diseño factorial D-14</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: una columna de lectura con figuras anchas; cada sección es una lámina para la exposición */
+:root {
+  --bg: #f4f6f5;
+  --panel: #ffffff;
+  --fg: #17211f;
+  --muted: #5b6865;
+  --line: #d3dbd8;
+  --accent: #0d6b66;
+  --accent-soft: #d5ebe8;
+  --fail: #b3412c;
+  --fail-soft: #f6dcd5;
+  --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111816; --panel: #19221f; --fg: #e4ece9; --muted: #98a7a3; --line: #2f3c38;
+    --accent: #5cc3b9; --accent-soft: #1d3a37; --fail: #f08a72; --fail-soft: #4a2720;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111816; --panel: #19221f; --fg: #e4ece9; --muted: #98a7a3; --line: #2f3c38;
+  --accent: #5cc3b9; --accent-soft: #1d3a37; --fail: #f08a72; --fail-soft: #4a2720;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16px; line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 32px 64px;
+}
+main { max-width: 1060px; margin: 0 auto; display: grid; gap: 56px; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; line-height: 1.15; }
+h1 { font-size: clamp(2rem, 5vw, 3.1rem); font-weight: 800; letter-spacing: -0.01em; }
+h2 { font-size: 1.6rem; font-weight: 700; }
+h3 { font-size: 1.05rem; font-weight: 700; }
+p { margin: 0; max-width: 66ch; }
+.eyebrow { font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+section { display: grid; gap: 18px; }
+.intro { display: grid; gap: 14px; }
+.formula {
+  font-family: var(--mono); font-size: clamp(0.95rem, 2.4vw, 1.25rem); display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: baseline;
+}
+.formula b { color: var(--accent); font-weight: 600; }
+.formula .eq { color: var(--muted); }
+.note { color: var(--muted); font-size: 0.9rem; }
+
+/* conmutador diseño / resultados */
+.toggle { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 3px; background: var(--panel); width: fit-content; }
+.toggle button {
+  font: 600 0.85rem var(--body); border: 0; background: transparent; color: var(--muted); padding: 6px 14px; border-radius: 999px; cursor: pointer;
+}
+.toggle button[aria-pressed="true"] { background: var(--accent); color: var(--bg); }
+.toggle button:focus-visible, .fila-t:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* cortes del cubo */
+.cortes { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
+.corte { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: grid; gap: 10px; min-width: 0; }
+.corte h3 { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.corte h3 span { font-family: var(--mono); font-weight: 400; font-size: 0.8rem; color: var(--muted); }
+.rejilla { display: grid; grid-template-columns: 54px repeat(3, 1fr); gap: 4px; font-variant-numeric: tabular-nums; }
+.rejilla .cab { font-family: var(--mono); font-size: 0.72rem; color: var(--muted); display: flex; align-items: center; justify-content: center; }
+.rejilla .cab.izq { justify-content: flex-start; }
+.celda {
+  aspect-ratio: 1.25; border-radius: 6px; display: grid; place-items: center; font-family: var(--mono); font-size: 0.95rem;
+  background: var(--accent-soft); color: var(--fg); border: 1px solid transparent;
+}
+.celda small { display: block; font-size: 0.68rem; color: var(--muted); text-align: center; }
+.celda.f1 { background: color-mix(in srgb, var(--fail-soft) 70%, var(--accent-soft)); }
+.celda.f2 { background: var(--fail-soft); border-color: var(--fail); }
+.leyenda { display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.85rem; color: var(--muted); }
+.leyenda i { display: inline-block; width: 14px; height: 14px; border-radius: 3px; vertical-align: -2px; margin-right: 6px; }
+
+/* tabla 27 x 5 */
+.tabla-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
+table { border-collapse: collapse; width: 100%; min-width: 720px; font-variant-numeric: tabular-nums; }
+th, td { padding: 5px 8px; border-bottom: 1px solid var(--line); text-align: center; font-size: 0.85rem; }
+thead th { font-family: var(--body); font-weight: 700; vertical-align: bottom; background: var(--panel); position: sticky; top: 0; }
+thead th .dato { display: block; font-family: var(--mono); font-weight: 400; font-size: 0.7rem; color: var(--muted); max-width: 150px; margin: 4px auto 0; line-height: 1.3; }
+td.t { text-align: left; font-family: var(--mono); font-size: 0.78rem; white-space: nowrap; }
+td.t .num { color: var(--muted); margin-right: 8px; }
+td.o { font-family: var(--mono); }
+td.o.fallo { background: var(--fail-soft); color: var(--fail); font-weight: 600; }
+tr.grupo td { border-top: 2px solid var(--line); }
+tfoot td { font-weight: 700; border-bottom: 0; }
+tfoot td.alto { color: var(--fail); }
+
+/* flujo de un bloque */
+.pasos { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; counter-reset: paso; }
+.pasos li { display: grid; grid-template-columns: 44px 1fr; gap: 14px; padding: 14px 0; border-top: 1px solid var(--line); counter-increment: paso; }
+.pasos li::before {
+  content: counter(paso); font-family: var(--display); font-weight: 800; font-size: 1.4rem; color: var(--accent); line-height: 1.2;
+}
+.pasos li > div { display: grid; gap: 4px; min-width: 0; }
+code { font-family: var(--mono); font-size: 0.86em; background: var(--accent-soft); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+
+/* una corrida por dentro */
+.barra-wrap { overflow-x: auto; }
+svg text { font-family: var(--mono); }
+.pie { border-top: 1px solid var(--line); padding-top: 16px; font-size: 0.85rem; color: var(--muted); display: grid; gap: 6px; }
+@media (max-width: 520px) {
+  .rejilla { grid-template-columns: 44px repeat(3, 1fr); }
+  .celda { font-size: 0.85rem; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .celda { transition: background-color 0.2s ease; }
+}
+</style>
+</head>
+<body>
+
+<main>
+  <header class="intro">
+    <span class="eyebrow">Consultoría e Investigación · Universidad Santo Tomás · final_D14</span>
+    <h1>Diseño factorial D-14</h1>
+    <p>Evaluador de retención de un dato inventado en conversaciones largas con modelos locales. Factorial completo en bloques completos aleatorizados (D-14, D-15).</p>
+    <div class="formula" aria-label="3 modelos por 3 posiciones por 3 niveles igual a 27 tratamientos, por 5 bloques igual a 135 corridas">
+      <span><b>3</b> modelos</span><span class="eq">×</span>
+      <span><b>3</b> posiciones</span><span class="eq">×</span>
+      <span><b>3</b> niveles</span><span class="eq">=</span>
+      <span><b>27</b> tratamientos</span><span class="eq">×</span>
+      <span><b>5</b> bloques</span><span class="eq">=</span>
+      <span><b>135</b> corridas</span>
+    </div>
+  </header>
+
+  <section aria-labelledby="s-cubo">
+    <span class="eyebrow">El cubo 3 × 3 × 3</span>
+    <h2 id="s-cubo">Tres cortes del cubo, uno por modelo</h2>
+    <p>Cada corte cruza posición del dato (filas) con nivel de tokens (columnas). Cada celda es un tratamiento y se corre una vez en cada uno de los 5 bloques.</p>
+    <div class="toggle" role="group" aria-label="Qué mostrar en las celdas">
+      <button type="button" id="ver-diseno" aria-pressed="true">Diseño</button>
+      <button type="button" id="ver-resultados" aria-pressed="false">Aciertos de 5</button>
+    </div>
+    <div class="cortes" id="cortes"></div>
+    <div class="leyenda" id="leyenda" hidden>
+      <span><i style="background:var(--accent-soft)"></i>5 de 5</span>
+      <span><i style="background:color-mix(in srgb, var(--fail-soft) 70%, var(--accent-soft))"></i>4 de 5</span>
+      <span><i style="background:var(--fail-soft);outline:1px solid var(--fail)"></i>3 de 5</span>
+    </div>
+  </section>
+
+  <section aria-labelledby="s-bloques">
+    <span class="eyebrow">27 tratamientos × 5 bloques</span>
+    <h2 id="s-bloques">El bloque es el dato inventado</h2>
+    <p>Cada número es la posición de ese tratamiento en el orden aleatorio de su bloque (1 = primera corrida del bloque). Las celdas marcadas son fallos. Pasa el puntero por una celda para ver el tema.</p>
+    <div class="tabla-wrap">
+      <table id="tabla">
+        <thead><tr id="thead"></tr></thead>
+        <tbody id="tbody"></tbody>
+        <tfoot><tr id="tfoot"></tr></tfoot>
+      </table>
+    </div>
+    <p class="note">11 de los 19 fallos están en el bloque 4 (el dato 44295). Por eso el bloque se controla y no se deja al azar, y hay un análisis de sensibilidad sin ese bloque.</p>
+  </section>
+
+  <section aria-labelledby="s-flujo">
+    <span class="eyebrow">Flujo de un bloque</span>
+    <h2 id="s-flujo">Qué hace el runner en cada bloque</h2>
+    <ol class="pasos">
+      <li><div><h3>Fija el orden</h3><p>Semilla <code>crc32("orden|42|bloque")</code> → <code>random.Random</code> → baraja los 27 tratamientos. Se usa <code>crc32</code> porque el <code>hash()</code> de Python cambia entre ejecuciones. La semilla solo fija el diseño, no lo que generan los modelos (D-15).</p></div></li>
+      <li><div><h3>Fija dato y tema</h3><p>El dato es el mismo en todo el bloque. El tema rota: <code>((orden_en_bloque − 1) + bloque) mod 6</code>, entre 6 temas. El tema es covariable, no bloque.</p></div></li>
+      <li><div><h3>Corre los 27 en ese orden</h3><p>Cada tratamiento es una conversación completa con el modelo evaluado (ver abajo). Si cualquier turno falla, la corrida se aborta (D-11).</p></div></li>
+      <li><div><h3>Verifica y guarda</h3><p>Acierto por cadena exacta, sin negación y sin LLM juez. Una fila en <code>final_D14.csv</code> y un JSON y un TXT por corrida (D-16).</p></div></li>
+      <li><div><h3>Reintenta solo fallas externas</h3><p>Una <code>invalida_tecnica</code> por red o API se repite al relanzar; <code>no_alcanzo_nivel</code> no, porque es resultado del tratamiento. El runner se detiene tras 3 fallas reintentables seguidas (D-18). En <code>final_D14</code> hubo 4 filas así, todas cerradas como válidas.</p></div></li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="s-corrida">
+    <span class="eyebrow">Una corrida por dentro</span>
+    <h2 id="s-corrida">Dónde entra el dato y cuándo se pregunta</h2>
+    <p>El nivel es el contexto en la pregunta final, medido con <code>prompt_eval_count</code> (D-06). El relleno lo escribe <code>qwen2.5:1.5b</code> a temperatura 0.7; el modelo evaluado responde con la misma temperatura y un tope de 300 tokens.</p>
+    <div class="barra-wrap">
+      <svg id="barra" viewBox="0 0 900 190" width="100%" role="img" aria-label="Barra de contexto de 0 al nivel: inicio en el turno 2, mitad al cruzar el 50 por ciento, final al cruzar el 85 por ciento, pregunta al llegar al nivel"></svg>
+    </div>
+    <p class="note">Posición lograda en las 135 corridas, como fracción del nivel antes del dato: inicio 0.01 a 0.09, mitad 0.50 a 0.59, final 0.85 a 0.94. Los rangos no se solapan (<code>analisis/posicion_lograda.py</code>).</p>
+  </section>
+
+  <footer class="pie">
+    <span>Datos: <code>resultados/final_D14.csv</code>, última fila de cada celda (135 corridas válidas, 19 fallos). Constantes: <code>agente.py</code> y <code>correr_experimento.py</code>.</span>
+    <span>Página generada con Claude Code a partir del repositorio; declarado en el README, «Uso de IA en el desarrollo».</span>
+  </footer>
+</main>
+
+<script>
+const DATOS = {"1":"expediente del caso Aurora: 3851","2":"referencia del proyecto Fenix: F-7492-X","3":"registro del laboratorio Nexus: 6037","4":"resultado del experimento Delta-7: 44295","5":"versión del algoritmo Centinela: 9.15.6"};
+// [bloque, modelo, posicion, nivel, orden_en_bloque, tema, acierto]
+const CORRIDAS = [[1,"gemma3:4b","final",12000,1,"matematicas",1],[1,"gemma3:4b","final",4000,19,"matematicas",1],[1,"gemma3:4b","final",8000,8,"programacion",1],[1,"gemma3:4b","inicio",12000,14,"programacion",1],[1,"gemma3:4b","inicio",4000,9,"historia",1],[1,"gemma3:4b","inicio",8000,18,"geografia",1],[1,"gemma3:4b","mitad",12000,17,"ciencia",1],[1,"gemma3:4b","mitad",4000,11,"ciencia",1],[1,"gemma3:4b","mitad",8000,20,"programacion",1],[1,"llama3.2:3b","final",12000,21,"historia",1],[1,"llama3.2:3b","final",4000,26,"programacion",1],[1,"llama3.2:3b","final",8000,23,"ciencia",1],[1,"llama3.2:3b","inicio",12000,7,"matematicas",1],[1,"llama3.2:3b","inicio",4000,3,"historia",1],[1,"llama3.2:3b","inicio",8000,2,"programacion",1],[1,"llama3.2:3b","mitad",12000,10,"economia",1],[1,"llama3.2:3b","mitad",4000,27,"historia",1],[1,"llama3.2:3b","mitad",8000,16,"economia",1],[1,"phi4-mini","final",12000,25,"matematicas",1],[1,"phi4-mini","final",4000,13,"matematicas",1],[1,"phi4-mini","final",8000,22,"economia",1],[1,"phi4-mini","inicio",12000,12,"geografia",1],[1,"phi4-mini","inicio",4000,6,"geografia",1],[1,"phi4-mini","inicio",8000,24,"geografia",1],[1,"phi4-mini","mitad",12000,15,"historia",0],[1,"phi4-mini","mitad",4000,5,"ciencia",1],[1,"phi4-mini","mitad",8000,4,"economia",1],[2,"gemma3:4b","final",12000,25,"programacion",1],[2,"gemma3:4b","final",4000,18,"matematicas",1],[2,"gemma3:4b","final",8000,22,"ciencia",1],[2,"gemma3:4b","inicio",12000,8,"historia",1],[2,"gemma3:4b","inicio",4000,27,"economia",1],[2,"gemma3:4b","inicio",8000,5,"geografia",1],[2,"gemma3:4b","mitad",12000,2,"historia",1],[2,"gemma3:4b","mitad",4000,9,"economia",1],[2,"gemma3:4b","mitad",8000,10,"ciencia",1],[2,"llama3.2:3b","final",12000,23,"geografia",1],[2,"llama3.2:3b","final",4000,24,"matematicas",0],[2,"llama3.2:3b","final",8000,13,"programacion",1],[2,"llama3.2:3b","inicio",12000,21,"economia",1],[2,"llama3.2:3b","inicio",4000,16,"ciencia",1],[2,"llama3.2:3b","inicio",8000,26,"historia",1],[2,"llama3.2:3b","mitad",12000,7,"programacion",1],[2,"llama3.2:3b","mitad",4000,3,"economia",1],[2,"llama3.2:3b","mitad",8000,19,"programacion",1],[2,"phi4-mini","final",12000,11,"geografia",1],[2,"phi4-mini","final",4000,1,"programacion",1],[2,"phi4-mini","final",8000,4,"ciencia",1],[2,"phi4-mini","inicio",12000,17,"geografia",1],[2,"phi4-mini","inicio",4000,6,"matematicas",1],[2,"phi4-mini","inicio",8000,12,"matematicas",1],[2,"phi4-mini","mitad",12000,14,"historia",1],[2,"phi4-mini","mitad",4000,20,"historia",1],[2,"phi4-mini","mitad",8000,15,"economia",1],[3,"gemma3:4b","final",12000,12,"programacion",1],[3,"gemma3:4b","final",4000,14,"economia",1],[3,"gemma3:4b","final",8000,7,"historia",1],[3,"gemma3:4b","inicio",12000,6,"programacion",1],[3,"gemma3:4b","inicio",4000,11,"matematicas",1],[3,"gemma3:4b","inicio",8000,19,"historia",1],[3,"gemma3:4b","mitad",12000,23,"matematicas",1],[3,"gemma3:4b","mitad",4000,10,"geografia",1],[3,"gemma3:4b","mitad",8000,27,"ciencia",1],[3,"llama3.2:3b","final",12000,18,"programacion",1],[3,"llama3.2:3b","final",4000,1,"historia",1],[3,"llama3.2:3b","final",8000,22,"geografia",1],[3,"llama3.2:3b","inicio",12000,20,"economia",1],[3,"llama3.2:3b","inicio",4000,4,"geografia",1],[3,"llama3.2:3b","inicio",8000,15,"ciencia",1],[3,"llama3.2:3b","mitad",12000,8,"economia",1],[3,"llama3.2:3b","mitad",4000,13,"historia",1],[3,"llama3.2:3b","mitad",8000,24,"programacion",1],[3,"phi4-mini","final",12000,16,"geografia",0],[3,"phi4-mini","final",4000,25,"historia",1],[3,"phi4-mini","final",8000,3,"ciencia",1],[3,"phi4-mini","inicio",12000,21,"ciencia",1],[3,"phi4-mini","inicio",4000,2,"economia",1],[3,"phi4-mini","inicio",8000,5,"matematicas",1],[3,"phi4-mini","mitad",12000,26,"economia",1],[3,"phi4-mini","mitad",4000,17,"matematicas",1],[3,"phi4-mini","mitad",8000,9,"ciencia",1],[4,"gemma3:4b","final",12000,10,"matematicas",1],[4,"gemma3:4b","final",4000,6,"historia",1],[4,"gemma3:4b","final",8000,9,"geografia",1],[4,"gemma3:4b","inicio",12000,13,"economia",1],[4,"gemma3:4b","inicio",4000,14,"ciencia",1],[4,"gemma3:4b","inicio",8000,18,"historia",1],[4,"gemma3:4b","mitad",12000,22,"matematicas",1],[4,"gemma3:4b","mitad",4000,8,"ciencia",1],[4,"gemma3:4b","mitad",8000,12,"historia",1],[4,"llama3.2:3b","final",12000,21,"geografia",1],[4,"llama3.2:3b","final",4000,15,"geografia",0],[4,"llama3.2:3b","final",8000,20,"ciencia",0],[4,"llama3.2:3b","inicio",12000,24,"historia",0],[4,"llama3.2:3b","inicio",4000,16,"matematicas",1],[4,"llama3.2:3b","inicio",8000,25,"economia",0],[4,"llama3.2:3b","mitad",12000,26,"ciencia",1],[4,"llama3.2:3b","mitad",4000,7,"economia",1],[4,"llama3.2:3b","mitad",8000,5,"programacion",0],[4,"phi4-mini","final",12000,17,"programacion",1],[4,"phi4-mini","final",4000,27,"geografia",0],[4,"phi4-mini","final",8000,19,"economia",0],[4,"phi4-mini","inicio",12000,4,"matematicas",0],[4,"phi4-mini","inicio",4000,3,"geografia",0],[4,"phi4-mini","inicio",8000,23,"programacion",0],[4,"phi4-mini","mitad",12000,2,"ciencia",1],[4,"phi4-mini","mitad",4000,11,"programacion",1],[4,"phi4-mini","mitad",8000,1,"economia",0],[5,"gemma3:4b","final",12000,10,"programacion",1],[5,"gemma3:4b","final",4000,24,"economia",1],[5,"gemma3:4b","final",8000,7,"ciencia",1],[5,"gemma3:4b","inicio",12000,22,"programacion",1],[5,"gemma3:4b","inicio",4000,5,"historia",1],[5,"gemma3:4b","inicio",8000,27,"matematicas",1],[5,"gemma3:4b","mitad",12000,20,"geografia",1],[5,"gemma3:4b","mitad",4000,4,"programacion",1],[5,"gemma3:4b","mitad",8000,12,"economia",1],[5,"llama3.2:3b","final",12000,26,"geografia",1],[5,"llama3.2:3b","final",4000,9,"matematicas",1],[5,"llama3.2:3b","final",8000,11,"historia",0],[5,"llama3.2:3b","inicio",12000,19,"ciencia",1],[5,"llama3.2:3b","inicio",4000,6,"economia",1],[5,"llama3.2:3b","inicio",8000,17,"historia",1],[5,"llama3.2:3b","mitad",12000,18,"economia",1],[5,"llama3.2:3b","mitad",4000,3,"matematicas",1],[5,"llama3.2:3b","mitad",8000,23,"historia",1],[5,"phi4-mini","final",12000,16,"programacion",0],[5,"phi4-mini","final",4000,14,"geografia",0],[5,"phi4-mini","final",8000,1,"ciencia",1],[5,"phi4-mini","inicio",12000,2,"geografia",0],[5,"phi4-mini","inicio",4000,8,"geografia",1],[5,"phi4-mini","inicio",8000,13,"ciencia",1],[5,"phi4-mini","mitad",12000,25,"ciencia",1],[5,"phi4-mini","mitad",4000,15,"matematicas",1],[5,"phi4-mini","mitad",8000,21,"matematicas",0]];
+
+const MODELOS = [["phi4-mini","Microsoft · 3.8B"],["llama3.2:3b","Meta · 3.2B"],["gemma3:4b","Google · 4.3B"]];
+const POSICIONES = ["inicio","mitad","final"];
+const NIVELES = [4000, 8000, 12000];
+const BLOQUES = [1,2,3,4,5];
+const clave = (m,p,n) => `${m}|${p}|${n}`;
+
+const porTratamiento = new Map();
+for (const [b,m,p,n,orden,tema,ok] of CORRIDAS) {
+  const k = clave(m,p,n);
+  if (!porTratamiento.has(k)) porTratamiento.set(k, {});
+  porTratamiento.get(k)[b] = {orden, tema, ok};
+}
+const tratamientos = [];
+MODELOS.forEach(([m]) => POSICIONES.forEach(p => NIVELES.forEach(n => tratamientos.push([m,p,n]))));
+const numero = new Map(tratamientos.map((t,i) => [clave(...t), i+1]));
+const nivelCorto = n => `${n/1000}K`;
+
+function pintarCortes(modo) {
+  const cont = document.getElementById("cortes");
+  cont.innerHTML = "";
+  for (const [m, info] of MODELOS) {
+    const corte = document.createElement("div");
+    corte.className = "corte";
+    const aciertosModelo = CORRIDAS.filter(c => c[1] === m && c[6]).length;
+    corte.innerHTML = `<h3>${m}<span>${modo === "resultados" ? `${aciertosModelo} de 45` : info}</span></h3>`;
+    const rej = document.createElement("div");
+    rej.className = "rejilla";
+    rej.innerHTML = `<div></div>` + NIVELES.map(n => `<div class="cab">${nivelCorto(n)}</div>`).join("");
+    for (const p of POSICIONES) {
+      rej.insertAdjacentHTML("beforeend", `<div class="cab izq">${p}</div>`);
+      for (const n of NIVELES) {
+        const celdas = porTratamiento.get(clave(m,p,n));
+        const aciertos = BLOQUES.reduce((s,b) => s + celdas[b].ok, 0);
+        const div = document.createElement("div");
+        if (modo === "resultados") {
+          div.className = "celda" + (aciertos === 4 ? " f1" : aciertos <= 3 ? " f2" : "");
+          div.innerHTML = `<span>${aciertos}/5</span>`;
+        } else {
+          div.className = "celda";
+          div.innerHTML = `<span>T${numero.get(clave(m,p,n))}<small>× 5 bloques</small></span>`;
+        }
+        div.setAttribute("aria-label", `${m}, ${p}, ${n} tokens: ${modo === "resultados" ? aciertos + " aciertos de 5" : "tratamiento " + numero.get(clave(m,p,n))}`);
+        rej.appendChild(div);
+      }
+    }
+    corte.appendChild(rej);
+    cont.appendChild(corte);
+  }
+  document.getElementById("leyenda").hidden = modo !== "resultados";
+  document.getElementById("ver-diseno").setAttribute("aria-pressed", modo === "diseno");
+  document.getElementById("ver-resultados").setAttribute("aria-pressed", modo === "resultados");
+}
+document.getElementById("ver-diseno").addEventListener("click", () => pintarCortes("diseno"));
+document.getElementById("ver-resultados").addEventListener("click", () => pintarCortes("resultados"));
+pintarCortes("diseno");
+
+function pintarTabla() {
+  document.getElementById("thead").innerHTML = `<th style="text-align:left">Tratamiento</th>` +
+    BLOQUES.map(b => `<th>Bloque ${b}<span class="dato">${DATOS[b]}</span></th>`).join("");
+  const filas = tratamientos.map(([m,p,n], i) => {
+    const celdas = porTratamiento.get(clave(m,p,n));
+    const grupo = i > 0 && i % 9 === 0 ? ' class="grupo"' : "";
+    return `<tr${grupo}><td class="t"><span class="num">T${i+1}</span>${m} · ${p} · ${nivelCorto(n)}</td>` +
+      BLOQUES.map(b => {
+        const c = celdas[b];
+        return `<td class="o${c.ok ? "" : " fallo"}" title="tema: ${c.tema}${c.ok ? "" : " · fallo"}">${c.orden}</td>`;
+      }).join("") + `</tr>`;
+  });
+  document.getElementById("tbody").innerHTML = filas.join("");
+  document.getElementById("tfoot").innerHTML = `<td style="text-align:left">Fallos en el bloque</td>` +
+    BLOQUES.map(b => {
+      const f = CORRIDAS.filter(c => c[0] === b && !c[6]).length;
+      return `<td class="${f > 5 ? "alto" : ""}">${f} de 27</td>`;
+    }).join("");
+}
+pintarTabla();
+
+function pintarBarra() {
+  const svg = document.getElementById("barra");
+  const x0 = 40, x1 = 860, y = 92, alto = 26;
+  const X = f => x0 + (x1 - x0) * f;
+  const marcas = [
+    {f: 0.045, nombre: "inicio", detalle: "turno 2"},
+    {f: 0.5, nombre: "mitad", detalle: "cruza el 50 %"},
+    {f: 0.85, nombre: "final", detalle: "cruza el 85 %"},
+  ];
+  let s = `<rect x="${x0}" y="${y}" width="${x1-x0}" height="${alto}" rx="5" fill="var(--accent-soft)" stroke="var(--line)"/>`;
+  for (let i = 1; i < 24; i++) {
+    const x = X(i / 24);
+    s += `<line x1="${x}" y1="${y+4}" x2="${x}" y2="${y+alto-4}" stroke="var(--line)" stroke-width="1"/>`;
+  }
+  s += `<text x="${x0}" y="${y+alto+22}" font-size="12" fill="var(--muted)">0 tokens</text>`;
+  s += `<text x="${x1}" y="${y+alto+22}" font-size="12" fill="var(--muted)" text-anchor="end">nivel: 4K, 8K o 12K</text>`;
+  s += `<text x="${(x0+x1)/2}" y="${y+alto+22}" font-size="12" fill="var(--muted)" text-anchor="middle">turnos de relleno (qwen2.5:1.5b) ↔ respuestas del modelo evaluado</text>`;
+  marcas.forEach((m, i) => {
+    const x = X(m.f);
+    const ty = 64;
+    s += `<line x1="${x}" y1="${ty+6}" x2="${x}" y2="${y+alto}" stroke="var(--accent)" stroke-width="2"/>`;
+    s += `<circle cx="${x}" cy="${y+alto/2}" r="6" fill="var(--accent)"/>`;
+    s += `<text x="${x}" y="${ty-12}" font-size="13" font-weight="600" fill="var(--fg)" text-anchor="${i===0?"start":"middle"}">${m.nombre}</text>`;
+    s += `<text x="${x}" y="${ty+2}" font-size="11" fill="var(--muted)" text-anchor="${i===0?"start":"middle"}">${m.detalle}</text>`;
+  });
+  s += `<line x1="${x1}" y1="30" x2="${x1}" y2="${y+alto}" stroke="var(--fail)" stroke-width="2" stroke-dasharray="4 3"/>`;
+  s += `<text x="${x1}" y="18" font-size="13" font-weight="600" fill="var(--fail)" text-anchor="end">pregunta por el dato</text>`;
+  s += `<text x="${x1}" y="34" font-size="11" fill="var(--muted)" text-anchor="end">verificación por cadena exacta</text>`;
+  s += `<text x="${x0}" y="178" font-size="11" fill="var(--muted)">un punto = turno donde se inserta el dato según la posición; máximo 60 turnos</text>`;
+  svg.innerHTML = s;
+}
+pintarBarra();
+</script>
+</body>
+</html>

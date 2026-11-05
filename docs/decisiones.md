@@ -370,7 +370,7 @@ lenguaje (verificador de checkpoints, clasificador de fallos, analista), aún si
 ## D-22 · Alcance de Laya y de los agentes planeados en D-08
 **Fecha:** 2026-11-03
 **Contexto.** D-03 pospuso a Laya como clasificador de tipo de fallo por falta de fallos reales etiquetados, y D-08 planeó tres agentes (verificador de checkpoints, clasificador de tipo de fallo y analista de hallazgos) sin implementarlos. `final_D14` dejó 19 fallos (17 con el criterio ampliado de D-20), que dos integrantes etiquetan por separado con `docs/guia_etiquetado.md`; el kappa está pendiente.
-**Decisión.** En este proyecto no se entrena ni se evalúa a Laya, y no se implementan los tres agentes. El etiquetado manual con kappa de Cohen cumple el papel del clasificador, y los tipos de fallo se reportan por modelo a partir de las etiquetas humanas. El agente CrewAI sigue siendo solo la entrada interactiva (D-08).
+**Decisión.** En este proyecto no se entrena ni se evalúa a Laya, y no se implementan los tres agentes. El etiquetado manual con kappa de Cohen cumple el papel del clasificador, y los tipos de fallo se iban a reportar por modelo a partir de las etiquetas humanas (reemplazado por D-24: con un kappa de 0.089 no se presentan como resultado). El agente CrewAI sigue siendo solo la entrada interactiva (D-08).
 **Alternativas descartadas.**
 - Entrenar o ajustar a Laya con los fallos de `final_D14`: son 19 casos en seis categorías; según las etiquetas de Cristian la categoría 1 tiene un caso y la 5 ninguno, así que no habría conjunto de validación. No se verificó cuántos ejemplos usa el procedimiento oficial de ajuste.
 - Usar a Laya zero-shot como clasificador: D-03 midió 38 % de coincidencia en cinco categorías con n = 13, frente a 20 % de azar.

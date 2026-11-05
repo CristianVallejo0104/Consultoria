@@ -16,7 +16,7 @@ y abierto; estos pasos son para rehacerlo si hiciera falta).
 1. Entrar a NotebookLM (notebooklm.google.com) con una cuenta de Google.
 2. Crear un cuaderno nuevo llamado «Evaluación Automatizada de Generación Aumentada por Recuperación».
 3. Agregar como fuentes los 11 PDF de `docs/fuentes/` (no otros).
-4. PENDIENTE: definir si el texto del protocolo vigente va en las instrucciones del cuaderno o se pega al inicio de cada consulta (ver `protocolo/v1.md`, «Dónde se configura»).
+4. Pegar el texto del protocolo vigente (`protocolo/v1.md`, «Texto que se le da a la herramienta») en las instrucciones del chat del cuaderno.
 5. Prueba de humo: hacer la pregunta 1 del banco y comprobar que responde con cita al documento y página esperados.
 6. Prueba de abstención: hacer una de las preguntas fuera del corpus y comprobar que responde
    «No está en las fuentes cargadas.»
@@ -28,5 +28,5 @@ y abierto; estos pasos son para rehacerlo si hiciera falta).
 
 ## Límites conocidos
 
-- Sin protocolo, NotebookLM cita con números entre corchetes y sin página (`c1_C.md`, `c2_C.md`). Falta comprobar si con el protocolo v1 da la página.
+- Sin protocolo, NotebookLM cita con números entre corchetes y sin página (`c1_C.md`, `c2_C.md`). Con el protocolo v1 sí da la página, pero en la prueba de humo citó una tabla en una página equivocada (`protocolo/v1.md`, «Prueba»): la página que da hay que comprobarla en el PDF.
 - Sin protocolo, trajo referencias que no son de los 11 PDF, sino trabajos citados en sus bibliografías (`02_experimento/resultados.md`).

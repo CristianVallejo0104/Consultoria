@@ -512,7 +512,7 @@ Después:
 
 ## Fuentes y trazabilidad
 
-El corpus son 11 artículos públicos guardados en `docs/fuentes/`. Su origen, versión, fecha de ingreso al repositorio y licencia están en `nada_sin_fuente/03_sistema/procedencia.md`. La columna «Verificó» registra quién abrió cada PDF para comprobar su origen y versión; las filas vacías no se han verificado todavía.
+El corpus son 11 artículos públicos guardados en `docs/fuentes/`. Su origen, versión, fecha de ingreso al repositorio y licencia están en `nada_sin_fuente/03_sistema/procedencia.md`. La columna «Verificó» registra quién abrió cada PDF para comprobar su origen y versión: Juan Pablo verificó los 11.
 
 Las afirmaciones del estado del arte se comprueban una por una en `nada_sin_fuente/03_sistema/trazabilidad.md`, con página y cita corta. Las que no se sostienen como estaban escritas se registran en la tabla «Afirmaciones corregidas» de ese archivo.
 

@@ -3,7 +3,7 @@
 Sistema que evalúa en qué punto los modelos de lenguaje locales dejan de retener un dato inventado, según la posición del dato, el nivel de longitud en tokens y el modelo (fenómeno "lost in the middle"). Proyecto de Consultoría e Investigación, Universidad Santo Tomás.
 
 **Estado (5 de noviembre de 2026):**
-El análisis estadístico principal es no paramétrico y ya está ejecutado (D-21, sección "Análisis estadístico"). Los dos integrantes etiquetaron los 19 fallos: kappa de Cohen 0.089 (4 de 19 coincidencias, 2 de ellas fijadas por la regla de F003 y F004): acuerdo apenas por encima del azar. **Pendiente:** acordar la etiqueta de los 15 desacuerdos (`etiquetado/consenso.csv`) y registrar la decisión como D-24. La regresión logística exploratoria con one-hot ya está ajustada (D-21, `analisis/logistica.py`). Laya y los agentes planeados en D-08 quedaron fuera del alcance (D-22), y el Diseño B con modelos en la nube no se ejecutó (D-23).
+El análisis estadístico principal es no paramétrico y ya está ejecutado (D-21, sección "Análisis estadístico"). Los dos integrantes etiquetaron los 19 fallos: kappa de Cohen 0.089 (4 de 19 coincidencias, 2 de ellas fijadas por la regla de F003 y F004): acuerdo apenas por encima del azar. Por ese acuerdo bajo, los tipos de fallo por modelo no se presentan como resultado (D-24). La regresión logística exploratoria con one-hot ya está ajustada (D-21, `analisis/logistica.py`). Laya y los agentes planeados en D-08 quedaron fuera del alcance (D-22), y el Diseño B con modelos en la nube no se ejecutó (D-23).
 
 ## Problema y contraparte
 
@@ -173,7 +173,7 @@ python analisis/sensibilidad_bloque4.py             # sin el bloque 4
 PYTHONPATH=. python analisis/sensibilidad_formato.py   # criterio ampliado de formato (D-20)
 PYTHONPATH=. python analisis/sensibilidad_ampliado.py  # Fisher y permutación con ese criterio
 python analisis/logistica.py                        # regresión logística exploratoria (one-hot, L2)
-python analisis/tipos_de_fallo.py                   # tipos de fallo por modelo (un evaluador)
+python analisis/tipos_de_fallo.py                   # tipos de fallo por modelo (un evaluador; exploratorio, D-24)
 PYTHONPATH=. python analisis/kappa.py               # kappa de Cohen entre las dos hojas de etiquetado
 python analisis/graficas.py                         # figuras en analisis/figuras/
 ```
@@ -197,8 +197,8 @@ Regresión logística exploratoria (one-hot, penalización L2; razones de momios
 Los 19 fallos se clasifican a mano con `docs/guia_etiquetado.md` (6 categorías: alucinación, admisión, negación de capacidad, alucinación narrativa, desvío y otra/duda). `preparar_etiquetado.py` carga los fallos de `resultados/final_D14`, los baraja con semilla 42 y escribe una hoja sin modelo, posición ni nivel (`etiquetado/hoja_ciega.csv`) y una clave aparte (`etiquetado/clave.csv`). Cada integrante etiqueta su propia copia y el acuerdo se mide con `kappa_cohen`.
 
 - **Estado:** Cristian y Juan Pablo terminaron sus 19 etiquetas; kappa de Cohen 0.089 (4 de 19 coincidencias, 2 de ellas fijadas por la regla de F003 y F004): acuerdo apenas por encima del azar (`PYTHONPATH=. python analisis/kappa.py`).
-- **Lectura del kappa:** la mayoría de los desacuerdos sigue un patrón: cuando el modelo niega que el dato exista o que se haya mencionado, Juan Pablo usó "alucinación" (afirma algo falso) y Cristian "admisión" o "negación de capacidad"; también hay cruces entre esas dos. La guía define "alucinación" solo como "da un dato concreto distinto al correcto", así que admite las dos lecturas. Mientras no haya consenso, los tipos de fallo por modelo (`tipos_de_fallo.py`, un evaluador) no se presentan como resultado confiable. El acierto lo decide `verificar_acierto` y el etiquetado no lo cambia.
-- **Sin reetiquetado:** después de calcular el kappa, cada uno ya vio las etiquetas del otro; volver a etiquetar dejaría de ser a ciegas. Los 15 desacuerdos están en `etiquetado/consenso.csv` (respuesta, las dos etiquetas y una columna vacía para la acordada); la decisión irá en D-24.
+- **Lectura del kappa:** la mayoría de los desacuerdos sigue un patrón: cuando el modelo niega que el dato exista o que se haya mencionado, Juan Pablo usó "alucinación" (afirma algo falso) y Cristian "admisión" o "negación de capacidad"; también hay cruces entre esas dos. La guía define "alucinación" solo como "da un dato concreto distinto al correcto", así que admite las dos lecturas. Por eso los tipos de fallo por modelo (`tipos_de_fallo.py`, un evaluador) no se presentan como resultado (D-24). El acierto lo decide `verificar_acierto` y el etiquetado no lo cambia.
+- **Sin reetiquetado:** después de calcular el kappa, cada uno ya vio las etiquetas del otro; volver a etiquetar dejaría de ser a ciegas. Tampoco se construyó una etiqueta de consenso (D-24); `analisis/kappa.py` lista los 15 desacuerdos.
 - **Reglas de borde, acordadas por el equipo:** F003 y F004 (número correcto con otro formato) van en "otra/duda" con la nota "variante de formato". "No recuerdo haber mencionado ese número" va en "admisión" (confirmado por Juan Pablo antes de etiquetar).
 - **Cegamiento:** la hoja es ciega respecto a modelo, posición y nivel, pero algunas respuestas nombran al modelo ("como Phi, de Microsoft"). Además, `hoja_cristian.csv` y `clave.csv` están en el repositorio, así que la independencia entre etiquetadores se protegió por acuerdo y no técnicamente.
 - **Verificación de `kappa_cohen`:** con un caso calculado a mano (50 casos, 35 coincidencias, acuerdo esperado por azar 0.5) dio 0.4, y con la misma lista contra sí misma dio 1.0.
@@ -238,6 +238,7 @@ Cada decisión se documenta con su alternativa descartada. Registro completo en 
 - **D-21:** análisis no paramétrico como resultado principal y regresión logística con one-hot como modelo exploratorio. Alternativas descartadas: ANOVA y pruebas paramétricas, medida cuantitativa, enfoque bayesiano o Firth como principal, y regresión sin penalizar.
 - **D-22:** Laya y los agentes planeados en D-08 quedan fuera del alcance. Alternativas descartadas: entrenar a Laya con 19 fallos, Laya zero-shot y un clasificador automático con LLM.
 - **D-23:** cierre de alcance: el Diseño B con modelos en la nube y otros pendientes no se ejecutaron; quedan como trabajo futuro. Alternativas descartadas: ejecutar el Diseño B completo y una prueba parcial con un solo modelo en la nube. 
+- **D-24:** el kappa del etiquetado (0.089) se reporta tal como salió; no hay etiqueta de consenso y los tipos de fallo por modelo no se presentan como resultado. Alternativas descartadas: consenso de los 15 desacuerdos, reetiquetar con la guía aclarada y usar las etiquetas de un solo integrante.
 
 ## Uso de IA en el desarrollo
 
@@ -252,7 +253,7 @@ Declarado según la rúbrica y registrado en D-17:
 - **Subagentes de revisión de solo lectura** (`revisor-codigo-python` y `consultor-estadistico`): auditaron el código antes de las corridas. Sus resúmenes se contrastaron con el código y con las pruebas ejecutadas.
 - **Verificación humana:** cada diff se revisó antes del commit y se ejecutaron pruebas con Ollama.
 - **Sesión de Claude en la nube, video del proyecto:** generó la animación (index.html y guion) a partir del repositorio, sin editar archivos del proyecto. Pendiente: contrastar cada cifra con el README y con la salida de los scripts.
-- **Claude Code, sesión de Juan Pablo (4 y 5 de noviembre), con permiso por cada cambio:** a pedido de Juan Pablo hizo los commits y los push de esta sesión, cada uno después de describirle los cambios y con su aprobación, y solo con los archivos nombrados; ejecutó `analisis/kappa.py` una vez subidas las dos hojas, registró el resultado en README, DISENO.md y CLAUDE.md, y generó `etiquetado/consenso.csv` con los 15 desacuerdos (sin llenar la columna de consenso). Además escribió `analisis/kappa.py` (probado con un caso calculado a mano: 4 casos, 3 coincidencias, kappa 0.5), volvió a ejecutar los scripts de `analisis/` para contrastar las cifras del README y de DISENO.md (coinciden; `logistica.py` no se pudo ejecutar porque `scikit-learn` no estaba instalado en ese entorno), cerró con referencia a D-22 y D-23 las notas pendientes de D-02, D-03 y D-13, y generó una página con el diagrama del diseño para la exposición (cubo 3 × 3 × 3, 27 tratamientos × 5 bloques con su orden y el flujo de una corrida), con los datos de `final_D14.csv`; la página no está en el repositorio. En el etiquetado de Juan Pablo mostró las respuestas de `hoja_juan.csv` una por una y pasó al CSV los números que él decidió, sin sugerir categorías ni comentar las respuestas; solo le recordó las reglas de borde ya acordadas cuando aplicaban (F003 y F004). En la revisión inicial del repositorio, un comando de conteo imprimió por error las categorías de `hoja_cristian.csv` en la salida de la sesión, antes de que Juan Pablo etiquetara.
+- **Claude Code, sesión de Juan Pablo (4 y 5 de noviembre), con permiso por cada cambio:** a pedido de Juan Pablo hizo los commits y los push de esta sesión, cada uno después de describirle los cambios y con su aprobación, y solo con los archivos nombrados; ejecutó `analisis/kappa.py` una vez subidas las dos hojas, registró el resultado en README, DISENO.md y CLAUDE.md, y redactó D-24 con la decisión que tomó Juan Pablo (una hoja de consenso que alcanzó a generar se retiró con esa decisión). Además escribió `analisis/kappa.py` (probado con un caso calculado a mano: 4 casos, 3 coincidencias, kappa 0.5), volvió a ejecutar los scripts de `analisis/` para contrastar las cifras del README y de DISENO.md (coinciden; `logistica.py` no se pudo ejecutar porque `scikit-learn` no estaba instalado en ese entorno), cerró con referencia a D-22 y D-23 las notas pendientes de D-02, D-03 y D-13, y generó una página con el diagrama del diseño para la exposición (cubo 3 × 3 × 3, 27 tratamientos × 5 bloques con su orden y el flujo de una corrida), con los datos de `final_D14.csv`; la página no está en el repositorio. En el etiquetado de Juan Pablo mostró las respuestas de `hoja_juan.csv` una por una y pasó al CSV los números que él decidió, sin sugerir categorías ni comentar las respuestas; solo le recordó las reglas de borde ya acordadas cuando aplicaban (F003 y F004). En la revisión inicial del repositorio, un comando de conteo imprimió por error las categorías de `hoja_cristian.csv` en la salida de la sesión, antes de que Juan Pablo etiquetara.
 - **Distribución del trabajo entre integrantes:** el proyecto lo hicieron en equipo Cristian Vallejo y Juan Pablo Tibamoso. Las ideas, los cambios de diseño y las decisiones se discutieron y se tomaron entre los dos en varias sesiones, siguiendo también las indicaciones y sugerencias del profesor.
   - **Trabajo conjunto:** casi todo se hizo juntos en el computador de Cristian, que corre los modelos más rápido. Ahí se ejecutaron las corridas y desde ahí se subieron los commits. Por eso casi todos los commits aparecen bajo el usuario de git de Cristian, aunque el trabajo fue de los dos.
   - **Código:** lo escribieron los dos; Cristian escribió la mayor parte.
@@ -451,7 +452,7 @@ Después:
 │ ├── sensibilidad_ampliado.py # Fisher y permutación con ese criterio
 │ ├── tiempos.py # Tiempo de ejecución por modelo y nivel
 │ ├── logistica.py             # Regresión logística exploratoria (one-hot, L2)
-│ ├── tipos_de_fallo.py        # Tipos de fallo por modelo (un evaluador)
+│ ├── tipos_de_fallo.py        # Tipos de fallo por modelo (un evaluador; exploratorio, D-24)
 │ ├── kappa.py                 # Kappa de Cohen entre las dos hojas de etiquetado
 │ ├── graficas.py # Figuras
 │ └── figuras/ # Imágenes generadas
@@ -462,7 +463,7 @@ Después:
 ├── .env.example # Nombre de la variable de entorno (sin valores)
 ├── docs/
 │ ├── DISENO.md # Diseño experimental completo
-│ ├── decisiones.md # Registro de decisiones D-01 a D-23
+│ ├── decisiones.md # Registro de decisiones D-01 a D-24
 │ ├── guia_etiquetado.md # Categorías y reglas del etiquetado de fallos
 │ ├── contraparte/ # Registro de la contraparte metodológica (D-12)
 │ ├── fuentes/ # Papers descargados y verificados
@@ -483,6 +484,7 @@ Después:
 - Más réplicas y más datos inventados en el banco (hoy 5 datos y 5 bloques) para ganar potencia y poder estimar la interacción posición × nivel.
 - Niveles de contexto mayores a 12K y otros modelos locales.
 - Clasificador de tipo de fallo (Laya u otro) con más fallos etiquetados, y agentes de verificación y análisis (D-22).
+- Aclarar en la guía si «alucinación» incluye afirmar que el dato no existe o no se mencionó, y etiquetar con ella fallos nuevos, a ciegas (D-24).
 - Puntos de control dentro de la conversación (medidas repetidas) y una medida de respuesta cuantitativa (D-14, D-21).
 - Modelo bayesiano o de Firth para la separación (D-19, D-21).
 - Guardar el mensaje de la excepción de `generador_relleno` (D-18).
@@ -505,7 +507,7 @@ Después:
 - Los modelos que razonan pueden consumir el límite de tokens en pensamiento interno y devolver texto vacío (relevante en la nube).
 - El orquestador pequeño puede confundir nombres de modelos.
 - El evaluador de calidad de texto es exploratorio y no está validado contra criterio humano.
-- El etiquetado tiene 19 casos y dos evaluadores; la independencia se protegió por acuerdo.
+- El etiquetado tiene 19 casos y dos evaluadores; la independencia se protegió por acuerdo. El kappa fue 0.089, así que los tipos de fallo no se reportan como resultado (D-24).
 - Los resultados valen para estos tres modelos y hasta 12K tokens.
 - Resultados del primer corte: una réplica y solo posición *inicio*; los de `phi3:mini` y `gemma2:2b` no entran al análisis final.
 - El texto final del agente interactivo lo redacta un modelo de 1.5B y puede sobreinterpretar una sola corrida (en la prueba del 3 de noviembre dijo que el resultado «demuestra la confiabilidad»); la medición es la línea «Resultado» de la herramienta.

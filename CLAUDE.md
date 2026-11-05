@@ -16,7 +16,7 @@ Evaluador de confiabilidad de LLMs en conversaciones largas (fenómeno "lost in 
 
 - Las 135 corridas de `final_D14` están completas: 135 celdas válidas y 139 filas en `resultados/final_D14.csv` (4 filas `invalida_tecnica` por `generador_relleno`, todas de `gemma3:4b`, conservadas como historial; D-18).
 - 19 fallos: `llama3.2:3b` 7, `phi4-mini` 12, `gemma3:4b` 0. Más de la mitad está en el bloque 4.
-- Etiquetado de los 19 fallos terminado por los dos (`etiquetado/`, `docs/guia_etiquetado.md`); kappa de Cohen 0.089 (4 de 19 coincidencias, 2 de ellas fijadas por la regla de F003 y F004): acuerdo apenas por encima del azar (`analisis/kappa.py`). Pendiente: consenso de los 15 desacuerdos (`etiquetado/consenso.csv`) y D-24. No reetiquetar: ya no sería a ciegas.
+- Etiquetado de los 19 fallos terminado por los dos (`etiquetado/`, `docs/guia_etiquetado.md`); kappa de Cohen 0.089 (4 de 19 coincidencias, 2 de ellas fijadas por la regla de F003 y F004): acuerdo apenas por encima del azar (`analisis/kappa.py`). Sin consenso y sin reetiquetar; los tipos de fallo por modelo no se presentan como resultado (D-24).
 - Análisis no paramétrico ejecutado (D-21), en `analisis/`: descriptivo, Fisher por pares con Holm, permutación estratificada, EDA y sensibilidades (formato, sin el bloque 4, posición lograda). Regresión logística exploratoria con one-hot y penalización L2 ajustada (`analisis/logistica.py`). No hechas (D-23): tema y `contexto_final` como covariables.
 - Fuera de alcance (D-22): Laya y los agentes planeados en D-08. Diseño B con modelos en la nube: no ejecutado (D-23).
 
@@ -109,6 +109,7 @@ Diseño B con modelos en la nube: **no ejecutado** (D-23). `MODELOS_CLOUD` está
 - **D-08:** agentes solo donde hay juicio de lenguaje; verificador, clasificador y analista no se implementaron (D-22).
 - **D-03, D-22:** Laya pospuesto y fuera de alcance: con 19 fallos no se entrena.
 - **D-23:** cierre de alcance: qué no se hizo (Diseño B en la nube y otros pendientes) y por qué.
+- **D-24:** kappa del etiquetado 0.089; se reporta sin consenso y los tipos de fallo no son resultado.
 
 
 ## Hallazgos preliminares (primer corte y piloto; no entran al análisis final)

@@ -54,7 +54,7 @@ Estado al 2026-11-05.
 - **Liu et al. (2023)** varían posición y longitud sistemáticamente; este diseño formaliza ese esquema como factorial en bloques y añade verificación estadística.
 
 ## 7. Taxonomía de fallos (D-03)
-Categorías observadas en el primer corte: alucinación, admisión, negación de capacidad y alucinación narrativa; además `rechazo_seguridad`, que no es un fallo de retención. «Admisión» y «negación de capacidad» son observación propia: la literatura (Huang et al. 2023, Zhang et al. 2023, Wen et al. 2025) da el marco, pero no las nombra. Los fallos de `final_D14` se etiquetan a mano por los dos integrantes por separado con `docs/guia_etiquetado.md` (seis categorías) y el acuerdo se mide con kappa de Cohen. Laya no se entrena ni se evalúa: con 19 fallos no alcanza (D-22).
+Categorías observadas en el primer corte: alucinación, admisión, negación de capacidad y alucinación narrativa; además `rechazo_seguridad`, que no es un fallo de retención. «Admisión» y «negación de capacidad» son observación propia: la literatura (Huang et al. 2023, Zhang et al. 2023, Wen et al. 2025) da el marco, pero no las nombra. Los fallos de `final_D14` se etiquetan a mano por los dos integrantes por separado con `docs/guia_etiquetado.md` (seis categorías) y el acuerdo se mide con kappa de Cohen: dio 0.089, así que los tipos de fallo no se reportan como resultado (D-24). Laya no se entrena ni se evalúa: con 19 fallos no alcanza (D-22).
 
 ## 8. Calidad del texto de relleno (D-04)
 Se evalúan naturalidad, coherencia e interés de los turnos del «usuario» con un LLM juez pequeño. Es exploratorio y **no está validado contra criterio humano**: no se usan esas notas en el análisis final hasta validarlas.
@@ -105,5 +105,5 @@ Fuentes del diseño: factorial completo con réplicas, Montgomery y Runger (2018
 `final_D14` está completo: 135 celdas con resultado válido y 139 filas en el CSV (4 filas técnicas inválidas conservadas como historial). Hay 19 fallos: `llama3.2:3b` 7, `phi4-mini` 12, `gemma3:4b` 0. Las pruebas (Fisher por pares con Holm, permutación estratificada y sensibilidades) y sus resultados están en el README, sección "Análisis estadístico", y en D-21. Resumen: el modelo parece importar, pero la evidencia depende en buena parte del bloque 4; la posición y el nivel no muestran efecto detectable hasta 12K tokens, con poca potencia.
 
 ## 12. Pendiente
-- Etiquetado terminado por los dos; kappa de Cohen 0.089 (4 de 19 coincidencias, 2 de ellas fijadas por la regla de F003 y F004): acuerdo apenas por encima del azar. Falta acordar la etiqueta de los 15 desacuerdos (`etiquetado/consenso.csv`) y registrar la decisión (D-24).
+- Etiquetado terminado por los dos; kappa de Cohen 0.089 (4 de 19 coincidencias, 2 de ellas fijadas por la regla de F003 y F004): acuerdo apenas por encima del azar. No se hace consenso y los tipos de fallo no se reportan como resultado (D-24).
 - Sensibilidades de D-19 no hechas (D-23): tema y `contexto_final`.

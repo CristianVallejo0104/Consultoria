@@ -12,11 +12,11 @@ Evaluador de confiabilidad de LLMs en conversaciones largas (fenómeno "lost in 
 - **Restricción central:** núcleo local y reproducible en cuanto al diseño (CrewAI + Ollama).
 - **La sustentación es individual:** cada línea de código debe poder explicarla quien la presenta. Por eso se avanza paso a paso y se declara qué escribió la IA (ver README, "Uso de IA en el desarrollo").
 
-## Estado (2026-11-03)
+## Estado (2026-11-05)
 
 - Las 135 corridas de `final_D14` están completas: 135 celdas válidas y 139 filas en `resultados/final_D14.csv` (4 filas `invalida_tecnica` por `generador_relleno`, todas de `gemma3:4b`, conservadas como historial; D-18).
 - 19 fallos: `llama3.2:3b` 7, `phi4-mini` 12, `gemma3:4b` 0. Más de la mitad está en el bloque 4.
-- Etiquetado de los 19 fallos en curso (`etiquetado/`, `docs/guia_etiquetado.md`). Cristian terminó el suyo; falta Juan Pablo y el kappa.
+- Etiquetado de los 19 fallos terminado por los dos (`etiquetado/`, `docs/guia_etiquetado.md`); kappa de Cohen 0.089 (4 de 19 coincidencias, 2 de ellas fijadas por la regla de F003 y F004): acuerdo apenas por encima del azar (`analisis/kappa.py`). Pendiente: consenso de los 15 desacuerdos (`etiquetado/consenso.csv`) y D-24. No reetiquetar: ya no sería a ciegas.
 - Análisis no paramétrico ejecutado (D-21), en `analisis/`: descriptivo, Fisher por pares con Holm, permutación estratificada, EDA y sensibilidades (formato, sin el bloque 4, posición lograda). Regresión logística exploratoria con one-hot y penalización L2 ajustada (`analisis/logistica.py`). No hechas (D-23): tema y `contexto_final` como covariables.
 - Fuera de alcance (D-22): Laya y los agentes planeados en D-08. Diseño B con modelos en la nube: no ejecutado (D-23).
 

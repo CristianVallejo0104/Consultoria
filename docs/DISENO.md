@@ -1,6 +1,6 @@
 # Diseño experimental
 
-Estado al 2026-11-03.
+Estado al 2026-11-05.
 
 
 ## 1. Pregunta
@@ -101,9 +101,9 @@ Fuentes del diseño: factorial completo con réplicas, Montgomery y Runger (2018
 - El criterio exacto cuenta como fallo el número correcto con otro formato (2 casos); D-20 lo trata como sensibilidad.
 - 4 filas `invalida_tecnica` por `generador_relleno` (todas de `gemma3:4b`) tienen causa no determinada, porque el error no se guarda (D-18).
 
-## 11. Estado de la ejecución (2026-11-03)
+## 11. Estado de la ejecución (2026-11-05)
 `final_D14` está completo: 135 celdas con resultado válido y 139 filas en el CSV (4 filas técnicas inválidas conservadas como historial). Hay 19 fallos: `llama3.2:3b` 7, `phi4-mini` 12, `gemma3:4b` 0. Las pruebas (Fisher por pares con Holm, permutación estratificada y sensibilidades) y sus resultados están en el README, sección "Análisis estadístico", y en D-21. Resumen: el modelo parece importar, pero la evidencia depende en buena parte del bloque 4; la posición y el nivel no muestran efecto detectable hasta 12K tokens, con poca potencia.
 
 ## 12. Pendiente
-- Etiquetado del segundo integrante y kappa entre los dos.
+- Etiquetado terminado por los dos; kappa de Cohen 0.089 (4 de 19 coincidencias, 2 de ellas fijadas por la regla de F003 y F004): acuerdo apenas por encima del azar. Falta acordar la etiqueta de los 15 desacuerdos (`etiquetado/consenso.csv`) y registrar la decisión (D-24).
 - Sensibilidades de D-19 no hechas (D-23): tema y `contexto_final`.

@@ -23,7 +23,7 @@ Estado al 2026-11-05.
 
 ## 3. Cómo se asigna cada cosa
 - **Orden.** En cada bloque se baraja el orden de los 27 tratamientos con una semilla derivada de (`SEMILLA_EXPERIMENTO` = 42, bloque) mediante `crc32` (el `hash()` de Python cambia entre ejecuciones). Por qué: causas que no se controlan (temperatura de la GPU, estado de Ollama) se reparten al azar entre tratamientos y no se confunden con el modelo o el nivel.
-- **Dato.** El bloque determina el dato. Por qué: la dificultad del dato es una fuente de variabilidad conocida (cifras de 4 y 5 dígitos y una versión), y lo conocido se controla en lugar de dejarlo al azar.
+- **Dato.** El bloque determina el dato. Por qué: la dificultad del dato es una fuente de variabilidad conocida (cifras de 4 y 5 dígitos y una versión), y lo conocido se controla en lugar de dejarlo al azar. Límite: el runner recorre los bloques en orden, así que cada bloque es también un tramo seguido de la ejecución; la dificultad del dato y el momento en que se corrió no se pueden separar.
 - **Tema.** ((orden_en_bloque − 1) + bloque) mod 6, sin sorteo. Queda casi parejo pero no exacto (27 no se reparte en 6 temas): ver límites.
 - **Alcance de la reproducibilidad.** El diseño (orden, dato, tema) es reproducible. Las salidas de los modelos no se prometen reproducibles bit a bit; esa variabilidad es la que capturan las réplicas (D-15).
 

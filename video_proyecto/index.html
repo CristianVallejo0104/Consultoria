@@ -1,0 +1,846 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Retención en conversaciones largas</title>
+<script>
+/* =====================================================================
+   ESTADO DEL ETIQUETADO DE FALLOS (dos evaluadores) Y DEL KAPPA.
+   Cámbialo a mano cuando haya avance. NO escribas aquí ningún resultado
+   que no esté en el README.
+   ===================================================================== */
+const ESTADO_ETIQUETADO = "pendiente";
+</script>
+<!-- Three.js r128 desde cdnjs, versión fija -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+:root{
+  --bg:#0B0F17; --bg2:#121826; --panel:#161D2C; --line:#26304A;
+  --text:#E8ECF2; --muted:#8A94A6; --dim:#5B667C;
+  --gemma:#4C8DFF; --llama:#FF9A3C; --phi:#3CCB7F;
+  --gold:#FFD166; --fail:#FF6B6B; --neutral:#9AA7BD;
+  --font:"Inter","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  --mono:"JetBrains Mono","SFMono-Regular",Consolas,"DejaVu Sans Mono",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;background:#05070B;color:var(--text);font-family:var(--font);overflow:hidden}
+#viewport{position:absolute;left:0;top:0;right:0;bottom:64px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+body.rec #viewport{bottom:0}
+body.rec{cursor:none}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;overflow:hidden;
+  background:radial-gradient(1200px 700px at 50% 38%, #131A29 0%, var(--bg) 70%);}
+#gl{position:absolute;left:0;top:0;width:1920px;height:1080px;opacity:0}
+.scene{position:absolute;inset:0;opacity:0;visibility:hidden}
+.abs{position:absolute}
+#header{position:absolute;left:96px;top:44px;display:flex;align-items:baseline;gap:18px;z-index:5}
+#hnum{font:600 22px var(--mono);color:var(--gold);letter-spacing:.08em}
+#htitle{font-weight:600;font-size:26px;color:var(--text);letter-spacing:.01em}
+#brand{position:absolute;right:96px;top:48px;font-size:18px;color:var(--dim);letter-spacing:.04em;z-index:5}
+#dots{position:absolute;right:96px;top:80px;display:flex;gap:8px;z-index:5}
+#dots i{width:22px;height:4px;border-radius:2px;background:#2A3348;display:block}
+#dots i.on{background:var(--gold)}
+#subs{position:absolute;left:160px;right:160px;bottom:54px;text-align:center;font-size:34px;line-height:1.38;font-weight:500;
+  color:#F4F6FA;text-shadow:0 2px 12px rgba(0,0,0,.8);z-index:6;min-height:94px;display:flex;align-items:flex-end;justify-content:center}
+#subs span{background:rgba(8,11,18,.55);padding:6px 22px;border-radius:10px;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.h1{font-size:64px;font-weight:700;letter-spacing:-.01em;line-height:1.1}
+.h2{font-size:44px;font-weight:700;line-height:1.15}
+.h3{font-size:30px;font-weight:600}
+.small{font-size:22px;color:var(--muted)}
+.mono{font-family:var(--mono)}
+.gold{color:var(--gold)} .muted{color:var(--muted)} .fail{color:var(--fail)}
+.cg{color:var(--gemma)} .cl{color:var(--llama)} .cp{color:var(--phi)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:20px}
+.pill{display:inline-flex;align-items:center;gap:10px;padding:8px 18px;border-radius:999px;border:1px solid var(--line);background:#111827;font-size:22px}
+.dot{width:14px;height:14px;border-radius:50%;display:inline-block}
+.label3d{position:absolute;transform:translate(-50%,-50%);white-space:nowrap;font-size:22px;font-weight:600;pointer-events:none;text-shadow:0 2px 8px #000}
+/* escena 1 */
+#chatWin{position:absolute;left:200px;top:140px;width:820px;height:760px;border-radius:24px;background:#0E1420;border:1px solid var(--line);overflow:hidden}
+#chatInner{position:absolute;left:0;top:0;width:820px;transform-origin:50% 0}
+.bub{position:absolute;border-radius:18px;padding:18px 22px}
+.bub.user{right:30px;background:#1E2840}
+.bub.model{left:30px;background:#151C2B;border:1px solid #222B40}
+.bub .ln{height:12px;border-radius:6px;background:#33405C;margin:9px 0}
+.bub.model .ln{background:#2A354D}
+.bub.dato{background:#2A2410;border:2px solid var(--gold);font-size:25px;line-height:1.35;color:#FFE7A8}
+.bub.q{background:#1E2840;font-size:25px;line-height:1.35;border:2px solid #4B5A80}
+.who{position:absolute;top:-24px;font-size:15px;color:var(--dim);letter-spacing:.06em;text-transform:uppercase}
+.bub.user .who{right:6px}.bub.model .who{left:6px}
+/* escena 2 */
+.piece{position:absolute;top:180px;width:450px;height:340px;padding:30px 34px}
+.piece .ic{width:64px;height:64px;border-radius:16px;background:#1F2940;display:flex;align-items:center;justify-content:center;margin-bottom:22px}
+.piece .t{font-size:32px;font-weight:700}
+.piece .s{font:500 20px var(--mono);color:var(--gold);margin:8px 0 16px}
+.piece .d{font-size:23px;line-height:1.4;color:#C5CDDA}
+.arrow{position:absolute;top:330px;width:70px;height:40px}
+#track{position:absolute;left:200px;top:330px;width:1520px;height:46px;border-radius:12px;background:#121A2A;border:1px solid var(--line);overflow:hidden}
+.seg{position:absolute;top:0;height:100%}
+.mk{position:absolute;top:205px;width:2px;height:120px;transform:translateX(-1px);background:repeating-linear-gradient(to bottom,#58668A 0 6px,transparent 6px 12px)}
+.mklab{position:absolute;top:150px;transform:translateX(-50%);text-align:center;font-size:22px;white-space:nowrap}
+.dia{position:absolute;width:26px;height:26px;background:var(--gold);transform:translate(-50%,-50%) rotate(45deg);border-radius:4px;box-shadow:0 0 22px rgba(255,209,102,.7)}
+.box{position:absolute;padding:26px 30px}
+.vline{font:500 25px var(--mono);margin:12px 0;color:#D8DEE9}
+mark{background:rgba(255,209,102,.22);color:var(--gold);padding:0 6px;border-radius:6px}
+/* tablas */
+table.t{border-collapse:separate;border-spacing:0;font-size:28px}
+table.t th{font-size:20px;color:var(--muted);font-weight:600;text-align:center;padding:12px 26px;text-transform:uppercase;letter-spacing:.06em}
+table.t td{padding:18px 26px;text-align:center;border-top:1px solid var(--line);font-family:var(--mono)}
+table.t td:first-child{text-align:left;font-family:var(--font);color:#C5CDDA}
+.hl{color:var(--gold);font-weight:700}
+.chip{position:absolute;width:300px;height:150px;padding:22px 24px}
+.chip .n{font:600 18px var(--mono);color:var(--dim)}
+.chip .t{font-size:27px;font-weight:700;margin:6px 0 6px}
+.chip .d{font-size:19px;color:#AEB7C6;line-height:1.35}
+.li{font-size:28px;line-height:1.35;margin:0 0 24px;padding-left:38px;position:relative;color:#D6DCE6}
+.li:before{content:"";position:absolute;left:4px;top:13px;width:14px;height:14px;border-radius:4px;background:var(--gold)}
+.li.f:before{background:#6C7BFF;border-radius:50%}
+/* controles */
+#controls{position:fixed;left:0;right:0;bottom:0;height:64px;background:#0A0E16;border-top:1px solid #1C2436;display:flex;align-items:center;gap:12px;padding:0 18px;z-index:20;font-size:15px}
+body.rec #controls{display:none}
+#controls button{background:#18213A;color:var(--text);border:1px solid #2A3550;border-radius:10px;height:40px;min-width:44px;padding:0 12px;font-size:16px;cursor:pointer}
+#controls button:hover{background:#22305A}
+#controls button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+#bar{flex:1;height:10px;background:#1A2235;border-radius:5px;position:relative;cursor:pointer;min-width:80px}
+#barfill{position:absolute;left:0;top:0;bottom:0;background:var(--gold);border-radius:5px;width:0}
+#bar .tick{position:absolute;top:-4px;width:2px;height:18px;background:#3A4560}
+#time{font-family:var(--mono);color:var(--muted);min-width:110px;text-align:right}
+#chips{display:flex;gap:4px}
+#chips button{min-width:34px;padding:0 8px;font-family:var(--mono)}
+#chips button.on{border-color:var(--gold);color:var(--gold)}
+@media (max-width:760px){#chips{display:none}#time{min-width:0}}
+#scrim{position:absolute;inset:0;background:rgba(8,11,18,.82);opacity:0;visibility:hidden;z-index:7}
+#key{position:absolute;left:200px;right:200px;top:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;opacity:0;visibility:hidden;z-index:8}
+#key .kl{font-size:20px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:26px}
+#key .kt{font-size:52px;font-weight:700;line-height:1.25;max-width:1400px}
+#key .kb{width:120px;height:4px;border-radius:2px;background:var(--gold);margin-top:34px}
+#nogl{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:26px;color:var(--muted);display:none}
+</style>
+</head>
+<body>
+<div id="viewport"><div id="stage">
+  <canvas id="gl" width="1920" height="1080"></canvas>
+  <div id="labels3d" class="abs" style="inset:0;pointer-events:none"></div>
+  <div id="header"><span id="hnum">01</span><span id="htitle"></span></div>
+  <div id="brand">Confiabilidad de LLMs en conversaciones largas</div>
+  <div id="dots"></div>
+
+  <!-- ================= TARJETA DE TÍTULO ================= -->
+  <section class="scene" id="s0">
+    <div class="abs" style="left:0;right:0;top:330px;text-align:center" data-a="0.15" data-fx="scale">
+      <div class="small" style="letter-spacing:.14em;text-transform:uppercase;color:var(--gold)">Consultoría e Investigación · Universidad Santo Tomás</div>
+      <div class="h1" style="margin:28px auto 0;max-width:1400px">Evaluador de confiabilidad de LLMs<br>en conversaciones largas</div>
+      <div class="h3" style="margin-top:40px;font-weight:500;color:#C5CDDA">Juan Pablo Tibamoso · Cristian Vallejo</div>
+    </div>
+  </section>
+
+  <!-- ================= ESCENA 1: EL PROBLEMA ================= -->
+  <section class="scene" id="s1">
+    <div id="chatWin"><div id="chatInner"></div></div>
+    <div class="abs" style="left:1120px;top:330px;width:660px" data-a="1.9,5.6">
+      <div class="small" style="letter-spacing:.08em;text-transform:uppercase;color:var(--gold)">Un dato inventado</div>
+      <div class="h2" style="margin-top:14px">El modelo no puede conocerlo de su entrenamiento.</div>
+    </div>
+    <div class="abs" style="left:1120px;top:360px;width:660px" data-a="6,9.8">
+      <div class="h2">La conversación sigue…</div>
+      <div class="h3 muted" style="margin-top:18px;font-weight:500">y el dato queda en el medio.</div>
+    </div>
+    <div class="abs" style="left:1120px;top:300px;width:700px" data-a="10.2">
+      <div class="h1">¿Cuándo deja de ser <span class="gold">confiable</span>?</div>
+      <div class="pill" style="margin-top:34px"><span class="mono" style="color:var(--gold)">«lost in the middle»</span></div>
+    </div>
+  </section>
+
+  <!-- ================= ESCENA 2: CÓMO FUNCIONA ================= -->
+  <section class="scene" id="s2">
+    <div id="s2a">
+      <div class="piece card" style="left:170px" data-a="0.6,12.4">
+        <div class="ic"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#FFD166" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></div>
+        <div class="t">Agente CrewAI</div>
+        <div class="s">qwen2.5:1.5b · temperatura 0.0</div>
+        <div class="d">Entrada <b>interactiva</b>: pide modelo, posición y nivel y llama al núcleo.</div>
+      </div>
+      <svg class="arrow" style="left:635px" viewBox="0 0 70 40" data-a="3.2,12.4"><path d="M4 20h56M48 8l14 12-14 12" stroke="#58668A" stroke-width="4" fill="none" stroke-linecap="round"/></svg>
+      <div class="piece card" style="left:735px" data-a="3.5,12.4">
+        <div class="ic"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#FFD166" stroke-width="2"><path d="M8 6l-5 6 5 6M16 6l5 6-5 6"/></svg></div>
+        <div class="t">Núcleo en Python</div>
+        <div class="s">ejecutar_evaluacion()</div>
+        <div class="d">Corre la conversación turno a turno y verifica el resultado.</div>
+      </div>
+      <svg class="arrow" style="left:1200px;transform:scaleX(-1)" viewBox="0 0 70 40" data-a="5.8,12.4"><path d="M4 20h56M48 8l14 12-14 12" stroke="#58668A" stroke-width="4" fill="none" stroke-linecap="round"/></svg>
+      <div class="piece card" style="left:1300px" data-a="6,12.4">
+        <div class="ic"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#FFD166" stroke-width="2"><path d="M4 5h16v11H9l-5 4z"/></svg></div>
+        <div class="t">Generador de relleno</div>
+        <div class="s">qwen2.5:1.5b</div>
+        <div class="d">Escribe los mensajes del «usuario» en los turnos sin el dato.</div>
+      </div>
+      <svg class="abs" style="left:930px;top:536px" width="60" height="80" viewBox="0 0 60 80" data-a="8.4,12.4"><path d="M30 76V10M16 24L30 8l14 16" stroke="#FFD166" stroke-width="4" fill="none" stroke-linecap="round" stroke-dasharray="8 7"/></svg>
+      <div class="abs card" style="left:660px;top:626px;width:600px;padding:20px 28px;text-align:center;border-color:#5A4A1E" data-a="8.4,12.4">
+        <div class="mono" style="font-size:22px;color:var(--gold)">correr_experimento.py</div>
+        <div style="font-size:23px;margin-top:6px">Las <b>135 corridas</b> llaman al núcleo directamente,<br><span class="muted">sin pasar por el agente</span></div>
+      </div>
+      <div class="abs" style="left:0;right:0;top:812px;display:flex;gap:16px;justify-content:center;align-items:center" data-a="10.6,12.4">
+        <span class="h3" style="font-size:26px;margin-right:8px">Todo local, con <span class="gold">Ollama</span> ·</span>
+        <span class="pill"><span class="dot" style="background:var(--gemma)"></span><span class="mono">gemma3:4b</span></span>
+        <span class="pill"><span class="dot" style="background:var(--llama)"></span><span class="mono">llama3.2:3b</span></span>
+        <span class="pill"><span class="dot" style="background:var(--phi)"></span><span class="mono">phi4-mini</span></span>
+      </div>
+    </div>
+    <div id="s2b">
+      <div class="abs small" style="left:200px;top:432px;letter-spacing:.08em;text-transform:uppercase" data-a="13">Conversación · contexto en tokens</div>
+      <div id="track" data-a="13" data-fx="fade"></div>
+      <div id="mks"></div>
+      <div class="abs mono small" style="left:200px;top:392px" data-a="13.2">0</div>
+      <div class="abs mono small" style="left:1220px;top:392px;width:500px;text-align:right" data-a="13.6">nivel: 4,000 · 8,000 o 12,000 tokens</div>
+      <div class="bub q" style="left:200px;top:520px;width:760px" data-a="21.8">
+        <span class="who" style="left:6px;right:auto">Pregunta final</span>¿Cuál es el número de expediente del caso Aurora?</div>
+      <div class="bub model" style="left:200px;top:660px;width:760px;font-size:25px;line-height:1.4;color:#C5CDDA" data-a="23.2">
+        <span class="who">Respuesta (ilustrativa)</span>El número de expediente del caso Aurora es <mark>3851</mark>.</div>
+      <div class="box card" style="left:1040px;top:490px;width:680px;height:370px" data-a="24.6">
+        <div class="small" style="letter-spacing:.08em;text-transform:uppercase">Verificación en Python</div>
+        <div class="vline" data-a="25.3" data-fx="left">verificar_acierto(r, <span class="gold">"3851"</span>)</div>
+        <div class="vline" data-a="26.1" data-fx="left"><span class="cp">✓</span> aparece la cadena exacta</div>
+        <div class="vline" data-a="26.9" data-fx="left"><span class="cp">✓</span> sin negación («no recuerdo»…)</div>
+        <div class="vline" data-a="27.8" data-fx="left">→ acierto = <span class="cp">True</span></div>
+        <div class="pill" style="margin-top:16px" data-a="28.5"><span>Determinista · sin modelo juez</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= ESCENA 3: EL DISEÑO (3D) ================= -->
+  <section class="scene" id="s3">
+    <div class="abs" style="left:96px;top:130px" data-a="1.5">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <span class="pill"><span class="dot" style="background:var(--gemma)"></span><span class="mono">gemma3:4b</span></span>
+        <span class="pill"><span class="dot" style="background:var(--llama)"></span><span class="mono">llama3.2:3b</span></span>
+        <span class="pill"><span class="dot" style="background:var(--phi)"></span><span class="mono">phi4-mini</span></span>
+      </div>
+    </div>
+    <div class="abs" style="right:110px;top:170px;text-align:right" data-a="9,13.2" data-fx="scale">
+      <div class="h1 mono">3 × 3 × 3</div>
+      <div class="h2" style="margin-top:8px">= <span class="gold">27</span> tratamientos</div>
+    </div>
+    <div class="abs" style="right:110px;top:150px;text-align:right" data-a="16.6">
+      <div class="small">corridas</div>
+      <div class="h1 mono"><span id="cnt">0</span><span class="muted" style="font-size:40px"> / 135</span></div>
+    </div>
+    <div class="abs" style="left:0;right:0;top:820px;text-align:center" data-a="20.2,33.8">
+      <span class="pill">Orden barajado dentro de cada bloque · semilla 42 (crc32)</span>
+    </div>
+    <div class="abs" style="left:0;right:0;top:800px;text-align:center" data-a="34" data-fx="scale">
+      <div class="h2">5 bloques × 27 = <span class="gold">135 corridas</span></div>
+    </div>
+  </section>
+
+  <!-- ================= ESCENA 4: LA EJECUCIÓN ================= -->
+  <section class="scene" id="s4">
+    <div class="abs" style="left:150px;top:140px" data-a="0.3">
+      <div class="h3">Mediana de minutos por corrida</div>
+    </div>
+    <svg id="chT" class="abs" style="left:120px;top:190px" width="1000" height="700"></svg>
+    <div class="abs" style="left:1200px;top:250px;width:600px" data-a="5,10.6">
+      <div class="small">tiempo total de las corridas válidas</div>
+      <div class="h1 mono" style="font-size:96px;margin:6px 0 26px">17.31 h</div>
+      <div class="h3" style="line-height:1.4"><span class="cp">phi4-mini</span> es el más lento:<br>hasta <span class="mono">28.6 min</span> en una corrida</div>
+      <div class="small" style="margin-top:26px">Medido en una RTX 3050 de 6 GB, con el PC en uso.</div>
+    </div>
+    <div class="abs" style="left:1180px;top:200px;width:640px" data-a="11">
+      <div class="h3" style="margin-bottom:8px">Fallas técnicas y reintentos</div>
+      <div class="small" style="margin-bottom:30px">todas de <span class="mono cg">gemma3:4b</span>, por el generador de relleno</div>
+      <div id="retries"></div>
+      <div class="small" style="margin-top:20px;line-height:1.45" data-a="14.6">4 filas en 3 celdas. Una falla técnica no cuenta como «olvidó el dato»; las 135 celdas cerraron como válidas.</div>
+    </div>
+  </section>
+
+  <!-- ================= ESCENA 5: RESULTADOS ================= -->
+  <section class="scene" id="s5">
+    <div id="s5a" data-a="0.2,13" data-fx="fade">
+      <div class="abs h3" style="left:150px;top:140px">Acierto por modelo</div>
+      <svg id="chM" class="abs" style="left:120px;top:190px" width="1080" height="700"></svg>
+      <div class="abs" style="left:1260px;top:300px;width:560px">
+        <div class="small" style="line-height:1.5" data-a="0.8">Barra: proporción de acierto<br>Línea: intervalo exacto al 95 %<br>(Clopper-Pearson)</div>
+        <div class="h3" style="margin-top:40px;line-height:1.4" data-a="8"><span class="cg mono">gemma3:4b</span><br>no falló en ninguna de sus 45 corridas</div>
+      </div>
+    </div>
+    <div id="s5b" data-a="13.3,27" data-fx="fade">
+      <div class="abs h3" style="left:150px;top:140px">Acierto por posición del dato</div>
+      <div class="abs h3" style="left:1010px;top:140px">Acierto por nivel de tokens</div>
+      <svg id="chP" class="abs" style="left:110px;top:190px" width="820" height="620"></svg>
+      <svg id="chN" class="abs" style="left:970px;top:190px" width="820" height="620"></svg>
+      <div class="abs" style="left:0;right:0;top:830px;text-align:center" data-a="19.2,22.4"><span class="pill">La mitad tiene el mayor acierto: no aparece el patrón clásico</span></div>
+      <div class="abs" style="left:0;right:0;top:830px;text-align:center" data-a="22.8"><span class="pill" style="border-color:#5A4A1E">Los intervalos se traslapan: no hay diferencia detectable entre posiciones ni niveles</span></div>
+    </div>
+    <div id="s5c" data-a="27.3" data-fx="fade">
+      <div class="abs h3" style="left:150px;top:140px">Fallos por bloque (dato inventado)</div>
+      <svg id="chB" class="abs" style="left:120px;top:190px" width="1100" height="700"></svg>
+      <div class="abs" style="left:1280px;top:280px;width:520px">
+        <div style="display:flex;flex-direction:column;gap:10px" data-a="28">
+          <span class="pill" style="align-self:flex-start"><span class="dot" style="background:var(--llama)"></span><span class="mono">llama3.2:3b</span> 7 fallos</span>
+          <span class="pill" style="align-self:flex-start"><span class="dot" style="background:var(--phi)"></span><span class="mono">phi4-mini</span> 12 fallos</span>
+          <span class="pill" style="align-self:flex-start"><span class="dot" style="background:var(--gemma)"></span><span class="mono">gemma3:4b</span> 0 fallos</span>
+        </div>
+        <div class="h2" style="margin-top:50px" data-a="33.6"><span class="gold">11 de 19</span> fallos<br>en el bloque 4</div>
+        <div class="h3 muted" style="margin-top:12px;font-weight:500" data-a="34.2">dato: <span class="mono">44295</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= ESCENA 6: ANÁLISIS Y SUPUESTOS ================= -->
+  <section class="scene" id="s6">
+    <div id="s6a" data-a="0.2,9" data-fx="fade">
+      <div class="abs h3" style="left:150px;top:140px">135 corridas · <span class="fail">19 fallos</span></div>
+      <div id="grid" class="abs" style="left:300px;top:230px"></div>
+      <div class="abs" style="left:300px;top:560px;width:1320px;display:flex;gap:60px;align-items:flex-start">
+        <div data-a="4.4">
+          <div class="small">respuesta 0/1 · varianza</div>
+          <div class="h2 mono" style="margin-top:8px">p(1 − p)</div>
+          <div class="small" style="margin-top:10px">depende de la media: <span class="cg">0</span> · <span class="cl">0.13</span> · <span class="cp">0.20</span></div>
+        </div>
+        <div data-a="6.4" data-fx="scale" style="margin-left:auto;text-align:right">
+          <div class="h2"><span class="fail">✕</span> ANOVA y pruebas paramétricas</div>
+          <div class="small" style="margin-top:10px">sus supuestos no se pueden comprobar</div>
+        </div>
+      </div>
+    </div>
+    <div id="s6b" data-a="9.2,25" data-fx="fade">
+      <div class="abs h3" style="left:150px;top:140px">Permutación estratificada</div>
+      <div id="perm"></div>
+      <div class="abs" style="left:1200px;top:240px;width:600px">
+        <div class="li" data-a="9.8" style="color:#fff">Si el modelo no importara, estas marcas podrían estar en cualquier modelo del grupo.</div>
+        <div class="li" data-a="13">Por eso se baraja el acierto solo dentro de cada grupo de 3 corridas.</div>
+        <div class="li" data-a="16.4">Cada grupo comparte bloque y los otros dos factores (45 grupos).</div>
+        <div class="li" data-a="18">20,000 permutaciones · semilla 42</div>
+      </div>
+      <div class="abs" style="left:0;right:0;top:770px;display:flex;gap:24px;justify-content:center" data-a="21">
+        <span class="pill" style="font-size:26px">Modelo&nbsp;<b class="mono gold">p ≤ 1/20 001</b></span>
+        <span class="pill" style="font-size:26px">Posición&nbsp;<b class="mono">0.21</b></span>
+        <span class="pill" style="font-size:26px">Nivel&nbsp;<b class="mono">0.67</b></span>
+      </div>
+    </div>
+    <div id="s6c" data-a="25.2,31.4" data-fx="fade">
+      <div class="abs h3" style="left:150px;top:140px">Sensibilidad · permutación estratificada (p)</div>
+      <table class="t abs" style="left:150px;top:220px">
+        <tr><th></th><th>Modelo</th><th>Posición</th><th>Nivel</th></tr>
+        <tr data-a="25.4"><td>Principal (135 corridas)</td><td class="hl">≤ 1/20 001</td><td>0.21</td><td>0.67</td></tr>
+        <tr data-a="25.8"><td>Sin el bloque 4 (108 corridas)</td><td class="hl">0.035</td><td>0.25</td><td>0.71</td></tr>
+        <tr data-a="28.6"><td>Criterio ampliado de formato (17 fallos)</td><td class="hl">0.00095</td><td>0.38</td><td>0.44</td></tr>
+      </table>
+      <div class="abs card" style="left:150px;top:600px;width:1620px;padding:26px 34px" data-a="29.2">
+        <div class="small">criterio ampliado de formato</div><div class="h3" style="margin-top:6px">«<span class="mono">44,295</span>» con coma cuenta como acierto: 2 de los 19 fallos pasan a acierto</div>
+      </div>
+    </div>
+    <div id="s6d" data-a="31.6,39.4" data-fx="fade">
+      <div class="abs h3" style="left:150px;top:140px">Fisher con Holm · gemma3:4b frente a llama3.2:3b</div>
+      <div class="abs small" style="left:150px;top:196px;width:1500px;font-size:24px;line-height:1.45" data-a="31.8">Compara cada par de modelos con una prueba exacta y <b style="color:#fff">ajusta el p</b> porque se hacen 3 comparaciones (corrección de Holm).</div>
+      <table class="t abs" style="left:150px;top:320px">
+        <tr><th></th><th>p sin ajustar</th><th>p ajustado (Holm)</th></tr>
+        <tr data-a="33.2"><td>Criterio exacto (19 fallos)</td><td>0.012</td><td class="hl">0.024</td></tr>
+        <tr data-a="35.6"><td>Criterio ampliado (17 fallos)</td><td>0.026</td><td class="hl">0.052</td></tr>
+      </table>
+      <div class="abs small" style="left:150px;top:620px;width:1500px;font-size:24px" data-a="36.6">Con el criterio ampliado, el p <b style="color:#fff">ajustado</b> queda por encima de 0.05: esa diferencia depende del formato.</div>
+    </div>
+    <div id="s6e" class="abs" style="left:240px;right:240px;top:330px;text-align:center" data-a="39.6">
+      <div class="h2" style="line-height:1.35">Posición y nivel: sin efecto detectable hasta 12K tokens.</div>
+      <div class="h3 muted" style="margin-top:30px;font-weight:500">Con poca potencia, «no se detecta» no es «no hay efecto».</div>
+    </div>
+  </section>
+
+  <!-- ================= ESCENA 7: LOS FALLOS ================= -->
+  <section class="scene" id="s7">
+    <div class="abs h3" style="left:150px;top:140px" data-a="0.3">Tipos de fallo (guía de etiquetado)</div>
+    <div id="chips7"></div>
+    <div class="abs card" style="left:1180px;top:230px;width:620px;height:520px;padding:34px" data-a="5.4">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div class="h3">Etiquetado a ciegas</div>
+        <span id="badge" class="pill estado-up" style="border-color:var(--gold);color:var(--gold);font-weight:700;letter-spacing:.08em"></span>
+      </div>
+      <div class="small" style="margin:10px 0 34px">sin modelo, posición ni nivel</div>
+      <div style="font-size:24px;margin-bottom:10px">Evaluador 1 · <span class="muted">19 de 19 etiquetas</span></div>
+      <div style="height:12px;background:#222B40;border-radius:6px;margin-bottom:30px"><div style="height:100%;width:100%;background:#6C7BFF;border-radius:6px"></div></div>
+      <div style="font-size:24px;margin-bottom:10px">Evaluador 2 · <span class="gold estado"></span></div>
+      <div style="height:12px;background:#222B40;border-radius:6px;margin-bottom:30px;overflow:hidden"><div id="pend" style="height:100%;width:30%;background:linear-gradient(90deg,transparent,#3A4766,transparent)"></div></div>
+      <div style="font-size:24px">Kappa de Cohen · <span class="gold estado"></span></div>
+      <div class="small" style="margin-top:8px">sin resultado todavía</div>
+    </div>
+  </section>
+
+  <!-- ================= ESCENA 8: LÍMITES Y CIERRE ================= -->
+  <section class="scene" id="s8">
+    <div class="abs" style="left:150px;top:140px;width:1620px" data-a="0.1,10.4" data-fx="fade">
+      <div class="h3" style="margin-bottom:30px" data-a="0.3">Límites</div>
+      <div class="li" data-a="0.8">Respuesta binaria y 5 réplicas por celda: poca potencia (con 5 de 5, el IC va de 0.48 a 1.00).</div>
+      <div class="li" data-a="3.6">El tope de 300 tokens cortó respuestas en las 135 corridas: cerca del <span class="cg">37 %</span>, <span class="cl">65 %</span> y <span class="cp">60 %</span> de los turnos de <span class="mono cg">gemma3:4b</span>, <span class="mono cl">llama3.2:3b</span> y <span class="mono cp">phi4-mini</span>. El efecto del modelo puede incluir el del tope.</div>
+      <div class="li" data-a="7">La interacción posición × nivel no se contrasta (modelo sin interacción por la baja potencia).</div>
+      <div class="li" data-a="8.4">Solo estos 3 modelos locales y hasta 12K tokens.</div>
+    </div>
+    <div class="abs" style="left:150px;top:140px;width:1620px" data-a="10.8,14.6" data-fx="fade">
+      <div class="h3" style="margin-bottom:30px" data-a="10.9">Trabajo futuro</div>
+      <div class="li f" data-a="11.2">Más réplicas y más datos inventados, para poder estimar la interacción posición × nivel.</div>
+      <div class="li f" data-a="12">Modelos en la nube con el mismo diseño (Diseño B).</div>
+      <div class="li f" data-a="12.8">Contextos mayores a 12K y otros modelos locales.</div>
+      <div class="li f" data-a="13.4">Puntos de control dentro de la conversación.</div>
+    </div>
+    <div class="abs" style="left:0;right:0;top:300px;text-align:center" data-a="18.6" data-fx="scale">
+      <div class="small" style="letter-spacing:.1em;text-transform:uppercase">Evaluador de confiabilidad de LLMs en conversaciones largas</div>
+      <div class="h2 mono" style="margin:30px 0 34px;color:var(--gold)">github.com/CristianVallejo0104/Consultoria</div>
+      <div class="h3" style="font-weight:500">Juan Pablo Tibamoso · Cristian Vallejo</div>
+      <div class="small" style="margin-top:14px">Consultoría e Investigación · Pregrado en Estadística · Universidad Santo Tomás</div>
+    </div>
+  </section>
+
+  <div id="scrim"></div>
+  <div id="key"><div class="kl">Idea clave</div><div class="kt"></div><div class="kb"></div></div>
+  <div id="subs"><span></span></div>
+  <div id="nogl">No se pudo iniciar WebGL.</div>
+</div></div>
+
+<div id="controls" role="toolbar" aria-label="Controles del video">
+  <button id="bPrev" title="Escena anterior (←)" aria-label="Escena anterior">⏮</button>
+  <button id="bPlay" title="Reproducir / pausar (espacio)" aria-label="Reproducir o pausar">⏸</button>
+  <button id="bNext" title="Escena siguiente (→)" aria-label="Escena siguiente">⏭</button>
+  <div id="chips"></div>
+  <div id="bar"><div id="barfill"></div></div>
+  <span id="time">0:00 / 0:00</span>
+</div>
+
+<script>
+"use strict";
+/* ---------- parámetros de modo ---------- */
+const Q = new URLSearchParams(location.search);
+const EXPORT = Q.has('export');                       // cuadro a cuadro (para generar el .mp4)
+const REC = EXPORT || Q.has('grabacion') || Q.has('rec');
+if (REC) document.body.classList.add('rec');
+
+/* ---------- utilidades ---------- */
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const lerp=(a,b,t)=>a+(b-a)*t;
+const eio=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+const eout=t=>1-Math.pow(1-t,3);
+const ein=t=>t*t*t;
+const eback=t=>{const c1=1.70158,c3=c1+1;return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2);};
+const P=(lt,a,d=.6,f=eout)=>f(clamp((lt-a)/d));
+const $=s=>document.querySelector(s);
+const el=(tag,cls,parent,html)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;if(parent)parent.appendChild(e);return e;};
+const NS='http://www.w3.org/2000/svg';
+const sv=(tag,attrs,parent)=>{const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e;};
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+const COL={gemma:'#4C8DFF',llama:'#FF9A3C',phi:'#3CCB7F',gold:'#FFD166',fail:'#FF6B6B',neutral:'#9AA7BD',muted:'#8A94A6',line:'#26304A'};
+const MOD=[{n:'gemma3:4b',c:COL.gemma},{n:'llama3.2:3b',c:COL.llama},{n:'phi4-mini',c:COL.phi}];
+
+/* ---------- datos (todos de resultados/final_D14.csv y salidas de analisis/) ---------- */
+// orden real de los 27 tratamientos dentro de cada bloque: [modelo, posición, nivel] (columna orden_en_bloque)
+const ORDEN={"1":[[0,2,2],[1,0,1],[1,0,0],[2,1,1],[2,1,0],[2,0,0],[1,0,2],[0,2,1],[0,0,0],[1,1,2],[0,1,0],[2,0,2],[2,2,0],[0,0,2],[2,1,2],[1,1,1],[0,1,2],[0,0,1],[0,2,0],[0,1,1],[1,2,2],[2,2,1],[1,2,1],[2,0,1],[2,2,2],[1,2,0],[1,1,0]],"2":[[2,2,0],[0,1,2],[1,1,0],[2,2,1],[0,0,1],[2,0,0],[1,1,2],[0,0,2],[0,1,0],[0,1,1],[2,2,2],[2,0,1],[1,2,1],[2,1,2],[2,1,1],[1,0,0],[2,0,2],[0,2,0],[1,1,1],[2,1,0],[1,0,2],[0,2,1],[1,2,2],[1,2,0],[0,2,2],[1,0,1],[0,0,0]],"3":[[1,2,0],[2,0,0],[2,2,1],[1,0,0],[2,0,1],[0,0,2],[0,2,1],[1,1,2],[2,1,1],[0,1,0],[0,0,0],[0,2,2],[1,1,0],[0,2,0],[1,0,1],[2,2,2],[2,1,0],[1,2,2],[0,0,1],[1,0,2],[2,0,2],[1,2,1],[0,1,2],[1,1,1],[2,2,0],[2,1,2],[0,1,1]],"4":[[2,1,1],[2,1,2],[2,0,0],[2,0,2],[1,1,1],[0,2,0],[1,1,0],[0,1,0],[0,2,1],[0,2,2],[2,1,0],[0,1,1],[0,0,2],[0,0,0],[1,2,0],[1,0,0],[2,2,2],[0,0,1],[2,2,1],[1,2,1],[1,2,2],[0,1,2],[2,0,1],[1,0,2],[1,0,1],[1,1,2],[2,2,0]],"5":[[2,2,1],[2,0,2],[1,1,0],[0,1,0],[0,0,0],[1,0,0],[0,2,1],[2,0,0],[1,2,0],[0,2,2],[1,2,1],[0,1,1],[2,0,1],[2,2,0],[2,1,0],[2,2,2],[1,0,1],[1,1,2],[1,0,2],[0,1,2],[2,1,1],[0,0,2],[1,1,1],[0,2,0],[2,1,2],[1,2,2],[0,0,1]]};
+const DATOS=["3851","F-7492-X","6037","44295","9.15.6"];
+// acierto de las 135 corridas válidas, ordenadas por bloque, modelo, posición, nivel (1 = acierto)
+const ACIERTO="111111111111111111111110111111111111111111011111111111111111111111111111111111110111111111100101001000101001111111111111111101110101010";
+
+/* ---------- escenas ---------- */
+const SCENES=[
+ {id:'s0',title:'',dur:3,cues:[]},
+ {id:'s1',title:'El problema',dur:16,key:'Objetivo: medir cuándo un modelo deja de retener un dato inventado.',cues:[
+   [0.4,'En una conversación larga, le das al modelo un dato inventado.'],
+   [5.6,'La conversación sigue y el dato queda enterrado en el medio.'],
+   [10.2,'¿Cuándo deja el modelo de ser confiable?']]},
+ {id:'s2',title:'Cómo funciona',dur:32,key:'Verificación determinista: la cadena exacta, sin modelo juez.',cues:[
+   [0.6,'El agente CrewAI es la entrada interactiva:<br>pide la tarea y llama al núcleo.'],
+   [3.6,'El núcleo en Python corre la conversación turno a turno…'],
+   [6,'…y un generador de relleno escribe los mensajes del usuario.'],
+   [8.4,'Las 135 corridas llaman a ejecutar_evaluacion() directamente,<br>sin pasar por el agente.'],
+   [10.6,'Todo corre en local, con Ollama.'],
+   [13,'La conversación crece hasta un nivel de tokens.'],
+   [15.7,'El dato entra al inicio (2.º turno), a la mitad (50 %)<br>o al final (85 %).'],
+   [21.8,'Al final se pregunta por el dato.'],
+   [24.6,'Python busca la cadena exacta, sin negación. No hay modelo juez.']]},
+ {id:'s3',title:'El diseño',dur:40,key:'Factorial 3 × 3 × 3 en 5 bloques, con orden aleatorio dentro de cada bloque.',cues:[
+   [0.5,'Tres factores: modelo, posición del dato y nivel de tokens.'],
+   [9,'3 × 3 × 3 = 27 tratamientos: cada punto del cubo.'],
+   [13.5,'El cubo se repite en 5 bloques; cada bloque es un dato inventado.'],
+   [20.2,'Dentro de cada bloque, el orden de los 27 tratamientos se baraja.'],
+   [27,'Así, la deriva de la máquina no se confunde con los factores.'],
+   [34,'En total: 135 corridas.']]},
+ {id:'s4',title:'La ejecución',dur:20,key:'Una falla técnica se reintenta: no cuenta como olvido.',cues:[
+   [0.4,'Mediana de minutos por corrida, según modelo y nivel.'],
+   [5,'El tiempo crece con el nivel; phi4-mini es el más lento.<br>Total: 17.31 h.'],
+   [11,'4 fallas técnicas del generador de relleno, todas de gemma3:4b.'],
+   [14.6,'Se reintentaron: las 135 celdas cerraron como válidas.']]},
+ {id:'s5',title:'Resultados',dur:43,key:'gemma3:4b no falló; los fallos se concentran en el bloque 4.',cues:[
+   [0.5,'Acierto por modelo, con intervalo exacto al 95 %.'],
+   [4,'gemma3:4b: 45 de 45 · llama3.2:3b: 38 de 45 · phi4-mini: 33 de 45.'],
+   [13.5,'Ahora, por posición y por nivel.'],
+   [19.2,'La mitad tiene el mayor acierto:<br>no se ve el patrón clásico «lost in the middle».'],
+   [22.8,'Los intervalos se traslapan: no hay diferencia detectable<br>entre posiciones ni niveles.'],
+   [27.5,'Los 19 fallos por bloque: 1, 1, 1, 11 y 5.'],
+   [33.4,'El bloque 4 (dato 44295) concentra más de la mitad.']]},
+ {id:'s6',title:'Análisis y supuestos',dur:46,key:'El modelo parece importar, pero la evidencia depende en buena parte del bloque 4.',cues:[
+   [0.5,'Respuesta binaria y solo 19 fallos de 135.'],
+   [4.4,'La varianza p(1 − p) depende de la media:<br>no se usan pruebas paramétricas.'],
+   [9.6,'Intuición: si el modelo no importara, estas marcas<br>podrían estar en cualquier modelo del grupo.'],
+   [13,'Por eso se baraja el acierto solo dentro de cada grupo de 3 corridas.'],
+   [16.4,'Cada grupo comparte bloque y los otros dos factores.<br>20,000 permutaciones.'],
+   [21,'Modelo: p ≤ 1/20 001. Posición: 0.21. Nivel: 0.67.'],
+   [25.4,'Sin el bloque 4, el efecto del modelo se debilita (p = 0.035).'],
+   [28.6,'Con el criterio ampliado de formato, «44,295» con coma<br>cuenta como acierto: 17 fallos en vez de 19.'],
+   [31.8,'Fisher con Holm compara cada par de modelos<br>y ajusta el p por las 3 comparaciones.'],
+   [35.6,'gemma vs. llama: 0.024 ajustado; con el criterio ampliado,<br>0.052 ajustado (0.026 sin ajustar).'],
+   [39.6,'Posición y nivel: sin efecto detectable hasta 12K tokens.']]},
+ {id:'s7',title:'Los fallos',dur:15,key:'Etiquetado de fallos y kappa: '+ESTADO_ETIQUETADO+'. No hay resultados todavía.',cues:[
+   [0.5,'Seis categorías: alucinación, admisión, negación de capacidad,<br>alucinación narrativa, desvío y otra.'],
+   [5.6,'Dos evaluadores etiquetan a ciegas.<br>Estado del etiquetado y del kappa: '+ESTADO_ETIQUETADO+'.']]},
+ {id:'s8',title:'Límites y trabajo futuro',dur:24,key:'Los resultados valen para estos 3 modelos locales y hasta 12K tokens.',keyT:15,keyEnd:18.4,cues:[
+   [0.5,'Límites: respuesta binaria y solo 5 réplicas por celda.'],
+   [3.6,'El tope de 300 tokens cortó respuestas en las 135 corridas:<br>cerca del 37 %, 65 % y 60 % de los turnos, según el modelo.'],
+   [7,'La interacción posición × nivel no se contrasta.<br>Solo 3 modelos y hasta 12K tokens.'],
+   [10.8,'Futuro: más réplicas y datos, modelos en la nube y contextos mayores.'],
+   [18.6,'Código, datos y análisis en el repositorio.']]},
+];
+const SC=id=>SCENES.find(s=>s.id===id);
+let acc=0; SCENES.forEach(s=>{s.start=acc;acc+=s.dur;s.el=document.getElementById(s.id);s.anims=[...s.el.querySelectorAll('[data-a]')].map(e=>{const [a,b]=e.dataset.a.split(',').map(Number);return{e,a,b,fx:e.dataset.fx||'up'};});});
+const TOTAL=acc;
+
+/* ---------- animador genérico: data-a="entra,sale" ---------- */
+function animate(s,lt){
+  for(const o of s.anims){
+    const pin=P(lt,o.a,.7), pout=isNaN(o.b)?0:P(lt,o.b,.5,ein), k=pin*(1-pout);
+    const e=o.e; e.style.opacity=k.toFixed(3);
+    e.style.visibility=k<=.002?'hidden':'visible';
+    let tr='';
+    if(o.fx==='up') tr=`translateY(${((1-pin)*26-pout*10).toFixed(1)}px)`;
+    else if(o.fx==='left') tr=`translateX(${((1-pin)*-36).toFixed(1)}px)`;
+    else if(o.fx==='scale') tr=`scale(${(.88+.12*eback(clamp((lt-o.a)/.8))).toFixed(4)})`;
+    if(e.tagName==='TR') tr='';
+    e.style.transform=tr;
+  }
+}
+
+/* ================= ESCENA 1 ================= */
+(function(){
+  const S=SC('s1'), inner=$('#chatInner'), rng=mulberry32(5);
+  const B=[]; let y=40;
+  const add=(role,a,kind,h,html)=>{B.push({role,a,kind,h,html,y});y+=h+30;};
+  for(let i=0;i<8;i++){ const u=i%2===0; add(u?'user':'model',-1,'f',u?78:100+Math.round(rng()*3)*26); }
+  add('user',1.6,'dato',96,'El número de expediente del caso Aurora es <b>3851</b>.');
+  for(let i=0;i<11;i++){ const u=i%2===1; add(u?'user':'model',3.0+i*.48,'f',u?78:100+Math.round(rng()*3)*26); }
+  add('user',10.2,'q',96,'¿Cuál es el número de expediente del caso Aurora?');
+  add('model',11.2,'ans',70,'');
+  const TOT=y;
+  B.forEach((b,i)=>{
+    const d=el('div','bub '+b.role+(b.kind==='dato'?' dato':'')+(b.kind==='q'?' q':''),inner);
+    d.style.top=b.y+'px'; d.style.height=b.h+'px'; d.style.width=(b.role==='user'?(b.kind==='f'?400:520):560)+'px';
+    if(b.kind==='f'){ const n=Math.round((b.h-30)/21); for(let k=0;k<n;k++){const l=el('div','ln',d);l.style.width=(k===n-1?40+rng()*40:80+rng()*20)+'%';} }
+    else if(b.kind==='ans'){ d.innerHTML='<span id="typing" class="mono" style="font-size:30px;color:#8A94A6;letter-spacing:6px">• • •</span>'; }
+    else d.innerHTML=b.html;
+    if(b.kind==='dato'||b.kind==='q'){ const w=el('span','who',d,b.kind==='dato'?'Dato inventado':'Pregunta final'); w.style.color=b.kind==='dato'?COL.gold:''; }
+    b.d=d;
+  });
+  const WIN=760, sF=Math.min(1,(WIN-60)/TOT);
+  S.update=lt=>{
+    let bottom=0, lastB=0;
+    B.forEach(b=>{ const k=b.a<0?1:eout(clamp((lt-b.a)/.4)); b.d.style.opacity=k; b.d.style.transform=`translateY(${(1-k)*20}px)`;
+      if(k>0){ lastB=b.y+b.h*k+30; } });
+    bottom=lastB;
+    const z=eio(clamp((lt-5.4)/4)), s=lerp(1,sF,z);
+    const ty=Math.min(20, WIN-30-bottom*s);
+    inner.style.transform=`translateY(${ty.toFixed(1)}px) scale(${s.toFixed(4)})`;
+    const dato=B[8].d, glow=P(lt,1.6,.6)*(1-P(lt,6,3,eio));
+    dato.style.boxShadow=`0 0 ${(40*glow).toFixed(0)}px rgba(255,209,102,${(.55*glow).toFixed(2)})`;
+    dato.style.filter=`saturate(${(1-.7*P(lt,6.5,3,eio)).toFixed(2)})`;
+    const lost=P(lt,6.5,3,eio); dato.style.opacity=(dato.style.opacity*(1-.45*lost)).toFixed(3);
+    const ty2=document.getElementById('typing'); if(ty2) ty2.style.opacity=(.4+.6*Math.abs(Math.sin(lt*3))).toFixed(2);
+  };
+})();
+
+/* ================= ESCENA 2 ================= */
+(function(){
+  const S=SC('s2'), track=$('#track'), mks=$('#mks'), rng=mulberry32(11), W=1520;
+  const T=[]; let x=0;
+  while(x<1-1e-6){ const u=T.length%2===0; let w=u?.012+rng()*.012:.03+rng()*.035; w=Math.min(w,1-x); T.push({x0:x,w,u}); x+=w; }
+  const iD=T.findIndex(t=>t.u&&t.x0>=.5);              // turno del dato en el ejemplo (mitad)
+  T.forEach((t,i)=>{ t.d=el('div','seg',track); t.d.style.left=(t.x0*W)+'px';
+    t.d.style.background= i===iD? COL.gold : (t.u?'#3A4A6E':'#25314A'); if(i!==iD) t.d.style.borderRight='1px solid #121A2A'; });
+  const POS=[{x:T[2].x0,lab:'inicio',sub:'2.º turno',t:15.9},{x:.5,lab:'mitad',sub:'50 % del nivel',t:16.8},{x:.85,lab:'final',sub:'85 % del nivel',t:17.7}];
+  POS.forEach(p=>{ const px=200+p.x*W;
+    p.m=el('div','mk',mks); p.m.style.left=px+'px';
+    p.l=el('div','mklab',mks,`<div style="font-weight:700">${p.lab}</div><div class="small" style="font-size:18px">${p.sub}</div>`); p.l.style.left=px+'px';
+    p.dm=el('div','dia',mks); p.dm.style.left=px+'px'; });
+  const tag=el('div','abs mono',mks,'dato en esta corrida'); tag.style.cssText+=';top:395px;font-size:18px;color:'+COL.gold+';transform:translateX(-50%)'; tag.style.left=(200+T[iD].x0*W)+'px';
+  S.update=lt=>{
+    const a=$('#s2a'), b=$('#s2b');
+    a.style.opacity=1-P(lt,12.2,.8,eio); a.style.visibility=lt>13.1?'hidden':'visible';
+    b.style.visibility=lt<12.7?'hidden':'visible';
+    const f=eio(clamp((lt-13.4)/8.2));
+    T.forEach(t=>{ const k=clamp((f-t.x0)/t.w); t.d.style.width=(k*t.w*W).toFixed(1)+'px'; });
+    POS.forEach((p,i)=>{ const k=P(lt,p.t,.6); const keep= i===1?1:1-.7*P(lt,19.2,1,eio);
+      p.m.style.opacity=k*keep; p.l.style.opacity=k*keep; p.l.style.transform=`translateX(-50%) translateY(${(1-k)*14}px)`;
+      const drop=eout(clamp((lt-p.t-.2)/.7)); p.dm.style.top=lerp(200,353,drop)+'px'; p.dm.style.opacity=(clamp((lt-p.t-.2)/.2)*keep*(i===1?1:1-.5*drop*0)).toFixed(3);
+      const glow=i===1? .7+.3*Math.sin(lt*3):.4; p.dm.style.boxShadow=`0 0 ${22*glow}px rgba(255,209,102,${.7*glow})`;
+    });
+    tag.style.opacity=P(lt,19.6,.6)*(1-P(lt,21.5,.4));
+  };
+})();
+
+/* ================= ESCENA 3: Three.js ================= */
+const GL={ok:false};
+(function(){
+  const S=SC('s3'); const L=$('#labels3d');
+  if(typeof THREE==='undefined'){ S.update=lt=>{$('#nogl').style.display='block';}; return; }
+  let renderer;
+  try{ renderer=new THREE.WebGLRenderer({canvas:$('#gl'),antialias:true,alpha:true,preserveDrawingBuffer:true}); }
+  catch(e){ S.update=lt=>{$('#nogl').style.display='block';}; return; }
+  GL.ok=true; renderer.setPixelRatio(1); renderer.setSize(1920,1080,false); renderer.setClearColor(0x000000,0);
+  const scene=new THREE.Scene(), cam=new THREE.PerspectiveCamera(34,16/9,.1,300);
+  scene.add(new THREE.AmbientLight(0xffffff,.55));
+  const dl=new THREE.DirectionalLight(0xffffff,.85); dl.position.set(6,10,8); scene.add(dl);
+  const dl2=new THREE.DirectionalLight(0x8899ff,.25); dl2.position.set(-8,-4,-6); scene.add(dl2);
+  const geo=new THREE.SphereGeometry(.27,36,24), SP=1.2;
+  const edgeGeo=new THREE.EdgesGeometry(new THREE.BoxGeometry(SP*2+.9,SP*2+.9,SP*2+.9));
+  const blocks=[];
+  for(let b=0;b<5;b++){
+    const g=new THREE.Group(); scene.add(g); const pts={};
+    const edge=new THREE.LineSegments(edgeGeo,new THREE.LineBasicMaterial({color:0x4A5878,transparent:true,opacity:.55})); g.add(edge);
+    let idx=0;
+    for(let m=0;m<3;m++)for(let p=0;p<3;p++)for(let n=0;n<3;n++){
+      const c=new THREE.Color(MOD[m].c);
+      const mat=new THREE.MeshStandardMaterial({color:c,emissive:c,emissiveIntensity:.25,roughness:.38,metalness:.1,transparent:true});
+      const me=new THREE.Mesh(geo,mat); me.position.set((m-1)*SP,(n-1)*SP,(p-1)*SP); g.add(me);
+      pts[m+','+p+','+n]={me,mat,i:idx++};
+    }
+    const order=ORDEN[String(b+1)].map(([m,p,n])=>pts[m+','+p+','+n]);
+    order.forEach((o,j)=>o.j=j);
+    blocks.push({g,edge,pts:Object.values(pts),order});
+  }
+  // etiquetas
+  const lab=(html,color)=>{const d=el('div','label3d',L,html); if(color) d.style.color=color; d.style.visibility='hidden'; d.style.opacity=0; return d;};
+  const axisL=[]; const V=(x,y,z)=>new THREE.Vector3(x,y,z);
+  MOD.forEach((m,i)=>axisL.push({d:lab(m.n,m.c),v:V((i-1)*SP,-1.95,1.95),t:3}));
+  ['inicio','mitad','final'].forEach((p,i)=>axisL.push({d:lab(p,'#C5CDDA'),v:V(1.95,-1.95,(i-1)*SP),t:4.6}));
+  ['4K','8K','12K'].forEach((n,i)=>axisL.push({d:lab(n,'#C5CDDA'),v:V(-1.95,(i-1)*SP,1.95),t:6.2}));
+  axisL.push({d:lab('<span class="small" style="font-size:19px;letter-spacing:.08em">MODELO</span>'),v:V(0,-2.55,2.3),t:3});
+  axisL.push({d:lab('<span class="small" style="font-size:19px;letter-spacing:.08em">POSICIÓN</span>'),v:V(2.7,-2.5,0),t:4.6});
+  axisL.push({d:lab('<span class="small" style="font-size:19px;letter-spacing:.08em">NIVEL</span>'),v:V(-2.6,1.9,2.0),t:6.2});
+  const BX=b=>(b-2)*4.3, SB=.82, LB=b=>16.6+b*3.3, STEP=.112;
+  const blkL=[...Array(5)].map((_,b)=>({d:lab(`<div style="text-align:center"><div style="font-size:22px">Bloque ${b+1}</div><div class="mono" style="font-size:20px;color:${COL.gold}">${DATOS[b]}</div></div>`),b}));
+  const proj=(v,d,o)=>{const p=v.clone().project(cam); d.style.left=((p.x+1)/2*1920).toFixed(1)+'px'; d.style.top=((1-p.y)/2*1080).toFixed(1)+'px'; d.style.opacity=o.toFixed(3); d.style.visibility=o<.01?'hidden':'visible';};
+  S.update=(lt,so)=>{
+    const k=eio(clamp((lt-13)/3.6));
+    // cámara: rotación lenta y continua
+    const ang=-.78+lt*.022, el_=.40-.06*k, r=lerp(13.5,26,k);
+    const tgt=V(0,lerp(-.55,-.3,k),0);
+    cam.position.set(tgt.x+r*Math.sin(ang)*Math.cos(el_),tgt.y+r*Math.sin(el_),tgt.z+r*Math.cos(ang)*Math.cos(el_)); cam.lookAt(tgt);
+    let lit=0;
+    blocks.forEach((B,b)=>{
+      let x,y,sc,op;
+      if(b===0){ x=lerp(0,BX(0),k); y=0; sc=lerp(1,SB,k); op=1; }
+      else { const kb=eio(clamp((lt-13.6-b*.28)/2.4)); x=BX(b); y=lerp(-7,0,kb); sc=SB; op=kb; }
+      B.g.position.set(x,y,0); B.g.scale.setScalar(sc); B.g.visible=op>.005;
+      B.edge.material.opacity=.5*op;
+      const dimK=P(lt,13.4,1.4,eio);
+      B.pts.forEach(o=>{
+        let s=1, ei=.25, opa=op;
+        if(b===0 && lt<13.4){ const a=.5+o.i*.11; s=eback(clamp((lt-a)/.55)); if(lt<a) s=0; }
+        const tl=LB(b)+o.j*STEP, f=lt-tl;
+        if(f>=0){ const fl=Math.exp(-f*3.2); s=1+.55*fl; ei=.32+1.3*fl; opa=op; lit++; }
+        else if(lt>=13.4){ s=lerp(1,.78,dimK); ei=lerp(.25,.04,dimK); opa=op*lerp(1,.32,dimK); }
+        o.me.scale.setScalar(Math.max(s,0.0001)); o.mat.emissiveIntensity=ei; o.mat.opacity=opa;
+      });
+    });
+    $('#cnt').textContent=lit;
+    renderer.render(scene,cam);
+    axisL.forEach(a=>proj(a.v,a.d,P(lt,a.t,.6)*(1-P(lt,12.6,.7,ein))*so));
+    blkL.forEach(o=>{ const B=blocks[o.b]; proj(V(BX(o.b),2.35,0),o.d,P(lt,Math.max(15.6,LB(o.b)-.4),.6)*so); });
+  };
+  S.leave=()=>{ L.querySelectorAll('.label3d').forEach(d=>{d.style.visibility='hidden';}); renderer.clear(); };
+})();
+
+/* ---------- gráficas de barras (SVG) ---------- */
+function barChart(svg,o){
+  const {x0=90,y0=30,w,h,ymax,ticks,fmt=v=>v}=o, g=sv('g',{},svg), Y=v=>y0+h-v/ymax*h;
+  ticks.forEach(t=>{ sv('line',{x1:x0,x2:x0+w,y1:Y(t),y2:Y(t),stroke:t===0?'#3A4560':'#1E2638','stroke-width':t===0?2:1},g);
+    const tx=sv('text',{x:x0-16,y:Y(t)+7,'text-anchor':'end',fill:'#8A94A6','font-size':20,'font-family':'var(--mono)'},g); tx.textContent=fmt(t); });
+  const items=[]; const n=o.bars.length, gw=w/n, bw=o.bw||Math.min(150,gw*.5);
+  o.bars.forEach((b,i)=>{
+    const cx=b.cx!=null?x0+b.cx:x0+gw*(i+.5);
+    const r=sv('rect',{x:cx-bw/2,width:bw,y:Y(0),height:0,rx:8,fill:b.color},g);
+    const wh=sv('g',{opacity:0},g);
+    if(b.lo!=null){ sv('line',{x1:cx,x2:cx,y1:Y(b.lo),y2:Y(b.hi),stroke:'#E8ECF2','stroke-width':3},wh);
+      [b.lo,b.hi].forEach(v=>sv('line',{x1:cx-16,x2:cx+16,y1:Y(v),y2:Y(v),stroke:'#E8ECF2','stroke-width':3},wh)); }
+    const top=b.hi!=null?Y(b.hi):Y(b.v);
+    const lt=sv('text',{x:cx,y:top-18,'text-anchor':'middle',fill:'#E8ECF2','font-size':b.fs||26,'font-weight':700,opacity:0},g); lt.textContent=b.top||'';
+    if(b.sub){ const s2=sv('tspan',{x:cx,dy:-30,'font-size':18,fill:'#8A94A6','font-weight':500},lt); }
+    const xl=sv('text',{x:cx,y:y0+h+38,'text-anchor':'middle',fill:b.lc||'#C5CDDA','font-size':b.lfs||24,'font-family':b.mono?'var(--mono)':'inherit','font-weight':600,opacity:0},g); xl.textContent=b.label;
+    items.push({b,r,wh,lt,xl});
+  });
+  return lt=>items.forEach(({b,r,wh,lt:tx,xl})=>{
+    const k=eio(clamp((lt-b.t)/.9)), hh=b.v/ymax*h*k;
+    r.setAttribute('y',Y(0)-hh); r.setAttribute('height',Math.max(hh,0));
+    wh.setAttribute('opacity',P(lt,b.t+.7,.5)); tx.setAttribute('opacity',P(lt,b.t+.9,.5)); xl.setAttribute('opacity',P(lt,b.t-.3,.5));
+    if(b.glow!=null) r.setAttribute('opacity',b.glow(lt));
+  });
+}
+
+/* ================= ESCENA 4 ================= */
+(function(){
+  const S=SC('s4'), svg=$('#chT');
+  const V=[[2.7,5.5,7.8],[2.5,5.9,9.1],[4.2,9.6,17.3]]; // analisis/tiempos.py
+  const bars=[]; const gw=870/3, bw=72;
+  for(let n=0;n<3;n++)for(let m=0;m<3;m++) bars.push({v:V[m][n],color:MOD[m].c,cx:gw*(n+.5)+(m-1)*(bw+14),top:V[m][n].toFixed(1),fs:22,label:'',t:1+n*1.3+m*.25});
+  const up=barChart(svg,{x0:90,y0:40,w:870,h:540,ymax:20,ticks:[0,5,10,15,20],bars,bw});
+  ['4,000','8,000','12,000'].forEach((s,i)=>{const t=sv('text',{x:90+gw*(i+.5),y:40+540+44,'text-anchor':'middle',fill:'#C5CDDA','font-size':24,'font-family':'var(--mono)'},svg);t.textContent=s+' tokens';});
+  const yl=sv('text',{x:20,y:30,fill:'#8A94A6','font-size':18},svg); yl.textContent='min';
+  // reintentos (resultados/final_D14.csv, columna intento; D-18)
+  const R=[['bloque 1 · mitad · 12K',[0,1]],['bloque 1 · final · 4K',[0,0,1]],['bloque 5 · inicio · 8K',[0,1]]];
+  const box=$('#retries'); let t0=11.8; const chips=[];
+  R.forEach(([lab,att])=>{ const row=el('div','',box); row.style.cssText='display:flex;align-items:center;gap:14px;margin:0 0 22px';
+    el('div','mono',row,lab).style.cssText='font-size:22px;width:320px;color:#C5CDDA';
+    att.forEach(ok=>{ const c=el('div','',row,ok?'✓':'✕'); c.style.cssText=`width:54px;height:54px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;background:${ok?'rgba(60,203,127,.15)':'rgba(255,107,107,.14)'};color:${ok?COL.phi:COL.fail};border:1px solid ${ok?'#2D6B4D':'#6B2D33'}`; chips.push({c,t:t0}); t0+=.55; });
+    t0+=.2; });
+  S.update=lt=>{ up(lt); chips.forEach(({c,t})=>{const k=P(lt,t,.4); c.style.opacity=k; c.style.transform=`scale(${.7+.3*eback(clamp((lt-t)/.5))})`;}); };
+})();
+
+/* ================= ESCENA 5 ================= */
+(function(){
+  const S=SC('s5'), pct=v=>Math.round(v*100)+'%';
+  // analisis/descriptivo.py
+  const upM=barChart($('#chM'),{x0:90,y0:60,w:900,h:520,ymax:1,ticks:[0,.25,.5,.75,1],fmt:pct,bars:[
+    {label:'gemma3:4b',mono:1,lc:COL.gemma,color:COL.gemma,v:1,lo:.921,hi:1,top:'45 de 45',t:1.4},
+    {label:'llama3.2:3b',mono:1,lc:COL.llama,color:COL.llama,v:.844,lo:.705,hi:.935,top:'38 de 45',t:2.4},
+    {label:'phi4-mini',mono:1,lc:COL.phi,color:COL.phi,v:.733,lo:.581,hi:.854,top:'33 de 45',t:3.4}]});
+  const NB='#7F8BA3';
+  const hiMid=lt=>1;
+  const upP=barChart($('#chP'),{x0:80,y0:50,w:700,h:470,ymax:1,ticks:[0,.25,.5,.75,1],fmt:pct,bw:120,bars:[
+    {label:'inicio',color:NB,v:.867,lo:.732,hi:.949,top:'39 de 45',fs:22,t:14.4},
+    {label:'mitad',color:'#B7C2D8',v:.911,lo:.788,hi:.975,top:'41 de 45',fs:22,t:14.8},
+    {label:'final',color:NB,v:.8,lo:.654,hi:.904,top:'36 de 45',fs:22,t:15.2}]});
+  const upN=barChart($('#chN'),{x0:80,y0:50,w:700,h:470,ymax:1,ticks:[0,.25,.5,.75,1],fmt:pct,bw:120,bars:[
+    {label:'4,000',mono:1,color:NB,v:.889,lo:.759,hi:.963,top:'40 de 45',fs:22,t:16.2},
+    {label:'8,000',mono:1,color:NB,v:.822,lo:.679,hi:.92,top:'37 de 45',fs:22,t:16.6},
+    {label:'12,000',mono:1,color:NB,v:.867,lo:.732,hi:.949,top:'39 de 45',fs:22,t:17}]});
+  // analisis/eda.py: fallos por bloque y modelo
+  const svg=$('#chB'), x0=90,y0=40,w=940,h=540,ymax=12,Y=v=>y0+h-v/ymax*h;
+  [0,3,6,9,12].forEach(t=>{ sv('line',{x1:x0,x2:x0+w,y1:Y(t),y2:Y(t),stroke:t?'#1E2638':'#3A4560','stroke-width':t?1:2},svg);
+    const tx=sv('text',{x:x0-16,y:Y(t)+7,'text-anchor':'end',fill:'#8A94A6','font-size':20,'font-family':'var(--mono)'},svg); tx.textContent=t; });
+  const F=[[0,1],[1,0],[0,1],[5,6],[1,4]]; const items=[]; const gw=w/5, bw=110;
+  const hlr=sv('rect',{x:x0+gw*3.5-bw/2-22,y:y0-14,width:bw+44,height:h+92,rx:16,fill:'rgba(255,209,102,.07)',stroke:COL.gold,'stroke-opacity':.6,'stroke-width':2,opacity:0},svg);
+  F.forEach(([l,p],b)=>{ const cx=x0+gw*(b+.5);
+    const rl=sv('rect',{x:cx-bw/2,width:bw,y:Y(0),height:0,fill:COL.llama},svg);
+    const rp=sv('rect',{x:cx-bw/2,width:bw,y:Y(0),height:0,fill:COL.phi},svg);
+    const tt=sv('text',{x:cx,y:Y(l+p)-16,'text-anchor':'middle',fill:'#E8ECF2','font-size':30,'font-weight':700,opacity:0},svg); tt.textContent=l+p;
+    const xl=sv('text',{x:cx,y:y0+h+36,'text-anchor':'middle',fill:'#C5CDDA','font-size':22,'font-weight':600},svg); xl.textContent='Bloque '+(b+1);
+    const xd=sv('text',{x:cx,y:y0+h+64,'text-anchor':'middle',fill:COL.gold,'font-size':19,'font-family':'var(--mono)'},svg); xd.textContent=DATOS[b];
+    items.push({l,p,rl,rp,tt,t:28.6+b*.55}); });
+  S.update=lt=>{ upM(lt); upP(lt); upN(lt);
+    items.forEach(o=>{ const k=eio(clamp((lt-o.t)/.9)); const hl=o.l/ymax*h*k, hp=o.p/ymax*h*k;
+      o.rl.setAttribute('y',Y(0)-hl); o.rl.setAttribute('height',hl); o.rp.setAttribute('y',Y(0)-hl-hp); o.rp.setAttribute('height',hp);
+      o.tt.setAttribute('opacity',P(lt,o.t+.8,.5)); });
+    hlr.setAttribute('opacity',P(lt,33.4,.8)*(0.75+.25*Math.sin(lt*2.4)));
+  };
+})();
+
+/* ================= ESCENA 6 ================= */
+(function(){
+  const S=SC('s6'), grid=$('#grid'), cells=[]; const sz=36, gap=8;
+  for(let b=0;b<5;b++){ const lb=el('div','abs small',grid,'Bloque '+(b+1)); lb.style.cssText+=`;left:-130px;top:${b*(sz+gap)+6}px;font-size:19px;white-space:nowrap`;
+    for(let c=0;c<27;c++){ const ok=ACIERTO[b*27+c]==='1'; const d=el('div','abs',grid); d.style.cssText+=`;left:${c*(sz+gap)+Math.floor(c/9)*20}px;top:${b*(sz+gap)}px;width:${sz}px;height:${sz}px;border-radius:8px;background:#3A4560`; cells.push({d,ok,b,c}); } }
+  MOD.forEach((m,i)=>{ const x=i*(9*(sz+gap)+20); const bar=el('div','abs',grid); bar.style.cssText+=`;left:${x}px;top:${5*(sz+gap)+4}px;width:${9*(sz+gap)-gap}px;height:5px;border-radius:3px;background:${m.c}`;
+    const t=el('div','abs mono',grid,m.n); t.style.cssText+=`;left:${x}px;top:${5*(sz+gap)+16}px;font-size:19px;color:${m.c};white-space:nowrap`; });
+  // grupos reales del bloque 4 (modelo gemma, llama, phi): acierto 1/0
+  const G=[['bloque 4 · inicio · 8K',[1,0,0]],['bloque 4 · mitad · 8K',[1,0,0]],['bloque 4 · final · 4K',[1,0,0]],['bloque 4 · mitad · 12K',[1,1,1]]];
+  const PERMS=[[0,1,2],[1,2,0],[2,0,1],[0,2,1],[1,0,2],[2,1,0]];
+  const SH=[13.4,15.2,17,18.8,20.4]; const pw=$('#perm'); const slotX=s=>560+s*150, rowY=r=>240+r*120;
+  MOD.forEach((m,s)=>{ const t=el('div','abs mono',pw,m.n); t.style.cssText+=`;left:${slotX(s)}px;top:200px;transform:translateX(-50%);font-size:18px;color:${m.c};white-space:nowrap`; });
+  const marks=[];
+  G.forEach(([lab,acc],r)=>{ const l=el('div','abs mono',pw,lab); l.style.cssText+=`;left:150px;top:${rowY(r)+28}px;font-size:21px;color:#C5CDDA;white-space:nowrap`;
+    const fr=el('div','abs',pw); fr.style.cssText+=`;left:${slotX(0)-60}px;top:${rowY(r)-6}px;width:420px;height:98px;border-radius:20px;border:1px dashed #334063`;
+    for(let s=0;s<3;s++){ const o=el('div','abs',pw); o.style.cssText+=`;left:${slotX(s)-43}px;top:${rowY(r)}px;width:86px;height:86px;border-radius:50%;border:3px solid ${MOD[s].c};opacity:.85`; }
+    acc.forEach((a,j)=>{ const mk=el('div','abs',pw,a?'✓':'✕'); mk.style.cssText+=`;width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800;background:${a?'#E8ECF2':COL.fail};color:${a?'#0B0F17':'#2A0A0E'}`; marks.push({mk,r,j}); }); });
+  const permAt=(r,k)=>k===0?PERMS[0]:PERMS[(k+r*2)%6];
+  S.update=lt=>{
+    cells.forEach(o=>{ const t=.4+o.c*.025+o.b*.06, k=P(lt,t,.4); o.d.style.opacity=k;
+      const red=P(lt,2.4+o.c*.01,.5); o.d.style.background=o.ok?'#3A4560':`rgb(${lerp(58,255,red)|0},${lerp(69,107,red)|0},${lerp(96,107,red)|0})`;
+      o.d.style.transform=o.ok?'':`scale(${1+.18*Math.exp(-Math.max(0,lt-2.6)*3)*red})`; });
+    let k=0; while(k<SH.length&&lt>=SH[k]) k++;
+    const q= k===0?1:eio(clamp((lt-SH[k-1])/.8));
+    marks.forEach(o=>{ const from=permAt(o.r,Math.max(0,k-1)), to=permAt(o.r,k);
+      const s0=from.indexOf(o.j), s1=to.indexOf(o.j), x=lerp(slotX(s0),slotX(s1),k===0?1:q), y=rowY(o.r)+13-(k===0?0:Math.sin(Math.PI*q)*46*(s0!==s1?1:0));
+      o.mk.style.left=(x-30).toFixed(1)+'px'; o.mk.style.top=y.toFixed(1)+'px'; });
+  };
+})();
+
+/* ================= ESCENA 7 ================= */
+(function(){
+  const S=SC('s7'), box=$('#chips7');
+  // docs/guia_etiquetado.md
+  const CAT=[['Alucinación','Da un dato concreto distinto al correcto.'],['Admisión','Dice que no tiene o no recuerda la información.'],['Negación de capacidad','Dice que no puede recordar conversaciones.'],['Alucinación narrativa','Convierte el dato en una historia inventada.'],['Desvío','No responde la pregunta.'],['Otra / duda','No encaja; se anota por qué.']];
+  CAT.forEach(([t,d],i)=>{ const c=el('div','chip card',box,`<div class="n">${i+1}</div><div class="t">${t}</div><div class="d">${d}</div>`);
+    c.style.left=(150+(i%3)*320)+'px'; c.style.top=(230+Math.floor(i/3)*180)+'px'; c.dataset.a=String(.8+i*.6); });
+  S.anims.push(...[...box.children].map(e=>({e,a:Number(e.dataset.a),b:NaN,fx:'up'})));
+  S.update=lt=>{ const b=$('#badge'); b.style.boxShadow=`0 0 ${(10+14*Math.abs(Math.sin(lt*2))).toFixed(0)}px rgba(255,209,102,.35)`;
+    const p=$('#pend'); p.style.transform=`translateX(${((lt*.6%1)*330-100).toFixed(0)}%)`; };
+})();
+
+/* ================= ESCENA 8 ================= */
+SC('s8').update=()=>{};
+SC('s0').update=()=>{};
+// estado del etiquetado desde la constante
+document.querySelectorAll('.estado').forEach(e=>e.textContent=ESTADO_ETIQUETADO);
+document.querySelectorAll('.estado-up').forEach(e=>e.textContent=ESTADO_ETIQUETADO.toUpperCase());
+
+/* ---------- motor de tiempo ---------- */
+const subs=$('#subs span'), dots=$('#dots');
+SCENES.slice(1).forEach(()=>el('i','',dots));
+function sceneAt(T){ for(let i=SCENES.length-1;i>=0;i--) if(T>=SCENES[i].start) return i; return 0; }
+let cur=-1;
+function render(T){
+  T=clamp(T,0,TOTAL-1e-3);
+  const i=sceneAt(T), s=SCENES[i], lt=T-s.start;
+  if(i!==cur){ if(cur>=0){ const o=SCENES[cur]; o.el.style.visibility='hidden'; o.el.style.opacity=0; o.leave&&o.leave(); } cur=i;
+    $('#hnum').textContent=i?String(i).padStart(2,'0'):''; $('#htitle').textContent=s.title;
+    [...dots.children].forEach((d,j)=>d.classList.toggle('on',j<i)); $('#nogl').style.display='none';
+    $('#key .kt').textContent=s.key||''; }
+  const fin=eio(clamp(lt/.7)), fout= i===SCENES.length-1?1:eio(clamp((s.dur-lt)/.7)), so=Math.min(fin,fout);
+  s.el.style.visibility='visible'; s.el.style.opacity=so.toFixed(3);
+  $('#header').style.opacity=(i?so:0).toFixed(3); dots.style.opacity=i?1:0;
+  $('#gl').style.opacity= (s.id==='s3'&&GL.ok)? so.toFixed(3):0;
+  // frase clave al cierre de la escena
+  let kk=0; if(s.key){ const kt=s.keyT!=null?s.keyT:s.dur-3.2, ke=s.keyEnd!=null?s.keyEnd:s.dur+1;
+    kk=P(lt,kt,.6,eio)*(1-P(lt,ke-.5,.5,ein)); }
+  const ko=(kk*so); $('#scrim').style.opacity=ko.toFixed(3); $('#scrim').style.visibility=ko<.01?'hidden':'visible';
+  const K=$('#key'); K.style.opacity=ko.toFixed(3); K.style.visibility=ko<.01?'hidden':'visible'; K.style.transform=`translateY(${((1-kk)*18).toFixed(1)}px)`;
+  animate(s,lt); s.update&&s.update(lt,so);
+  // subtítulos
+  let k=-1; s.cues.forEach((c,j)=>{ if(c[0]<=lt) k=j; });
+  if(k<0){ subs.style.opacity=0; }
+  else { const t0=s.cues[k][0], t1=k+1<s.cues.length?s.cues[k+1][0]:s.dur+1;
+    const o=Math.min(P(lt,t0,.35), 1-P(lt,t1-.3,.3,ein));
+    const key=s.id+k; if(subs.dataset.k!==key){ subs.innerHTML=s.cues[k][1]; subs.dataset.k=key; }
+    const so2=o*so*(1-kk); subs.style.opacity=so2.toFixed(3); subs.style.visibility=so2<.01?'hidden':'visible'; }
+  // controles
+  $('#barfill').style.width=(T/TOTAL*100)+'%';
+  const fm=x=>Math.floor(x/60)+':'+String(Math.floor(x%60)).padStart(2,'0');
+  $('#time').textContent=fm(T)+' / '+fm(TOTAL);
+  [...$('#chips').children].forEach((c,j)=>c.classList.toggle('on',j===i));
+}
+
+/* ---------- escala del escenario ---------- */
+function fit(){ const vp=$('#viewport'), w=vp.clientWidth, h=vp.clientHeight, sc=Math.min(w/1920,h/1080);
+  const st=$('#stage'); st.style.transform=`translate(${(w-1920*sc)/2}px,${(h-1080*sc)/2}px) scale(${sc})`; }
+addEventListener('resize',fit); fit();
+
+/* ---------- reproducción ---------- */
+let T=0, playing=!EXPORT, last=null;
+const setPlay=v=>{ playing=v; $('#bPlay').textContent=v?'⏸':'▶'; last=null; };
+function loop(now){ if(playing){ if(last!=null) T+=(now-last)/1000; last=now; if(T>=TOTAL){ T=TOTAL; setPlay(false); } } render(T); requestAnimationFrame(loop); }
+const goScene=i=>{ i=clamp(i,0,SCENES.length-1); T=SCENES[i].start+.001; render(T); };
+$('#bPlay').onclick=()=>{ if(T>=TOTAL-.01) T=0; setPlay(!playing); };
+$('#bPrev').onclick=()=>{ const i=sceneAt(T), lt=T-SCENES[i].start; goScene(lt>1.5?i:i-1); };
+$('#bNext').onclick=()=>goScene(sceneAt(T)+1);
+SCENES.forEach((s,i)=>{ const b=el('button','',$('#chips'),i?String(i):'T'); b.title=s.title||'Título'; b.onclick=()=>goScene(i);
+  const tk=el('div','tick',$('#bar')); tk.style.left=(s.start/TOTAL*100)+'%'; });
+$('#bar').onclick=e=>{ const r=e.currentTarget.getBoundingClientRect(); T=clamp((e.clientX-r.left)/r.width)*TOTAL; render(T); };
+addEventListener('keydown',e=>{ if(e.code==='Space'){e.preventDefault();$('#bPlay').click();} else if(e.key==='ArrowRight') $('#bNext').click(); else if(e.key==='ArrowLeft') $('#bPrev').click(); });
+
+/* ---------- API para exportar cuadro a cuadro ---------- */
+window.__TOTAL=TOTAL;
+window.__seek=t=>{ playing=false; T=t; render(T); return true; };
+if(EXPORT){ render(0); } else requestAnimationFrame(loop);
+</script>
+</body>
+</html>

@@ -101,9 +101,57 @@ Fuentes del diseño: factorial completo con réplicas, Montgomery y Runger (2018
 - El criterio exacto cuenta como fallo el número correcto con otro formato (2 casos); D-20 lo trata como sensibilidad.
 - 4 filas `invalida_tecnica` por `generador_relleno` (todas de `gemma3:4b`) tienen causa no determinada, porque el error no se guarda (D-18).
 
-## 11. Estado de la ejecución (2026-11-05)
-`final_D14` está completo: 135 celdas con resultado válido y 139 filas en el CSV (4 filas técnicas inválidas conservadas como historial). Hay 19 fallos: `llama3.2:3b` 7, `phi4-mini` 12, `gemma3:4b` 0. Las pruebas (Fisher por pares con Holm, permutación estratificada y sensibilidades) y sus resultados están en el README, sección "Análisis estadístico", y en D-21. Resumen: el modelo parece importar, pero la evidencia depende en buena parte del bloque 4; la posición y el nivel no muestran efecto detectable hasta 12K tokens, con poca potencia.
+## 11. Estado de la ejecución (2026-11-07)
+`final_D14` está completo: 135 celdas con resultado válido y 139 filas en el CSV (4 filas técnicas inválidas conservadas como historial). Hay 19 fallos: `llama3.2:3b` 7, `phi4-mini` 12, `gemma3:4b` 0. Las pruebas (Fisher por pares con Holm, permutación estratificada y sensibilidades) y sus resultados están en el README, sección "Análisis estadístico", y en D-21. Resumen: el modelo parece importar, pero la evidencia depende en buena parte del bloque 4, y la diferencia entre `gemma3:4b` y `llama3.2:3b` depende además del criterio de formato; la posición y el nivel no muestran efecto detectable hasta 12K tokens, con poca potencia.
 
-## 12. Pendiente
-- Etiquetado terminado por los dos; kappa de Cohen 0.089 (4 de 19 coincidencias, 2 de ellas fijadas por la regla de F003 y F004): sin esos dos casos, el kappa es −0.04 sobre 17 casos, es decir, el acuerdo no supera el azar. No se hace consenso y los tipos de fallo no se reportan como resultado (D-24).
-- Sensibilidades de D-19 no hechas (D-23): tema y `contexto_final`.
+## 12. Cierre: etiquetado y trabajo no realizado
+**Hecho.** Etiquetado terminado por los dos; kappa de Cohen 0.089 (4 de 19 coincidencias, 2 de ellas fijadas por la regla de F003 y F004): sin esos dos casos, el kappa es −0.04 sobre 17 casos, es decir, el acuerdo no supera el azar. No se hace consenso y los tipos de fallo no se reportan como resultado (D-24).
+
+**No realizado, queda como trabajo futuro** (la lista completa está en el README, sección "Cómo continuar el proyecto"):
+- Sensibilidades de D-19 con el tema y `contexto_final` como covariables (D-23).
+- Diseño B con modelos en la nube (D-23).
+- Clasificador de tipo de fallo (Laya u otro) y agentes de verificación y análisis (D-22).
+- Aclarar en la guía de etiquetado si «alucinación» incluye afirmar que el dato no existe o no se mencionó (D-24).
+
+## Anexo A. Arquitectura y alternativas descartadas
+- **Agente CrewAI con una herramienta.** El agente es una capa delgada para uso interactivo. La lógica del experimento es código determinista. Alternativa descartada: tres herramientas separadas, porque pasar el texto de la conversación por el agente entre cada una saturaba su contexto.
+- **Agentes solo donde hay juicio de lenguaje (D-08).** No hay agente selector local/nube (un diccionario lo resuelve) ni agente para verificar supuestos estadísticos (código plano). Se planearon un verificador de checkpoints intermedios, un clasificador de tipo de fallo y un analista de hallazgos, y **no se implementaron** (D-22): el etiquetado manual con kappa cumple el papel del clasificador, el análisis es determinista y los puntos de control dentro de la conversación se dejaron como trabajo futuro (D-14).
+- **CrewAI.** Alternativas descartadas: LangChain (más componentes para el mismo formato ReAct), LangGraph (sobrediseño para un flujo lineal) y AutoGen (complejidad sin beneficio).
+- **Datos inventados, no conocimiento general (D-11).** La primera versión usaba "la capital de Australia es Canberra" y todos acertaban por conocimiento de entrenamiento.
+- **Evaluación determinista, no LLM juez, para retención (D-09, D-11).** Alternativa descartada: otro modelo como evaluador (ruido y circularidad).
+- **Manejo de errores unificado (D-11).** Un solo punto (`consultar_modelo`) convierte errores de red en corridas inválidas tipadas. Alternativa descartada: copiar el parche en cada rama.
+
+## Anexo B. Parámetros controlados y registro de corridas
+**Parámetros** (constantes al inicio de `agente.py`):
+
+| Constante | Valor | Razón |
+|---|---|---|
+| `TEMPERATURA` | 0.7 | Igual en todos los modelos evaluados y en el generador de relleno. Sin fijarla, cada proveedor usa la suya (Ollama 0.8, nube ~1.0) y se confunde con el efecto del modelo. Con 0 las réplicas serían casi idénticas. |
+| `TEMPERATURA_ORQUESTADOR` | 0.0 | El orquestador solo copia parámetros. |
+| `NUM_CTX_OLLAMA` | 16,384 | Evita el truncamiento silencioso de Ollama; debe superar el nivel más alto (12,000). |
+| `TIMEOUT_SEGUNDOS` | 600 s | Aplica a todas las llamadas. Sin timeout, `requests` espera indefinidamente. |
+| Tope de respuesta | 300 tokens | Común a todos los modelos (D-06). Puede truncar respuestas largas; se registra `done_reason` (D-16). |
+| Máximo de turnos | 60 | Si no se alcanza el nivel en 60 turnos, la corrida queda `no_alcanzo_nivel`. |
+| `SEMILLA_EXPERIMENTO` | 42 (en `correr_experimento.py`) | Fija el diseño: orden de los tratamientos por bloque, dato y tema. No fija la generación del modelo, a propósito: las réplicas necesitan variabilidad natural (D-15). |
+
+`random.seed(42)` sigue en `agente.py` solo para el modo interactivo; no interviene en las corridas `final_D14`. `top_k` y `top_p` no se fijan: cada modelo usa los suyos.
+
+**Corridas inválidas en `final_D14`.** Hubo 4 filas `invalida_tecnica`, todas con `generador_relleno` y todas de `gemma3:4b`. Las 4 filas corresponden a 3 celdas (bloque 1 mitad 12K, bloque 1 final 4K y bloque 5 inicio 8K); al relanzar, las 3 cerraron como válidas (la de bloque 1 final 4K, en el tercer intento). La causa de las fallas no está determinada: el código descarta el mensaje de la excepción (`detalle_error` queda en `None`). Una hipótesis, sin probar, es el tope de 600 s de la llamada al generador.
+
+Campos del CSV (27 columnas): `modelo, posicion, nivel_tokens, replica, estado_final, acierto, turnos_reales, contexto_al_dato, contexto_final, contexto_decreciente, tokens_totales, tiempo_segundos, errores, tema, dato_clave` y, desde D-14, D-16 y D-18, `bloque, orden_en_bloque, indice_dato, indice_tema, done_reason_final, respuesta_final_vacia, contexto_tras_dato, contexto_antes_pregunta, turnos_dato_a_pregunta, dato_sobre_nivel, turnos_relleno_cortados, intento`.
+
+Notas sobre los campos:
+- `tokens_prompt` (en el JSON) es la **suma** de los prompts de todas las llamadas (cada turno reenvía el historial); no es la longitud de la conversación.
+- `contexto_final` es el `prompt_eval_count` de la llamada de la pregunta final, es decir, el contexto al preguntar. La redacción anterior de D-06 decía "prompt + respuesta" y se corrigió (D-16).
+- `contexto_al_dato` se mide antes de insertar el dato y `contexto_tras_dato` al cierre de ese turno.
+- `turnos_relleno_cortados` cuenta respuestas del modelo evaluado cortadas por el tope de tokens, no las del generador de relleno.
+
+## Anexo C. Iteraciones del diseño
+- **v1, párrafos estáticos:** el dato entre texto de relleno. Todos los modelos acertaban.
+- **v2, conversación con preguntas fijas:** las preguntas no seguían el hilo.
+- **v3, conversación natural generada:** `qwen2.5` escribe los mensajes del usuario según las respuestas del modelo.
+- **v4, dato inventado con banco rotativo:** los datos de conocimiento general medían conocimiento previo, no retención.
+- **v5, orquestador liviano y temporizador:** `qwen2.5:1.5b` (986 MB) en lugar de `qwen2.5` (4.7 GB), para correr con 8 GB de RAM.
+- **v6, control de variables y errores tipados:** temperatura fija, timeout, clasificación de corridas inválidas, detección de rechazos de seguridad, banco reescrito con frases neutras ("número de expediente") porque "código secreto" activaba filtros de seguridad.
+- **v7, niveles de tokens y diseño en bloques:** longitud medida en tokens (D-06), factorial en bloques con orden aleatorio, dato por bloque y tema por rotación (D-14, D-15), y registro de validez por corrida (D-16).
+- **v8, reintentos y análisis planeado:** reintento acotado de fallas técnicas (D-18), plan de análisis (D-19) y sensibilidad por formato (D-20).

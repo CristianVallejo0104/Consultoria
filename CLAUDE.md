@@ -87,7 +87,7 @@ Las corridas inválidas no cuentan como "el modelo olvidó el dato". Los rechazo
 
 ## Esquema de salida
 
-CSV de `final_D14`: 27 columnas (lista completa en el README, "Clasificación de las corridas"). `intento` es la última. Cada reintento agrega una fila y sobrescribe el JSON y el TXT del intento anterior (nombre determinista, D-16).
+CSV de `final_D14`: 27 columnas (lista completa en docs/DISENO.md, Anexo B). `intento` es la última. Cada reintento agrega una fila y sobrescribe el JSON y el TXT del intento anterior (nombre determinista, D-16).
 
 Claves del JSON por corrida: `modelo, empresa, posicion, nivel_tokens, tema, dato_clave, verificacion, turno_dato, contexto_al_dato, contexto_final, turnos_reales, contextos_por_turno, tokens_prompt, tokens_respuesta, tokens_totales, tiempo_segundos, acierto, estado_final, errores_por_tipo, contexto_decreciente, done_reason_final, respuesta_final_vacia, contexto_tras_dato, contexto_antes_pregunta, turnos_dato_a_pregunta, dato_sobre_nivel, turnos_relleno_cortados, respuesta_final, detalle_error, temperatura, max_tokens_respuesta, num_ctx`.
 
